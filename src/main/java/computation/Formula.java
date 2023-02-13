@@ -68,4 +68,6 @@ interface TotalFormulaProvider {
     FormulaProvider<OmegaOrLine, LineAssertionPair> lineUpdateFormulaProvider();
     FormulaProvider<OmegaOrLine, Assertion> assertionFormulaProvider();
 
+    FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider();
+
 }

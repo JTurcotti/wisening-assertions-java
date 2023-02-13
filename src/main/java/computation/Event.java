@@ -40,7 +40,7 @@ class Omega implements Event, OmegaOrLine {
 class Line implements Event, OmegaOrLine {
 }
 
-class Assertion implements Event {
+class Assertion implements Event, Dependency {
 }
 
 record LineAssertionPair(Line line, Assertion assertion) implements Event {}

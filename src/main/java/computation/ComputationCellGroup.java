@@ -58,4 +58,9 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> i
     public void passMessage(Result event, MsgT msg) {
         getCellForEvent(event).passMessage(event, msg);
     }
+
+    @Override
+    public void passMessageToAll(MsgT msg) {
+        cells.forEach(cell -> cell.passMessageToAll(msg));
+    }
 }

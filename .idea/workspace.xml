@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="initial commit - maven project and some ComputationNetwork skeletons">
-      <change afterPath="$PROJECT_DIR$/src/main/java/computation/Config.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/computation/MessageProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add message passing to branches and lines to handle more events, and other improvements like configging">
       <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" afterDir="false" />
@@ -71,7 +67,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
-      <workItem from="1676223267589" duration="33827000" />
+      <workItem from="1676223267589" duration="35039000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -80,7 +76,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676302757956</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add message passing to branches and lines to handle more events, and other improvements like configging">
+      <created>1676314088774</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1676314088774</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -99,6 +102,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit - maven project and some ComputationNetwork skeletons" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial commit - maven project and some ComputationNetwork skeletons" />
+    <MESSAGE value="add message passing to branches and lines to handle more events, and other improvements like configging" />
+    <option name="LAST_COMMIT_MESSAGE" value="add message passing to branches and lines to handle more events, and other improvements like configging" />
   </component>
 </project>

@@ -102,6 +102,11 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> implem
         getOrCreateRow(event).passMessage(msg);
     }
 
+    @Override
+    public void passMessageToAll(MsgT msg) {
+        store.forEach(((ignoredResult, row) -> row.passMessage(msg)));
+    }
+
     /**
      * Get the row corresponding to an event
      *

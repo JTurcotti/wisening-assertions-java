@@ -2,7 +2,17 @@ package computation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
+
 import static computation.Config.*;
+
+interface ExecutionSupervisor {
+    boolean executeAssertion(Assertion assertion);
+
+    void notifyAssertionPass(Assertion assertion);
+
+    void notifyBranchTaken(Pi branch, boolean direction);
+}
 
 interface ComputationRow<Dep extends Dependency, Result extends Event, MsgT> {
     float getVal();
@@ -15,18 +25,23 @@ interface RowProvider<Dep extends Dependency, Result extends Event, MsgT> {
     float get(Result event);
     ComputationRow<Dep, Result, MsgT> getRow(Result event, ComputationRow<? super Result, ?, ?> requester);
     void passMessage(Result event, MsgT msg);
+    void passMessageToAll(MsgT msg);
 }
 
-public class ComputationNetwork {
+public class ComputationNetwork implements ExecutionSupervisor {
 
-    final RowProvider<None, Pi, BranchTaken> piComputationCells;
-    final RowProvider<PiOrPhi, Phi, None> phiComputationCells;
-    final RowProvider<PiOrPhi, Beta, None> betaComputationCells;
-    final RowProvider<BetaOrEta, Eta, None> etaComputationCells;
-    final RowProvider<AlphaOrBeta, Alpha, None> alphaComputationCells;
-    final RowProvider<AlphaOrBetaOrEta, Omega, None> omegaComputationCells;
-    final RowProvider<None, Line, AssertionPass> lineComputationCells;
-    final RowProvider<OmegaOrLine, Assertion, None> assertionComputationCells;
+    private final RowProvider<None, Pi, BranchTaken> piComputationCells;
+    private final RowProvider<PiOrPhi, Phi, None> phiComputationCells;
+    private final RowProvider<PiOrPhi, Beta, None> betaComputationCells;
+    private final RowProvider<BetaOrEta, Eta, None> etaComputationCells;
+    private final RowProvider<AlphaOrBeta, Alpha, None> alphaComputationCells;
+    private final RowProvider<AlphaOrBetaOrEta, Omega, None> omegaComputationCells;
+    private final RowProvider<None, Line, AssertionPass> lineComputationCells;
+    private final RowProvider<OmegaOrLine, Assertion, None> assertionComputationCells;
+
+    private final FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider;
+
+    private final Random randomness = new Random();
 
 
     public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
@@ -56,6 +71,7 @@ public class ComputationNetwork {
         assertionComputationCells =
                 new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
                         formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
+        assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
 
@@ -68,6 +84,8 @@ public class ComputationNetwork {
             case Eta ignored -> ((RowProvider<?, Result, ?>) etaComputationCells);
             case Alpha ignored -> ((RowProvider<?, Result, ?>) alphaComputationCells);
             case Omega ignored -> ((RowProvider<?, Result, ?>) omegaComputationCells);
+            case Line ignored -> ((RowProvider<?, Result, ?>) lineComputationCells);
+            case Assertion ignored -> ((RowProvider<?, Result, ?>) assertionComputationCells);
             default -> throw new IllegalStateException("Unexpected Event value: " + event);
         };
     }
@@ -78,5 +96,21 @@ public class ComputationNetwork {
 
     public float get(Event event) {
         return getCellGroup(event).get(event);
+    }
+
+    @Override
+    public boolean executeAssertion(Assertion assertion) {
+        float assertion_freq = assertionCorrectnessToFrequencyProvider.get(assertion).compute(this::get);
+        return randomness.nextFloat() <= assertion_freq;
+    }
+
+    @Override
+    public void notifyAssertionPass(Assertion assertion) {
+        lineComputationCells.passMessageToAll(new AssertionPass(assertion));
+    }
+
+    @Override
+    public void notifyBranchTaken(Pi branch, boolean direction) {
+        piComputationCells.passMessage(branch, new BranchTaken(direction));
     }
 }
