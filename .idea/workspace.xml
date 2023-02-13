@@ -4,18 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/jturcotti/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="initial commit - maven project and some ComputationNetwork skeletons">
+      <change afterPath="$PROJECT_DIR$/src/main/java/computation/Config.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/computation/MessageProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/Formula.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/Formula.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +59,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "Debugger_Data_Views_Java",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -73,11 +71,34 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
-      <workItem from="1676223267589" duration="21548000" />
+      <workItem from="1676223267589" duration="33827000" />
     </task>
+    <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
+      <created>1676302757956</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1676302757956</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit - maven project and some ComputationNetwork skeletons" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial commit - maven project and some ComputationNetwork skeletons" />
   </component>
 </project>

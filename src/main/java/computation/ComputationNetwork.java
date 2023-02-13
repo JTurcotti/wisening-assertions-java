@@ -1,50 +1,78 @@
 package computation;
 
-interface ComputationRow<Dep extends Dependency, Result extends Event> {
+import org.jetbrains.annotations.NotNull;
+
+import static computation.Config.*;
+
+interface ComputationRow<Dep extends Dependency, Result extends Event, MsgT> {
     float getVal();
     void notifyDependeesUpdated();
-    void notifyNoLongerDependee(ComputationRow<? super Result, ?> formerDependerRow);
+    void notifyNoLongerDependee(ComputationRow<? super Result, ?, ?> formerDependerRow);
+    void passMessage(MsgT msg);
 }
 
-interface RowProvider<Dep extends Dependency, Result extends Event> {
+interface RowProvider<Dep extends Dependency, Result extends Event, MsgT> {
     float get(Result event);
-    ComputationRow<Dep, Result> getRow(Result event, ComputationRow<? super Result, ?> requester);
+    ComputationRow<Dep, Result, MsgT> getRow(Result event, ComputationRow<? super Result, ?, ?> requester);
+    void passMessage(Result event, MsgT msg);
 }
 
 public class ComputationNetwork {
 
-    final ComputationCellGroup<None, Pi> piComputationCells;
-    final ComputationCellGroup<PiOrPhi, Phi> phiComputationCells;
-    final ComputationCellGroup<PiOrPhi, Beta> betaComputationCells;
-    final ComputationCellGroup<BetaOrEta, Eta> etaComputationCells;
-    final ComputationCellGroup<AlphaOrBeta, Alpha> alphaComputationCells;
-    final ComputationCellGroup<AlphaOrBetaOrEta, Omega> omegaComputationCells;
+    final RowProvider<None, Pi, BranchTaken> piComputationCells;
+    final RowProvider<PiOrPhi, Phi, None> phiComputationCells;
+    final RowProvider<PiOrPhi, Beta, None> betaComputationCells;
+    final RowProvider<BetaOrEta, Eta, None> etaComputationCells;
+    final RowProvider<AlphaOrBeta, Alpha, None> alphaComputationCells;
+    final RowProvider<AlphaOrBetaOrEta, Omega, None> omegaComputationCells;
+    final RowProvider<None, Line, AssertionPass> lineComputationCells;
+    final RowProvider<OmegaOrLine, Assertion, None> assertionComputationCells;
 
 
-    public ComputationNetwork(TotalFormulaProvider formulaProvider) {
-        piComputationCells = new ComputationCellGroup<>(this, Pi.defaultValue, formulaProvider.piFormulaProvider());
-        phiComputationCells = new ComputationCellGroup<>(this, Phi.defaultValue, formulaProvider.phiFormulaProvider());
-        betaComputationCells = new ComputationCellGroup<>(this, Beta.defaultValue, formulaProvider.betaFormulaProvider());
-        etaComputationCells = new ComputationCellGroup<>(this, Eta.defaultValue, formulaProvider.etaFormulaProvider());
-        alphaComputationCells = new ComputationCellGroup<>(this, Alpha.defaultValue, formulaProvider.alphaFormulaProvider());
-        omegaComputationCells = new ComputationCellGroup<>(this, Omega.defaultValue, formulaProvider.omegaFormulaProvider());
+    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
+        piComputationCells =
+                new ComputationCellGroup<>(this, PI_COLD_VALUE,
+                        new ErrorFormulaProvider<>(), BranchMessageProcessor::new);
+        phiComputationCells =
+                new ComputationCellGroup<>(this, PHI_COLD_VALUE,
+                        formulaProvider.phiFormulaProvider(), NoopMessageProcessor::new);
+        betaComputationCells =
+                new ComputationCellGroup<>(this, BETA_COLD_VALUE,
+                        formulaProvider.betaFormulaProvider(), NoopMessageProcessor::new);
+        etaComputationCells =
+                new ComputationCellGroup<>(this, ETA_COLD_VALUE,
+                        formulaProvider.etaFormulaProvider(), NoopMessageProcessor::new);
+        alphaComputationCells =
+                new ComputationCellGroup<>(this, ALPHA_COLD_VALUE,
+                        formulaProvider.alphaFormulaProvider(), NoopMessageProcessor::new);
+        omegaComputationCells =
+                new ComputationCellGroup<>(this, OMEGA_COLD_VALUE,
+                        formulaProvider.omegaFormulaProvider(), NoopMessageProcessor::new);
+        lineComputationCells =
+                new ComputationCellGroup<>(this, LINE_CORRECTNESS_COLD_VALUE,
+                        new ErrorFormulaProvider<>(),
+                        line -> new AssertionPassMessageProcessor(
+                                formulaProvider.lineUpdateFormulaProvider(), this, line));
+        assertionComputationCells =
+                new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
+                        formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
     }
 
 
     @SuppressWarnings("unchecked")
-    private <Result extends Event> ComputationCellGroup<?, Result> getCellGroup(Result event) {
+    private <Result extends Event> RowProvider<?, Result, ?> getCellGroup(Result event) {
         return switch (event) {
-            case Pi ignored -> ((ComputationCellGroup<?, Result>) piComputationCells);
-            case Phi ignored -> ((ComputationCellGroup<?, Result>) phiComputationCells);
-            case Beta ignored -> ((ComputationCellGroup<?, Result>) betaComputationCells);
-            case Eta ignored -> ((ComputationCellGroup<?, Result>) etaComputationCells);
-            case Alpha ignored -> ((ComputationCellGroup<?, Result>) alphaComputationCells);
-            case Omega ignored -> ((ComputationCellGroup<?, Result>) omegaComputationCells);
+            case Pi ignored -> ((RowProvider<?, Result, ?>) piComputationCells);
+            case Phi ignored -> ((RowProvider<?, Result, ?>) phiComputationCells);
+            case Beta ignored -> ((RowProvider<?, Result, ?>) betaComputationCells);
+            case Eta ignored -> ((RowProvider<?, Result, ?>) etaComputationCells);
+            case Alpha ignored -> ((RowProvider<?, Result, ?>) alphaComputationCells);
+            case Omega ignored -> ((RowProvider<?, Result, ?>) omegaComputationCells);
             default -> throw new IllegalStateException("Unexpected Event value: " + event);
         };
     }
 
-    <Result extends Event> ComputationRow<?, Result> getRow(Result event, ComputationRow<? super Result, ?>requester) {
+    <Result extends Event> ComputationRow<?, Result, ?> getRow(Result event, ComputationRow<? super Result, ?, ?>requester) {
         return getCellGroup(event).getRow(event, requester);
     }
 

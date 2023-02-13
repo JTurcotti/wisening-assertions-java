@@ -12,27 +12,35 @@ interface AlphaOrBeta extends Dependency {}
 
 interface AlphaOrBetaOrEta extends Dependency {}
 
+interface OmegaOrLine extends Dependency {}
+
+/**
+ * This interface has no implementations. That's the point.
+ */
 interface None extends Dependency {}
 
 class Pi implements Event, PiOrPhi {
-    static final float defaultValue = 0.5f;
+
 }
 class Phi implements Event, PiOrPhi {
-    static final float defaultValue = 0.0f;
 }
 
 class Beta implements Event, AlphaOrBeta, BetaOrEta, AlphaOrBetaOrEta {
-    static final float defaultValue = 0.0f;
 }
 
 class Alpha implements Event, AlphaOrBeta, AlphaOrBetaOrEta {
-    static final float defaultValue = 0.0f;
 }
 
 class Eta implements Event, BetaOrEta, AlphaOrBetaOrEta {
-    static final float defaultValue = 0.0f;
 }
 
-class Omega implements Event {
-    static final float defaultValue = 0.0f;
+class Omega implements Event, OmegaOrLine {
 }
+
+class Line implements Event, OmegaOrLine {
+}
+
+class Assertion implements Event {
+}
+
+record LineAssertionPair(Line line, Assertion assertion) implements Event {}

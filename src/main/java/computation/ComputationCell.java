@@ -7,29 +7,40 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class ComputationCell<Dep extends Dependency, Result extends Event> implements RowProvider<Dep, Result> {
+import static computation.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 
-    static final float FRESH_VAL_THRESHOLD = 0.001f;
+class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> implements RowProvider<Dep, Result, MsgT> {
+
     private final ComputationNetwork parentNetwork;
     private final float defaultVal;
     private final FormulaProvider<Dep, Result> formulaProvider;
+    private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
-
-    ComputationCell(ComputationNetwork parentNetwork, float defaultVal, FormulaProvider<Dep, Result> formulaProvider) {
+    ComputationCell(ComputationNetwork parentNetwork,
+                    float defaultVal,
+                    FormulaProvider<Dep, Result> formulaProvider,
+                    MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
         this.parentNetwork = parentNetwork;
         this.defaultVal = defaultVal;
         this.formulaProvider = formulaProvider;
+        this.messageProcessorProducer = messageProcessorProducer;
     }
 
-    private class Row implements ComputationRow<Dep, Result> {
+    private class Row implements ComputationRow<Dep, Result, MsgT> {
         boolean initialized = false;
         private Formula<Dep> formula;
         private float val = defaultVal;
-        private final Set<ComputationRow<? super Result, ?>> dependers = new HashSet<>();
-        private final Map<Dep, ComputationRow<?, ? extends Dep>> dependees = new HashMap<>();
+        private final Set<ComputationRow<? super Result, ?, ?>> dependers = new HashSet<>();
+        private final Map<Dep, ComputationRow<?, ? extends Dep, ?>> dependees = new HashMap<>();
         private final AtomicBoolean dependeesUpdated = new AtomicBoolean(false);
         private boolean dependeesUpdatedSnapshot;
+        private final MessageProcessor<MsgT> messageProcessor;
 
+        private Row(Result event) {
+            messageProcessor = messageProcessorProducer.produce(event);
+        }
+
+        @Override
         public void notifyDependeesUpdated() {
             dependeesUpdated.set(true);
         }
@@ -49,17 +60,20 @@ class ComputationCell<Dep extends Dependency, Result extends Event> implements R
             formulaUpdatedSnapshot = formulaUpdated.getAndSet(false);
         }
 
-        public void notifyNoLongerDependee(ComputationRow<? super Result, ?> formerDependerRow) {
+        @Override
+        public void notifyNoLongerDependee(ComputationRow<? super Result, ?, ?> formerDependerRow) {
             dependers.remove(formerDependerRow);
         }
 
+        @Override
+        public void passMessage(MsgT msg) {
+            messageProcessor.passMessage(msg);
+        }
+
+        @Override
         public float getVal() {
             return val;
         }
-    }
-
-    private Row defaultRow(Result event) {
-        return new Row();
     }
 
     private final Map<Result, Row> store = new ConcurrentHashMap<>();
@@ -68,14 +82,24 @@ class ComputationCell<Dep extends Dependency, Result extends Event> implements R
         return store.size();
     }
 
+    private Row getOrCreateRow(Result event) {
+        return store.computeIfAbsent(event, Row::new);
+    }
+
     /**
      * Get a value for an event known to be stored in this cell -
      * WARNING: use `getRow` if you're another row and want to be notified of updates
      * @param event
      * @return
      */
+    @Override
     public float get(Result event) {
-        return store.computeIfAbsent(event, this::defaultRow).val;
+        return getOrCreateRow(event).getVal();
+    }
+
+    @Override
+    public void passMessage(Result event, MsgT msg) {
+        getOrCreateRow(event).passMessage(msg);
     }
 
     /**
@@ -85,8 +109,9 @@ class ComputationCell<Dep extends Dependency, Result extends Event> implements R
      * @param requester the row requesting this event
      * @return
      */
-    public Row getRow(Result event, ComputationRow<? super Result, ?> requester) {
-        Row row = store.computeIfAbsent(event, this::defaultRow);
+    @Override
+    public Row getRow(Result event, ComputationRow<? super Result, ?, ?> requester) {
+        Row row = getOrCreateRow(event);
         row.dependers.add(requester);
         return row;
     }
@@ -123,17 +148,26 @@ class ComputationCell<Dep extends Dependency, Result extends Event> implements R
                     }
                 });
             }
+
+            float oldVal = row.val;
+
+            //process any messages that might be waiting on this row
+            row.val = row.messageProcessor.processMessages(oldVal);
+
             //if this row had its formula or its dependees updated, or if it is only now being initialized,
-            //recompute its value and possible notify its dependers
-            if (row.formulaUpdatedSnapshot || row.dependeesUpdatedSnapshot || !row.initialized) {
-                float oldVal = row.val;
+            //recompute its value with the contained formula
+            if (row.formulaUpdatedSnapshot ||
+                    row.dependeesUpdatedSnapshot ||
+                    !row.initialized) {
                 row.val = row.formula.compute(dep -> row.dependees.computeIfAbsent(dep, d -> {
                             throw new IllegalStateException("dependee " + d + " should not be missing from table");
                         }
                 ).getVal());
-                if (Math.abs(oldVal - row.val) >= FRESH_VAL_THRESHOLD) {
-                    row.dependers.forEach(depender -> depender.notifyDependeesUpdated());
-                }
+            }
+
+            //if value was updated significantly, notify dependers
+            if (Math.abs(oldVal - row.val) >= COMPUTATION_CELL_FRESH_VAL_TRESHOLD) {
+                row.dependers.forEach(depender -> depender.notifyDependeesUpdated());
             }
 
             row.initialized = true;
