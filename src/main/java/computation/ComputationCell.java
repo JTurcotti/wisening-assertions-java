@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static computation.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 
-class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> implements RowProvider<Dep, Result, MsgT> {
+class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT> {
 
     private final ComputationNetwork parentNetwork;
     private final float defaultVal;
@@ -119,6 +119,13 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> implem
         Row row = getOrCreateRow(event);
         row.dependers.add(requester);
         return row;
+    }
+
+    @Override
+    public void run() {
+        while (!isInterrupted()) {
+            performCycle();
+        }
     }
 
     void performCycle() {

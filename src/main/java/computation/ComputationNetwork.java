@@ -3,6 +3,7 @@ package computation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static computation.Config.*;
 
@@ -28,16 +29,27 @@ interface RowProvider<Dep extends Dependency, Result extends Event, MsgT> {
     void passMessageToAll(MsgT msg);
 }
 
-public class ComputationNetwork implements ExecutionSupervisor {
+public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
-    private final RowProvider<None, Pi, BranchTaken> piComputationCells;
-    private final RowProvider<PiOrPhi, Phi, None> phiComputationCells;
-    private final RowProvider<PiOrPhi, Beta, None> betaComputationCells;
-    private final RowProvider<BetaOrEta, Eta, None> etaComputationCells;
-    private final RowProvider<AlphaOrBeta, Alpha, None> alphaComputationCells;
-    private final RowProvider<AlphaOrBetaOrEta, Omega, None> omegaComputationCells;
-    private final RowProvider<None, Line, AssertionPass> lineComputationCells;
-    private final RowProvider<OmegaOrLine, Assertion, None> assertionComputationCells;
+    private final ComputationCellGroup<None, Pi, BranchTaken> piComputationCells;
+    private final ComputationCellGroup<PiOrPhi, Phi, None> phiComputationCells;
+    private final ComputationCellGroup<PiOrPhi, Beta, None> betaComputationCells;
+    private final ComputationCellGroup<BetaOrEta, Eta, None> etaComputationCells;
+    private final ComputationCellGroup<AlphaOrBeta, Alpha, None> alphaComputationCells;
+    private final ComputationCellGroup<AlphaOrBetaOrEta, Omega, None> omegaComputationCells;
+    private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
+    private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
+
+    private void forEach(Consumer<ComputationCellGroup> action) {
+        action.accept(piComputationCells);
+        action.accept(phiComputationCells);
+        action.accept(betaComputationCells);
+        action.accept(etaComputationCells);
+        action.accept(alphaComputationCells);
+        action.accept(omegaComputationCells);
+        action.accept(lineComputationCells);
+        action.accept(assertionComputationCells);
+    }
 
     private final FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider;
 
@@ -112,5 +124,12 @@ public class ComputationNetwork implements ExecutionSupervisor {
     @Override
     public void notifyBranchTaken(Pi branch, boolean direction) {
         piComputationCells.passMessage(branch, new BranchTaken(direction));
+    }
+
+    @Override
+    public void run() {
+        forEach(Thread::start);
+        while (!isInterrupted()) {}
+        forEach(Thread::interrupt);
     }
 }

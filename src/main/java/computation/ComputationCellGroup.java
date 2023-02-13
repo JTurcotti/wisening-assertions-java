@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static computation.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
-class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> implements RowProvider<Dep, Result, MsgT> {
+class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {
     private final ComputationNetwork parentNetwork;
     private final float defaultVal;
     private final FormulaProvider<Dep, Result> formulaProvider;
@@ -37,6 +37,9 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> i
                 ComputationCell<Dep, Result, MsgT> newCell =
                         new ComputationCell<>(parentNetwork, defaultVal, formulaProvider, messageProcessorProducer);
                 cells.add(newCell);
+                if (isAlive()) {
+                    newCell.start();
+                }
                 target = newCell;
             }
             cellTable.put(e, target);
@@ -62,5 +65,12 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> i
     @Override
     public void passMessageToAll(MsgT msg) {
         cells.forEach(cell -> cell.passMessageToAll(msg));
+    }
+
+    @Override
+    public void run() {
+        cells.forEach(Thread::start);
+        while (!isInterrupted()) {}
+        cells.forEach(Thread::interrupt);
     }
 }
