@@ -29,6 +29,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     private ComputationCell<Dep, Result, MsgT> getCellForEvent(Result event) {
         return cellTable.computeIfAbsent(event, e -> {
+            //guaranteed to be performed atomically by the ConcurrentHashMap implementation
             ComputationCell<Dep, Result, MsgT> smallest = Collections.min(cells, Comparator.comparingInt(ComputationCell::size));
             ComputationCell<Dep, Result, MsgT> target;
             if (smallest.size() < COMPUTATION_CELL_GROUP_MAX_CELL_SIZE) {
