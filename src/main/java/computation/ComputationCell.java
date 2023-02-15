@@ -28,8 +28,8 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
 
     private class Row implements ComputationRow<Dep, Result, MsgT> {
         boolean initialized = false;
-        private Formula<Dep> formula;
-        private float val = defaultVal;
+        private volatile Formula<Dep> formula;
+        private volatile float val = defaultVal;
         private final Set<ComputationRow<? super Result, ?, ?>> dependers = new HashSet<>();
         private final Map<Dep, ComputationRow<?, ? extends Dep, ?>> dependees = new HashMap<>();
         private final AtomicBoolean dependeesUpdated = new AtomicBoolean(false);
