@@ -1,10 +1,13 @@
-package computation;
+package supervisor;
 
+import core.dependencies.Dependency;
+import core.events.Event;
+import core.formula.FormulaProvider;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static computation.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
+import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
 class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {

@@ -4,12 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add top-level ExecutionSupervisor contract">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="comment">
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/AlphaOrBeta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/AlphaOrBetaOrEta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/BetaOrEta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/Dependency.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/None.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/OmegaOrLine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/PiOrPhi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Alpha.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Assertion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Beta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Eta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Line.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/LineAssertionPair.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Omega.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Phi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/events/Pi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/formula/ConstantAssertionFreqFormulaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/formula/ConstantFormulaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/formula/FormulaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/formula/TotalFormulaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/supervisor/ExecutionSupervisor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/jturcotti/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jturcotti/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/events/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/Formula.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/Formula.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/computation/MessageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/MessageProcessor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +45,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -87,7 +114,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
-      <workItem from="1676223267589" duration="37335000" />
+      <workItem from="1676223267589" duration="45051000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -110,7 +137,28 @@
       <option name="project" value="LOCAL" />
       <updated>1676315149774</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="add thread running structure">
+      <created>1676317703478</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1676317703478</updated>
+    </task>
+    <task id="LOCAL-00005" summary="make computationcell row data volatile">
+      <created>1676472718653</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1676472718653</updated>
+    </task>
+    <task id="LOCAL-00006" summary="comment">
+      <created>1676472763894</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1676472763894</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -131,6 +179,9 @@
     <MESSAGE value="initial commit - maven project and some ComputationNetwork skeletons" />
     <MESSAGE value="add message passing to branches and lines to handle more events, and other improvements like configging" />
     <MESSAGE value="add top-level ExecutionSupervisor contract" />
-    <option name="LAST_COMMIT_MESSAGE" value="add top-level ExecutionSupervisor contract" />
+    <MESSAGE value="add thread running structure" />
+    <MESSAGE value="make computationcell row data volatile" />
+    <MESSAGE value="comment" />
+    <option name="LAST_COMMIT_MESSAGE" value="comment" />
   </component>
 </project>

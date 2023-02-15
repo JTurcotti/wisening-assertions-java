@@ -1,4 +1,4 @@
-package computation;
+package supervisor;
 
 public class Config {
     static final int BRANCH_MONITORING_WINDOW_SIZE = 10;

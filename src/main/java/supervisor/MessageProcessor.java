@@ -1,12 +1,16 @@
-package computation;
+package supervisor;
 
+import core.dependencies.None;
+import core.dependencies.OmegaOrLine;
+import core.events.*;
+import core.formula.FormulaProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static computation.Config.BRANCH_MONITORING_WINDOW_SIZE;
+import static supervisor.Config.BRANCH_MONITORING_WINDOW_SIZE;
 
 interface MessageProcessorProducer<Result extends Event, MsgT> {
     MessageProcessor<MsgT> produce(Result event);

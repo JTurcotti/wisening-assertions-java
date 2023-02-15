@@ -1,4 +1,9 @@
-package computation;
+package supervisor;
+
+import core.dependencies.Dependency;
+import core.events.Event;
+import core.formula.Formula;
+import core.formula.FormulaProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static computation.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
+import static supervisor.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 
 class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT> {
 
