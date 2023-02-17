@@ -1,6 +1,6 @@
 package core.formula;
 
-import core.events.Event;
+import core.codestructure.events.Event;
 import core.dependencies.Dependency;
 
 import java.util.HashSet;

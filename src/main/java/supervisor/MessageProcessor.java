@@ -1,8 +1,8 @@
 package supervisor;
 
+import core.codestructure.events.*;
 import core.dependencies.None;
 import core.dependencies.OmegaOrLine;
-import core.events.*;
 import core.formula.FormulaProvider;
 import org.jetbrains.annotations.NotNull;
 

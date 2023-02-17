@@ -1,7 +1,7 @@
 package core.formula;
 
+import core.codestructure.events.*;
 import core.dependencies.*;
-import core.events.*;
 
 public interface TotalFormulaProvider {
     FormulaProvider<PiOrPhi, Phi> phiFormulaProvider();

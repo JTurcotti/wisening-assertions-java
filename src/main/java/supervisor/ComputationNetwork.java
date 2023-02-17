@@ -1,7 +1,7 @@
 package supervisor;
 
+import core.codestructure.events.*;
 import core.dependencies.*;
-import core.events.*;
 import core.formula.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -127,6 +127,4 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         while (!isInterrupted()) {}
         forEach(Thread::interrupt);
     }
-
-    public static Assertion testAssertion = new Assertion();
 }

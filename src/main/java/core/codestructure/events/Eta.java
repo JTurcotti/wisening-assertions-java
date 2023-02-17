@@ -1,4 +1,4 @@
-package core.events;
+package core.codestructure.events;
 
 import core.dependencies.AlphaOrBetaOrEta;
 import core.dependencies.BetaOrEta;
