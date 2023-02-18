@@ -1,6 +1,6 @@
 package supervisor;
 
-import core.codestructure.events.*;
+import core.codemodel.events.*;
 import core.dependencies.*;
 import core.formula.*;
 import org.jetbrains.annotations.NotNull;

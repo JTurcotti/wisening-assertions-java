@@ -1,6 +1,6 @@
 package core.dependencies;
 
-import core.codestructure.events.Event;
+import core.codemodel.events.Event;
 
 public interface Dependency extends Event {}
 

@@ -1,6 +1,6 @@
 package core.formula;
 
-import core.codestructure.events.*;
+import core.codemodel.events.*;
 import core.dependencies.*;
 
 public interface TotalFormulaProvider {

@@ -1,7 +1,7 @@
 package core.formula;
 
 import core.dependencies.Dependency;
-import core.codestructure.events.Event;
+import core.codemodel.events.Event;
 
 import java.util.Set;
 import java.util.function.Function;

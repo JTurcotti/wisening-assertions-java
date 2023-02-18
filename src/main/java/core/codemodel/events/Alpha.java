@@ -1,6 +1,6 @@
-package core.codestructure.events;
+package core.codemodel.events;
 
-import core.codestructure.elements.Procedure;
+import core.codemodel.elements.Procedure;
 import core.dependencies.AlphaOrBeta;
 import core.dependencies.AlphaOrBetaOrEta;
 

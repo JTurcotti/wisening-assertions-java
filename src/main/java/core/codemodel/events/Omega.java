@@ -1,4 +1,4 @@
-package core.codestructure.events;
+package core.codemodel.events;
 
 import core.dependencies.OmegaOrLine;
 

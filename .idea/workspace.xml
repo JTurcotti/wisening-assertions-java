@@ -4,46 +4,56 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="refactoring into package structure">
-      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/Indexer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/SourcePos.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Arg.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Call.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/CallArgPair.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/CallRetPair.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Procedure.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Ret.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/types/Blame.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/types/Intraflow.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/types/ProcedureType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/util/Disj.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="lots of work">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Ret.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/util/Pair.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/util/Unit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/jturcotti/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/SourcePos.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Arg.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Call.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Call.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/CallArgPair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallArgPair.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/CallRetPair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallRetPair.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Procedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Procedure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/elements/Ret.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Assertion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Assertion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Eta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Line.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Line.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/LineAssertionPair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/LineAssertionPair.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Omega.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Omega.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Phi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Pi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Pi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/types/Blame.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/types/Intraflow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Intraflow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codestructure/types/ProcedureType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/TypecheckedProcedure.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/dependencies/Dependency.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/dependencies/Dependency.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Alpha.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Assertion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Assertion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Beta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Eta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Eta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Event.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Line.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Line.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/LineAssertionPair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/LineAssertionPair.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Omega.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Omega.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Phi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Phi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/events/Pi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codestructure/events/Pi.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ConstantAssertionFreqFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ConstantAssertionFreqFormulaProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ConstantFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ConstantFormulaProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/FormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/FormulaProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/TotalFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/TotalFormulaProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ExecutionSupervisor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ExecutionSupervisor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/MessageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/MessageProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +64,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
+        <option value="Record" />
         <option value="Interface" />
         <option value="Class" />
       </list>
@@ -123,7 +134,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
-      <workItem from="1676223267589" duration="71236000" />
+      <workItem from="1676223267589" duration="108881000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -174,7 +185,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676473450882</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="lots of work">
+      <created>1676661107292</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1676661107292</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,20 +217,39 @@
     <MESSAGE value="make computationcell row data volatile" />
     <MESSAGE value="comment" />
     <MESSAGE value="refactoring into package structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactoring into package structure" />
+    <MESSAGE value="lots of work" />
+    <option name="LAST_COMMIT_MESSAGE" value="lots of work" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
-          <line>13</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.UnsupportedOperationException" package="java.lang" />
           <option name="timeStamp" value="5" />
         </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.IndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="14" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.NullPointerException" package="java.lang" />
+          <option name="timeStamp" value="20" />
+        </breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
+          <line>293</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java</url>
+          <line>50</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
+          <line>235</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

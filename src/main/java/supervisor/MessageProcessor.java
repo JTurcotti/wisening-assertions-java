@@ -1,6 +1,6 @@
 package supervisor;
 
-import core.codestructure.events.*;
+import core.codemodel.events.*;
 import core.dependencies.None;
 import core.dependencies.OmegaOrLine;
 import core.formula.FormulaProvider;

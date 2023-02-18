@@ -1,6 +1,6 @@
-package core.codestructure.events;
+package core.codemodel.events;
 
-import core.codestructure.types.Blame;
+import core.codemodel.types.Blame;
 import core.dependencies.OmegaOrLine;
 
 public record Line(int num) implements Event, OmegaOrLine, Blame.Site {

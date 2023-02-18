@@ -1,14 +1,15 @@
-package core.codestructure.types;
+package analyzer;
 
-import core.codestructure.elements.CallArgPair;
-import core.codestructure.elements.Procedure;
-import core.codestructure.elements.Ret;
-import core.codestructure.events.Assertion;
+import core.codemodel.elements.CallArgPair;
+import core.codemodel.elements.Procedure;
+import core.codemodel.elements.Ret;
+import core.codemodel.events.Assertion;
+import core.codemodel.types.Blame;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProcedureType {
+public class TypecheckedProcedure {
 
     public int numArgs;
 

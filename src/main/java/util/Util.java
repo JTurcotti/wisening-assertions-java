@@ -1,7 +1,9 @@
 package util;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -23,5 +25,14 @@ public class Util {
                     }
                 }
         );
+    }
+
+    public static <K, V, V2> Map<K, V2> mapImmutableMap(Map<K, V> map, Function<V, V2> f) {
+        return map.keySet().stream().collect(Collectors.toUnmodifiableMap(Function.identity(),
+                k -> f.apply(map.get(k))));
+    }
+
+    public static <K, V> Map<K, V> copyImmutableMap(Map<K, V> map) {
+        return mapImmutableMap(map, Function.identity());
     }
 }

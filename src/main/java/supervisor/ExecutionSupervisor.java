@@ -1,7 +1,7 @@
 package supervisor;
 
-import core.codestructure.events.Assertion;
-import core.codestructure.events.Pi;
+import core.codemodel.events.Assertion;
+import core.codemodel.events.Pi;
 
 public interface ExecutionSupervisor {
     boolean executeAssertion(Assertion assertion);

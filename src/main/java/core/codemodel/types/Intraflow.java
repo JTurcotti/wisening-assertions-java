@@ -1,7 +1,7 @@
-package core.codestructure.types;
+package core.codemodel.types;
 
-import core.codestructure.events.Phi;
-import core.codestructure.events.Pi;
+import core.codemodel.events.Phi;
+import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Optional;
@@ -59,6 +59,24 @@ public class Intraflow {
                 .collect(Collectors.toUnmodifiableSet()));
     }
 
+    private Intraflow conjunctAe(AtomicEvent ae) {
+        return switch (ae) {
+            case Phi phi -> conjunctPhi(phi);
+            case SignedPi sp -> conjunctPi(sp.pi(), sp.sign());
+            default -> throw new IllegalArgumentException("Unrecognized Atomic Event " + ae);
+        };
+    }
+
+    private Intraflow conjunctConj(Set<AtomicEvent> conj) {
+        if (conj.isEmpty()) {
+            return new Intraflow(dnf);
+        } else {
+            AtomicEvent ae = Util.choose(conj);
+            return conjunctAe(ae).conjunctConj(conj.stream().filter(s -> !s.equals(ae))
+                    .collect(Collectors.toUnmodifiableSet()));
+        }
+    }
+
     private Optional<Set<AtomicEvent>> conjPairReduction(Set<AtomicEvent> left, Set<AtomicEvent> right) {
         if (left.containsAll(right)) {
             return Optional.of(right);
@@ -106,5 +124,9 @@ public class Intraflow {
         return new Intraflow(Stream.concat(dnf.stream(), other.dnf.stream())
                 .collect(Collectors.toUnmodifiableSet()))
                 .simplify();
+    }
+
+    public Intraflow conjunct(Intraflow other) {
+        return dnf.stream().map(other::conjunctConj).reduce(zero(), Intraflow::disjunct).simplify();
     }
 }
