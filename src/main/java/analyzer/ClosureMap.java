@@ -2,8 +2,6 @@ package analyzer;
 import core.codemodel.elements.*;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtVariable;
-import spoon.reflect.reference.CtVariableReference;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,13 +22,9 @@ public class ClosureMap {
 
         ClosureType closure = new ClosureType(procedure);
 
-        if (procedure.isInterfaceMethod()) {
-            //interface methods have no bodies
-            data.put(procKey, closure);
-            return;
-        }
-
         closure.processStmtList(procedure.body);
+
+        data.put(procKey, closure);
     }
 
     private static class TouchCondition {
@@ -65,7 +59,7 @@ public class ClosureMap {
         }
     }
 
-    private class ClosureType {
+    private class ClosureType implements Cloneable {
         final CtProcedure procedure;
         final Set<ClosedOver> reads = new HashSet<>();
         final Map<ClosedOver, TouchCondition> writes = new HashMap<>();
@@ -120,8 +114,11 @@ public class ClosureMap {
                 }
                 case CtInvocation<?> i ->
                     processRead(i);
-                case CtLocalVariable<?> v ->
-                    reads.remove(parentAnalyzer.varIndexer.lookupOrCreate(v));
+                case CtLocalVariable<?> lv -> {
+                    Variable v = parentAnalyzer.varIndexer.lookupOrCreate(lv);
+                    reads.remove(v);
+                    writes.remove(v);
+                }
                 case CtCFlowBreak ignored ->
                     throw new IllegalStateException("Unexpected statement " + stmt);
                 case CtSwitch<?> s -> {
@@ -134,9 +131,8 @@ public class ClosureMap {
                 }
                 case CtSynchronized s ->
                     processStmtList(s.getBlock());
-                case CtUnaryOperator<?> u -> {
+                case CtUnaryOperator<?> u ->
                     processRead(u);
-                }
                 case CtTry t ->
                     //TODO: handle abnormal control flow through exceptions
                     processStmtList(t.getBody());
@@ -275,9 +271,8 @@ public class ClosureMap {
                     reads.remove(v);
                     writes.merge(v, condition, TouchCondition::or);
                 }
-                case CtThisAccess<?> ignored -> {
+                case CtThisAccess<?> ignored ->
                     writes.merge(new Self(), condition, TouchCondition::or);
-                }
                 case CtInvocation<?> ignored -> {
                     /*
                     this is a case like a.b().c() - which could technically behave as a write to a if b() returns

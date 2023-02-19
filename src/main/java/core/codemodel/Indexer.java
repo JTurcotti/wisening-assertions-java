@@ -5,7 +5,6 @@ import spoon.reflect.cu.SourcePositionHolder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -32,6 +31,10 @@ public class Indexer<OutputT, IndexingT, AuxT> {
 
     public OutputT next(IndexingT ind, AuxT aux) {
         OutputT n = next(ind);
+        if (auxMap.values().stream().anyMatch((v -> v == aux))) {
+            //TODO: delete
+            throw new IllegalStateException("aux value duplicated: " + aux);
+        }
         auxMap.put(n, aux);
         return n;
     }
