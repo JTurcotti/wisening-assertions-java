@@ -13,6 +13,32 @@ public class ClosureMap {
     final Map<Procedure, ClosureType> data = new HashMap<>();
     final ProgramAnalyzer parentAnalyzer;
 
+    ClosureType lookupByCall(Call c) {
+        if (parentAnalyzer.procedureOfCall(c).isEmpty()) {
+            throw new IllegalStateException("The parent analyzer does not have a procedure for the call: " + c);
+        }
+        Procedure callProc = parentAnalyzer.procedureOfCall(c).get();
+        if (!data.containsKey(callProc)) {
+            throw new IllegalStateException("Closure map incomplete - no entry for procedure: " + callProc);
+        }
+        return data.get(callProc);
+    }
+
+    public int transitivelyClose() {
+        int rounds = 0;
+        boolean updated = true;
+        while (updated) {
+            rounds++;
+            updated = false;
+            for (ClosureType ct : data.values()) {
+                if (ct.performUpdate()) {
+                    updated = true;
+                }
+            }
+        }
+        return rounds;
+    }
+
     ClosureMap(ProgramAnalyzer parentAnalyzer) {
         this.parentAnalyzer = parentAnalyzer;
     }
@@ -58,6 +84,17 @@ public class ClosureMap {
             return new TouchCondition(Stream.concat(condition.stream(), other.condition.stream())
                     .collect(Collectors.toUnmodifiableSet()));
         }
+
+        boolean satisfied(ClosureMap c) {
+            if (isAlways()) {
+                return true;
+            }
+            return condition.stream().anyMatch(call ->
+                    c.parentAnalyzer.isIntrasourceCall(call) ?
+                            c.lookupByCall(call).writesSelf :
+                            Config.NONLOCAL_METHOD_MUTATES_SELF
+            );
+        }
     }
 
     private class ClosureType implements Cloneable {
@@ -65,6 +102,76 @@ public class ClosureMap {
         final Set<ClosedOver> reads = new HashSet<>();
         final Map<ClosedOver, TouchCondition> writes = new HashMap<>();
         final Set<Call> calls = new HashSet<>();
+        final Set<Call> selfCalls = new HashSet<>();
+
+        boolean readsSelf = false;
+        boolean writesSelf = false;
+
+        Set<Field> fieldReads = new HashSet<>();
+        Set<Field> fieldWrites = new HashSet<>();
+
+        Set<Field> getFieldReads() {
+            //TODO: also include reads from overriding methods
+            return Stream.concat(fieldReads.stream(),
+                    reads.stream().flatMap(c -> {
+                        if (c instanceof Field f) {
+                            return Stream.of(f);
+                        }
+                        return Stream.empty();
+                    })).collect(Collectors.toUnmodifiableSet());
+        }
+
+        boolean readsSelf() {
+            return readsSelf ||
+                    reads.contains(new Self()) ||
+                    !getFieldReads().isEmpty();
+        }
+
+        Set<Field> getFieldWrites() {
+            //TODO: also include writes from overriding methods
+            return Stream.concat(fieldWrites.stream(),
+                    writes.keySet().stream().flatMap(c -> {
+                        if (c instanceof Field f && (writes.get(c).satisfied(ClosureMap.this))) {
+                            return Stream.of(f);
+                        }
+                        return Stream.empty();
+                    })).collect(Collectors.toUnmodifiableSet());
+        }
+
+        boolean writesSelf() {
+            return writesSelf ||
+                    (writes.containsKey(new Self()) && writes.get(new Self()).satisfied(ClosureMap.this)) ||
+                    !getFieldWrites().isEmpty();
+        }
+
+        boolean performUpdate() {
+            boolean updated = false;
+            if (writesSelf != writesSelf()) {
+                updated = true;
+                writesSelf = writesSelf();
+            }
+            if (readsSelf != readsSelf()) {
+                updated = true;
+                readsSelf = readsSelf();
+            }
+            Set<Field> newFieldReads = Stream.concat(getFieldReads().stream(),
+                    selfCalls.stream().flatMap(call ->
+                        lookupByCall(call).getFieldReads().stream()
+                    )).collect(Collectors.toUnmodifiableSet());
+            if (!fieldReads.equals(newFieldReads)) {
+                updated = true;
+                fieldReads = newFieldReads;
+            }
+            Set<Field> newFieldWrites = Stream.concat(getFieldWrites().stream(),
+                    selfCalls.stream().flatMap(call ->
+                            lookupByCall(call).getFieldWrites().stream()
+                    )).collect(Collectors.toUnmodifiableSet());
+            if (!fieldWrites.equals(newFieldWrites)) {
+                updated = true;
+                fieldWrites = newFieldWrites;
+            }
+            return updated;
+        }
 
         ClosureType(CtProcedure procedure) {
             this.procedure = procedure;
@@ -150,7 +257,9 @@ public class ClosureMap {
 
                     data.put(proc, fixpointClosure);
 
-                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w)));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w));
+                    calls.add(call);
+                    selfCalls.add(call);
                 }
                 case CtDo d -> {
                     CtProcedure fixpoint = new CtProcedure(d);
@@ -163,7 +272,9 @@ public class ClosureMap {
 
                     data.put(proc, fixpointClosure);
 
-                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d)));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d));
+                    calls.add(call);
+                    selfCalls.add(call);
                 }
                 case CtFor f -> {
                     CtProcedure fixpoint = new CtProcedure(f);
@@ -178,7 +289,9 @@ public class ClosureMap {
 
                     data.put(proc, fixpointClosure);
 
-                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f)));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
+                    calls.add(call);
+                    selfCalls.add(call);
                 }
                 case CtForEach f -> {
                     CtProcedure fixpoint = new CtProcedure(f);
@@ -191,7 +304,9 @@ public class ClosureMap {
 
                     data.put(proc, fixpointClosure);
 
-                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f)));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
+                    calls.add(call);
+                    selfCalls.add(call);
                 }
                 default ->
                     throw new IllegalStateException("Unexpected statement to process: " + stmt);
@@ -224,6 +339,11 @@ public class ClosureMap {
                 case CtInvocation<?> i -> {
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(i));
                     calls.add(c);
+                    if ((i.getTarget() instanceof CtThisAccess<?> ||
+                            i.getTarget() instanceof CtSuperAccess<?>) &&
+                            parentAnalyzer.isIntrasourceCall(c)) {
+                        selfCalls.add(c);
+                    }
                     processWrite(i.getTarget(), TouchCondition.ifCall(c));
                     processRead(i.getTarget());
                     i.getArguments().forEach(this::processRead);

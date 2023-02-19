@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="loop handling">
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="code smells">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +92,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="3983000" />
+      <workItem from="1676765368190" duration="9799000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -169,7 +171,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676769180026</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="code smells">
+      <created>1676769489185</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1676769489185</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -198,7 +207,8 @@
     <MESSAGE value="start working on closure analysis" />
     <MESSAGE value="fix bugs" />
     <MESSAGE value="loop handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="loop handling" />
+    <MESSAGE value="code smells" />
+    <option name="LAST_COMMIT_MESSAGE" value="code smells" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -215,9 +225,13 @@
           <properties class="java.lang.NullPointerException" package="java.lang" />
           <option name="timeStamp" value="20" />
         </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.IllegalStateException" package="java.lang" />
+          <option name="timeStamp" value="25" />
+        </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>345</line>
+          <line>465</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -227,27 +241,20 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>288</line>
+          <line>408</line>
           <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
-          <line>40</line>
-          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java</url>
           <line>35</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="closures.data.values().stream().max(Comparator.comparingInt(ct -&gt; ct.reads.size() + ct.writes.size() + ct.calls.size())).get()" language="JAVA" custom="java.util.Comparator,java.util.stream.Collectors" />
-        <watch expression="closures.data.values().stream().max(Comparator.comparingInt(ct -&gt; ct.reads.size() + ct.writes.size())).get()" language="JAVA" custom="java.util.Comparator" />
-        <watch expression="closures.data.values().stream().max(Comparator.comparingInt(ct -&gt; ct.reads.size() + ct.writes.size())).get().reads.stream().map(varIndexer::lookupAux).collect(Collectors.toUnmodifiableSet())" language="JAVA" custom="java.util.stream.Collectors,java.util.Comparator" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

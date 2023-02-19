@@ -18,6 +18,7 @@ import util.Unit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ProgramAnalyzer {
     final CtModel model;
@@ -38,9 +39,21 @@ public class ProgramAnalyzer {
         launcher.buildModel();
         model = launcher.getModel();
         model.getElements(new TypeFilter<>(CtMethod.class)).forEach(closures::computeClosureForMethod);
+        int rounds = closures.transitivelyClose();
     }
 
     private void analyzeMethod(CtMethod<?> method) {
     }
 
+    public boolean isIntrasourceCall(Call c) {
+        return callIndexer.lookupAux(c)
+                .flatMap(CtVirtualCall::getProcedureSourcePos)
+                .isPresent();
+    }
+
+    public Optional<Procedure> procedureOfCall(Call c) {
+        return callIndexer.lookupAux(c)
+                .flatMap(CtVirtualCall::getProcedureSourcePos)
+                .flatMap(procedureIndexer::lookup);
+    }
 }
