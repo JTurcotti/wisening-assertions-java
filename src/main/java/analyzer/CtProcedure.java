@@ -57,18 +57,8 @@ public class CtProcedure implements SourcePositionHolder {
         this((CtBodyHolder) method);
     }
 
-    public CtProcedure(CtFor forLoop) {
-        this((CtBodyHolder) forLoop);
-
-    }
-
-    public CtProcedure(CtForEach forEachLoop) {
-        this((CtBodyHolder) forEachLoop);
-
-    }
-
-    public CtProcedure(CtWhile whileLoop) {
-        this((CtBodyHolder) whileLoop);
+    public CtProcedure(CtLoop loop) {
+        this((CtBodyHolder) loop);
 
     }
 }

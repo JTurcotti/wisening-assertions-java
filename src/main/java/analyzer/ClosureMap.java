@@ -2,6 +2,7 @@ package analyzer;
 import core.codemodel.elements.*;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtMethod;
+import util.Util;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -138,9 +139,62 @@ public class ClosureMap {
                     processStmtList(t.getBody());
                 case CtBlock<?> b ->
                     processStmtList(b);
-                default -> {
-                    System.out.println("unhandled stmt: " + stmt);
+                case CtWhile w -> {
+                    CtProcedure fixpoint = new CtProcedure(w);
+                    Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
+
+                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+
+                    fixpointClosure.processStmt(w.getBody());
+                    fixpointClosure.processRead(w.getLoopingExpression());
+
+                    data.put(proc, fixpointClosure);
+
+                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w)));
                 }
+                case CtDo d -> {
+                    CtProcedure fixpoint = new CtProcedure(d);
+                    Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
+
+                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+
+                    fixpointClosure.processRead(d.getLoopingExpression());
+                    fixpointClosure.processStmt(d.getBody());
+
+                    data.put(proc, fixpointClosure);
+
+                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d)));
+                }
+                case CtFor f -> {
+                    CtProcedure fixpoint = new CtProcedure(f);
+                    Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
+
+                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+
+                    fixpointClosure.processRead(f.getExpression());
+                    Util.forEachRev(f.getForUpdate(), fixpointClosure::processStmt);
+                    fixpointClosure.processStmt(f.getBody());
+                    Util.forEachRev(f.getForInit(), fixpointClosure::processStmt);
+
+                    data.put(proc, fixpointClosure);
+
+                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f)));
+                }
+                case CtForEach f -> {
+                    CtProcedure fixpoint = new CtProcedure(f);
+                    Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
+
+                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+
+                    fixpointClosure.processStmt(f.getBody());
+                    fixpointClosure.processStmt(f.getVariable());
+
+                    data.put(proc, fixpointClosure);
+
+                    calls.add(parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f)));
+                }
+                default ->
+                    throw new IllegalStateException("Unexpected statement to process: " + stmt);
             }
             return this;
         }
@@ -168,14 +222,14 @@ public class ClosureMap {
             }
             switch (expr) {
                 case CtInvocation<?> i -> {
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(i);
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(i));
                     calls.add(c);
                     processWrite(i.getTarget(), TouchCondition.ifCall(c));
                     processRead(i.getTarget());
                     i.getArguments().forEach(this::processRead);
                 }
                 case CtConstructorCall<?> cc -> {
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(cc);
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(cc));
                     calls.add(c);
                     cc.getArguments().forEach(this::processRead);
                 }
@@ -231,8 +285,8 @@ public class ClosureMap {
                 case CtExecutableReferenceExpression<?, ?> n -> {
                     //TODO: lambdas... handle them...
                 }
-                default -> {
-                    System.out.println("Unhandled read: " + expr);}
+                default ->
+                    throw new IllegalStateException("Unexpected read to expression: " + expr);
             }
             return this;
         }

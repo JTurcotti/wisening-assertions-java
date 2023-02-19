@@ -10,7 +10,6 @@ import core.codemodel.events.Line;
 import core.codemodel.events.Pi;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
-import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
@@ -24,7 +23,7 @@ public class ProgramAnalyzer {
     final CtModel model;
     final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
     final Indexer<Line, SourcePos, Unit> lineIndexer = new Indexer<>(Line::new);
-    final Indexer.BySourcePos<Call, CtAbstractInvocation<?>> callIndexer = new Indexer.BySourcePos<>(Call::new);
+    final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer = new Indexer.BySourcePos<>(Call::new);
     final Indexer<Pi, SourcePos, Unit> piIndexer = new Indexer<>(Pi::new);
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
     final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);

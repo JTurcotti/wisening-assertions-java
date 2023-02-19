@@ -1,8 +1,7 @@
 package util;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -34,5 +33,13 @@ public class Util {
 
     public static <K, V> Map<K, V> copyImmutableMap(Map<K, V> map) {
         return mapImmutableMap(map, Function.identity());
+    }
+
+    public static <T> void forEachRev(List<T> l, Consumer<T> f) {
+        if (!l.isEmpty()) {
+            for (int i = l.size() - 1; i >= 0; i--) {
+                f.accept(l.get(i));
+            }
+        }
     }
 }
