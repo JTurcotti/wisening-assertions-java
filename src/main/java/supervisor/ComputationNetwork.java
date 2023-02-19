@@ -35,7 +35,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
     private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
 
-    private void forEach(Consumer<ComputationCellGroup> action) {
+    private void forEach(Consumer<ComputationCellGroup<?, ?, ?>> action) {
         action.accept(piComputationCells);
         action.accept(phiComputationCells);
         action.accept(betaComputationCells);

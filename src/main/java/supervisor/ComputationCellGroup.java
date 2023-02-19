@@ -74,7 +74,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
     @Override
     public void run() {
         cells.forEach(Thread::start);
-        while (!isInterrupted()) {}
+        while (!isInterrupted()) {/*noop - intentional infinite loop */}
         cells.forEach(Thread::interrupt);
     }
 }

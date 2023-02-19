@@ -184,7 +184,7 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
 
             //if value was updated significantly, notify dependers
             if (Math.abs(oldVal - row.val) >= COMPUTATION_CELL_FRESH_VAL_TRESHOLD) {
-                row.dependers.forEach(depender -> depender.notifyDependeesUpdated());
+                row.dependers.forEach(ComputationRow::notifyDependeesUpdated);
             }
 
             row.initialized = true;
