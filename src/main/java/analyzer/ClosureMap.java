@@ -24,11 +24,15 @@ public class ClosureMap {
         return data.get(callProc);
     }
 
-    public int transitivelyClose() {
+    public void transitivelyClose() {
         int rounds = 0;
         boolean updated = true;
         while (updated) {
-            rounds++;
+            if (rounds++ > 2 * data.size()) {
+                throw new IllegalStateException("Fixpoint propagation does not seem to be converging; two passes " +
+                        "over the whole data structure (one for overrides and one for calls) should have been enough");
+            }
+
             updated = false;
             for (ClosureType ct : data.values()) {
                 if (ct.performUpdate()) {
@@ -36,7 +40,18 @@ public class ClosureMap {
                 }
             }
         }
-        return rounds;
+    }
+
+    public void determineOverrides() {
+        for (Map.Entry<Procedure, ClosureType> eChild : data.entrySet()) {
+            for (Map.Entry<Procedure, ClosureType> eParent : data.entrySet()) {
+                if (eChild.getValue().equals(eParent.getValue()) ||  //yes this is redundant...
+                        // but I'm relying on the fact that it occurs so... defensive programming?
+                        eChild.getValue().procedure.isOverriding(eParent.getValue().procedure)) {
+                    eParent.getValue().overrides.add(eChild.getValue());
+                }
+            }
+        }
     }
 
     ClosureMap(ProgramAnalyzer parentAnalyzer) {
@@ -44,7 +59,7 @@ public class ClosureMap {
     }
 
     void computeClosureForMethod(CtMethod<?> method) {
-        CtProcedure procedure = new CtProcedure(method);
+        CtProcedure procedure = new CtProcedure(method, parentAnalyzer);
         Procedure procKey = parentAnalyzer.procedureIndexer.lookupOrCreate(procedure);
 
         ClosureType closure = new ClosureType(procedure);
@@ -98,12 +113,23 @@ public class ClosureMap {
     }
 
     private class ClosureType implements Cloneable {
+
+        //the following fields are generated initially for a ClosureType
         final CtProcedure procedure;
         final Set<ClosedOver> reads = new HashSet<>();
         final Map<ClosedOver, TouchCondition> writes = new HashMap<>();
         final Set<Call> calls = new HashSet<>();
         final Set<Call> selfCalls = new HashSet<>();
 
+        //the following utility fields are populated after all
+        //closure types are generated
+
+        //the set of closuretypes that extend/override/implement this closuretype
+        //(including self)
+        final Set<ClosureType> overrides = new HashSet<>(Set.of(this));
+
+        //the following fields are populated by fixpoint propagation
+        //after all closure types are generated
         boolean readsSelf = false;
         boolean writesSelf = false;
 
@@ -111,7 +137,6 @@ public class ClosureMap {
         Set<Field> fieldWrites = new HashSet<>();
 
         Set<Field> getFieldReads() {
-            //TODO: also include reads from overriding methods
             return Stream.concat(fieldReads.stream(),
                     reads.stream().flatMap(c -> {
                         if (c instanceof Field f) {
@@ -128,7 +153,6 @@ public class ClosureMap {
         }
 
         Set<Field> getFieldWrites() {
-            //TODO: also include writes from overriding methods
             return Stream.concat(fieldWrites.stream(),
                     writes.keySet().stream().flatMap(c -> {
                         if (c instanceof Field f && (writes.get(c).satisfied(ClosureMap.this))) {
@@ -146,15 +170,22 @@ public class ClosureMap {
 
         boolean performUpdate() {
             boolean updated = false;
-            if (writesSelf != writesSelf()) {
+            boolean newWritesSelf = overrides.stream().anyMatch(ClosureType::writesSelf);
+            if (writesSelf != newWritesSelf) {
                 updated = true;
-                writesSelf = writesSelf();
+                writesSelf = newWritesSelf;
             }
-            if (readsSelf != readsSelf()) {
+            boolean newReadsSelf = overrides.stream().anyMatch(ClosureType::readsSelf);
+            if (readsSelf != newReadsSelf) {
                 updated = true;
-                readsSelf = readsSelf();
+                readsSelf = newReadsSelf;
             }
-            Set<Field> newFieldReads = Stream.concat(getFieldReads().stream(),
+            Set<Field> newFieldReads = Stream.concat(
+                    overrides.stream().map(ClosureType::getFieldReads)
+                            .flatMap(Set::stream)
+                            //this is here to ensure that superclasses don't think they can access
+                            //fields of subclasses
+                            .filter(procedure::canAccessField),
                     selfCalls.stream().flatMap(call ->
                         lookupByCall(call).getFieldReads().stream()
                     )).collect(Collectors.toUnmodifiableSet());
@@ -162,7 +193,12 @@ public class ClosureMap {
                 updated = true;
                 fieldReads = newFieldReads;
             }
-            Set<Field> newFieldWrites = Stream.concat(getFieldWrites().stream(),
+            Set<Field> newFieldWrites = Stream.concat(
+                    overrides.stream().map(ClosureType::getFieldWrites)
+                            .flatMap(Set::stream)
+                            //this is here to ensure that superclasses don't think they can access
+                            //fields of subclasses
+                            .filter(procedure::canAccessField),
                     selfCalls.stream().flatMap(call ->
                             lookupByCall(call).getFieldWrites().stream()
                     )).collect(Collectors.toUnmodifiableSet());
@@ -247,7 +283,7 @@ public class ClosureMap {
                 case CtBlock<?> b ->
                     processStmtList(b);
                 case CtWhile w -> {
-                    CtProcedure fixpoint = new CtProcedure(w);
+                    CtProcedure fixpoint = new CtProcedure(w, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
                     ClosureType fixpointClosure = new ClosureType(fixpoint);
@@ -262,7 +298,7 @@ public class ClosureMap {
                     selfCalls.add(call);
                 }
                 case CtDo d -> {
-                    CtProcedure fixpoint = new CtProcedure(d);
+                    CtProcedure fixpoint = new CtProcedure(d, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
                     ClosureType fixpointClosure = new ClosureType(fixpoint);
@@ -277,7 +313,7 @@ public class ClosureMap {
                     selfCalls.add(call);
                 }
                 case CtFor f -> {
-                    CtProcedure fixpoint = new CtProcedure(f);
+                    CtProcedure fixpoint = new CtProcedure(f, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
                     ClosureType fixpointClosure = new ClosureType(fixpoint);
@@ -294,7 +330,7 @@ public class ClosureMap {
                     selfCalls.add(call);
                 }
                 case CtForEach f -> {
-                    CtProcedure fixpoint = new CtProcedure(f);
+                    CtProcedure fixpoint = new CtProcedure(f, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
                     ClosureType fixpointClosure = new ClosureType(fixpoint);

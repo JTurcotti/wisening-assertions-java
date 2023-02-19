@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="code smells">
-      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/Config.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add transitive closure operation to closure map">
+      <change afterPath="$PROJECT_DIR$/src/test/java/simple/Simple.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +60,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -92,7 +93,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="9799000" />
+      <workItem from="1676765368190" duration="19350000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -178,7 +179,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676769489185</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="add transitive closure operation to closure map">
+      <created>1676775272435</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1676775272435</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -208,7 +216,8 @@
     <MESSAGE value="fix bugs" />
     <MESSAGE value="loop handling" />
     <MESSAGE value="code smells" />
-    <option name="LAST_COMMIT_MESSAGE" value="code smells" />
+    <MESSAGE value="add transitive closure operation to closure map" />
+    <option name="LAST_COMMIT_MESSAGE" value="add transitive closure operation to closure map" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -231,17 +240,17 @@
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>465</line>
+          <line>498</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java</url>
-          <line>50</line>
+          <line>73</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>408</line>
+          <line>441</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -251,10 +260,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
-          <line>41</line>
-          <option name="timeStamp" value="24" />
+          <line>43</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="closures.data.values()" language="JAVA" />
+        <watch expression="((CtAbstractInvocation) callIndexer.lookupAux(new Call(0)).get().underlying).getExecutable()" language="JAVA" custom="java.util.AbstractCollection,spoon.reflect.code.CtAbstractInvocation" />
+        <watch expression="((CtAbstractInvocation) callIndexer.lookupAux(new Call(0)).get().underlying).getExecutable().getOverridingExecutable((ClosureMap.ClosureType)(closures.data.values()).toArray()[3]).procedure.declaringType.getTypeErasure()))" language="JAVA" custom="java.util.AbstractCollection,spoon.reflect.code.CtAbstractInvocation,analyzer.ClosureMap" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

@@ -39,7 +39,8 @@ public class ProgramAnalyzer {
         launcher.buildModel();
         model = launcher.getModel();
         model.getElements(new TypeFilter<>(CtMethod.class)).forEach(closures::computeClosureForMethod);
-        int rounds = closures.transitivelyClose();
+        closures.determineOverrides();
+        closures.transitivelyClose();
     }
 
     private void analyzeMethod(CtMethod<?> method) {
