@@ -1,8 +1,6 @@
 package core.codemodel.elements;
 
-import analyzer.ClosureMap;
-import core.codemodel.types.Blame;
-import core.codemodel.types.Mutable;
+import core.codemodel.types.BlameSite;
 
-public record Variable(int num) implements Blame.Site, Mutable, ClosureMap.ClosedOver {
+public record Variable(int num) implements BlameSite, Mutable, ClosedOver {
 }

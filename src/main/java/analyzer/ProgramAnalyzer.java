@@ -13,12 +13,9 @@ import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
-import spoon.reflect.visitor.filter.TypeFilter;
 import util.Unit;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ProgramAnalyzer {
     final CtModel model;
@@ -29,7 +26,7 @@ public class ProgramAnalyzer {
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
     final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);
 
-    final Map<Procedure, TypecheckedProcedure> typedProcedures = new HashMap<>();
+    final Typechecker typechecker = new Typechecker(this);
     final ClosureMap closures = new ClosureMap(this);
 
     public ProgramAnalyzer(String sourcePath) {
@@ -38,9 +35,10 @@ public class ProgramAnalyzer {
         launcher.getEnvironment().setComplianceLevel(18);
         launcher.buildModel();
         model = launcher.getModel();
-        model.getElements(new TypeFilter<>(CtMethod.class)).forEach(closures::computeClosureForMethod);
+        closures.computeClosures();
         closures.determineOverrides();
         closures.transitivelyClose();
+        typechecker.performTypechecking();
     }
 
     private void analyzeMethod(CtMethod<?> method) {
@@ -56,5 +54,9 @@ public class ProgramAnalyzer {
         return callIndexer.lookupAux(c)
                 .flatMap(CtVirtualCall::getProcedureSourcePos)
                 .flatMap(procedureIndexer::lookup);
+    }
+
+    public Collection<Procedure> procedures() {
+        return procedureIndexer.outputs();
     }
 }

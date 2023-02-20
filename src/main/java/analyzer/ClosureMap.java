@@ -1,7 +1,9 @@
 package analyzer;
+
 import core.codemodel.elements.*;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
 
 import java.util.*;
@@ -9,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ClosureMap {
-    public interface ClosedOver {}
     final Map<Procedure, ClosureType> data = new HashMap<>();
     final ProgramAnalyzer parentAnalyzer;
 
@@ -24,7 +25,12 @@ public class ClosureMap {
         return data.get(callProc);
     }
 
-    public void transitivelyClose() {
+    void computeClosures() {
+        parentAnalyzer.model.getElements(new TypeFilter<>(CtMethod.class))
+                .forEach(this::computeClosureForMethod);
+    }
+
+    void transitivelyClose() {
         int rounds = 0;
         boolean updated = true;
         while (updated) {
@@ -42,7 +48,7 @@ public class ClosureMap {
         }
     }
 
-    public void determineOverrides() {
+    void determineOverrides() {
         for (Map.Entry<Procedure, ClosureType> eChild : data.entrySet()) {
             for (Map.Entry<Procedure, ClosureType> eParent : data.entrySet()) {
                 if (eChild.getValue().equals(eParent.getValue()) ||  //yes this is redundant...
@@ -112,30 +118,33 @@ public class ClosureMap {
         }
     }
 
-    private class ClosureType implements Cloneable {
+    class ClosureType {
 
         //the following fields are generated initially for a ClosureType
         final CtProcedure procedure;
-        final Set<ClosedOver> reads = new HashSet<>();
-        final Map<ClosedOver, TouchCondition> writes = new HashMap<>();
-        final Set<Call> calls = new HashSet<>();
-        final Set<Call> selfCalls = new HashSet<>();
+        private final Set<ClosedOver> reads = new HashSet<>();
+        private final Map<ClosedOver, TouchCondition> writes = new HashMap<>();
+        private final Set<Call> calls = new HashSet<>();
+        private final Set<Call> selfCalls = new HashSet<>();
 
         //the following utility fields are populated after all
         //closure types are generated
 
         //the set of closuretypes that extend/override/implement this closuretype
         //(including self)
-        final Set<ClosureType> overrides = new HashSet<>(Set.of(this));
+        private final Set<ClosureType> overrides = new HashSet<>(Set.of(this));
 
         //the following fields are populated by fixpoint propagation
         //after all closure types are generated
-        boolean readsSelf = false;
-        boolean writesSelf = false;
+        private boolean readsSelf = false;
+        private boolean writesSelf = false;
 
-        Set<Field> fieldReads = new HashSet<>();
-        Set<Field> fieldWrites = new HashSet<>();
+        private Set<Field> fieldReads = new HashSet<>();
+        private Set<Field> fieldWrites = new HashSet<>();
 
+
+
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
         Set<Field> getFieldReads() {
             return Stream.concat(fieldReads.stream(),
                     reads.stream().flatMap(c -> {
@@ -146,12 +155,14 @@ public class ClosureMap {
                     })).collect(Collectors.toUnmodifiableSet());
         }
 
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
         boolean readsSelf() {
             return readsSelf ||
                     reads.contains(new Self()) ||
                     !getFieldReads().isEmpty();
         }
 
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
         Set<Field> getFieldWrites() {
             return Stream.concat(fieldWrites.stream(),
                     writes.keySet().stream().flatMap(c -> {
@@ -162,13 +173,28 @@ public class ClosureMap {
                     })).collect(Collectors.toUnmodifiableSet());
         }
 
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
         boolean writesSelf() {
             return writesSelf ||
                     (writes.containsKey(new Self()) && writes.get(new Self()).satisfied(ClosureMap.this)) ||
                     !getFieldWrites().isEmpty();
         }
 
-        boolean performUpdate() {
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
+        Set<Variable> getVariableReads() {
+            return reads.stream().map(ClosedOver::asVariable).flatMap(Optional::stream)
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
+        Set<Variable> getVariableWrites() {
+            return writes.keySet().stream().flatMap(c ->
+                    c instanceof Variable v && writes.get(v).satisfied(ClosureMap.this)?
+                            Stream.of(v): Stream.empty())
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+
+        private boolean performUpdate() {
             boolean updated = false;
             boolean newWritesSelf = overrides.stream().anyMatch(ClosureType::writesSelf);
             if (writesSelf != newWritesSelf) {
@@ -213,7 +239,7 @@ public class ClosureMap {
             this.procedure = procedure;
         }
 
-        public ClosureType clone() {
+        ClosureType copy() {
             ClosureType other = new ClosureType(this.procedure);
             other.reads.addAll(this.reads);
             other.writes.putAll(this.writes);
@@ -235,7 +261,7 @@ public class ClosureMap {
             };
         }
 
-        ClosureType processStmt(CtStatement stmt) {
+        private ClosureType processStmt(CtStatement stmt) {
             if (stmt == null) {
                 return this;
             }
@@ -253,7 +279,7 @@ public class ClosureMap {
                 }
                 case CtIf i -> {
                     processStmt(i.getThenStatement());
-                    merge(clone().processStmt(i.getElseStatement()));
+                    merge(copy().processStmt(i.getElseStatement()));
                     processRead(i.getCondition());
                 }
                 case CtInvocation<?> i ->
@@ -266,9 +292,9 @@ public class ClosureMap {
                 case CtCFlowBreak ignored ->
                     throw new IllegalStateException("Unexpected statement " + stmt);
                 case CtSwitch<?> s -> {
-                    ClosureType current = clone();
+                    ClosureType current = copy();
                     for (CtCase<?> c : s.getCases()) {
-                        merge(current.clone().processStmtList(c));
+                        merge(current.copy().processStmtList(c));
                         processRead(c.getCaseExpression());
                     }
                     processRead(s.getSelector());
@@ -350,7 +376,7 @@ public class ClosureMap {
             return this;
         }
 
-        ClosureType processStmtList(CtStatementList stmtList) {
+        private ClosureType processStmtList(CtStatementList stmtList) {
             if (stmtList == null || stmtList.getStatements().isEmpty()) {
                 return this;
             }
@@ -367,7 +393,7 @@ public class ClosureMap {
             return this;
         }
 
-        ClosureType processRead(CtExpression<?> expr) {
+        private ClosureType processRead(CtExpression<?> expr) {
             if (expr == null) {
                 return this;
             }
@@ -427,7 +453,7 @@ public class ClosureMap {
                 }
                 case CtConditional<?> c -> {
                     processRead(c.getThenExpression());
-                    merge(clone().processRead(c.getElseExpression()));
+                    merge(copy().processRead(c.getElseExpression()));
                     processRead(c.getCondition());
                 }
                 case CtArrayAccess<?, ?> a -> {
@@ -447,11 +473,11 @@ public class ClosureMap {
             return this;
         }
 
-        ClosureType processWrite(CtExpression<?> expr) {
+        private ClosureType processWrite(CtExpression<?> expr) {
             return processWrite(expr, TouchCondition.always());
         }
 
-        ClosureType processWrite(CtExpression<?> expr, TouchCondition condition) {
+        private ClosureType processWrite(CtExpression<?> expr, TouchCondition condition) {
             if (expr == null) {
                 return this;
             }
@@ -495,7 +521,7 @@ public class ClosureMap {
                 case CtTypeAccess<?> ignored -> {/* noop - indicated a call to a static method*/}
                 case CtConditional<?> c -> {
                     processWrite(c.getThenExpression(), condition);
-                    merge(clone().processWrite(c.getElseExpression(), condition));
+                    merge(copy().processWrite(c.getElseExpression(), condition));
                     processRead(c.getCondition());
                 }
                 default ->

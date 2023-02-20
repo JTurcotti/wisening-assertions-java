@@ -1,24 +1,24 @@
 package core.codemodel.types;
 
 import core.codemodel.elements.CallArgPair;
+import core.codemodel.elements.Mutable;
+import core.codemodel.elements.Ret;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
 import util.Util;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public record FullContext(
         MutablesContext mutables,
         PcStack pcNecessary,
         IntraflowEvent pcExact,
-        List<Blame> resultBlames,
+        Map<Ret, Blame> resultBlames,
         Map<Assertion, Blame> assertionBlames,
         Map<CallArgPair, Blame> callArgBlames) {
 
     public FullContext() {
-        this(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), List.of(), Map.of(), Map.of());
+        this(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
     }
 
     public Blame lookupMutable(Mutable mutable) {
@@ -52,6 +52,7 @@ public record FullContext(
         return new FullContext(newMutables, pcNecessary, pcExact, resultBlames, assertionBlames, callArgBlames);
     }
 
+    /*
     private static List<Blame> mergeBlameLists(List<Blame> blames1, List<Blame> blames2) {
         if (blames1.isEmpty()) {
             return List.copyOf(blames2);
@@ -61,10 +62,10 @@ public record FullContext(
         }
         return IntStream.range(0, blames1.size())
                 .mapToObj(i -> blames1.get(i).disjunct(blames2.get(i))).toList();
-    }
+    }*/
 
-    public FullContext observeReturn(List<Blame> blames) {
-        List<Blame> newResultBlames = mergeBlameLists(resultBlames, blames);
+    public FullContext observeReturn(Map<Ret, Blame> blames) {
+        Map<Ret, Blame> newResultBlames = Util.mergeMaps(blames, resultBlames, Blame::disjunct);
         return new FullContext(mutables, pcNecessary, pcExact, newResultBlames, assertionBlames, callArgBlames);
     }
 
@@ -101,7 +102,7 @@ public record FullContext(
                 Util::assertEq
         ).orElseThrow(IllegalArgumentException::new);
         IntraflowEvent newPcExact = pcExact.disjunct(other.pcExact);
-        List<Blame> newResultBlames = mergeBlameLists(resultBlames, other.resultBlames);
+        Map<Ret, Blame> newResultBlames = Util.mergeMaps(resultBlames, other.resultBlames, Blame::disjunct);
         Map<Assertion, Blame> newAssertionBlames =
                 Util.mergeMaps(assertionBlames, other.assertionBlames, Blame::disjunct);
         Map<CallArgPair, Blame> newCallArgBlames =

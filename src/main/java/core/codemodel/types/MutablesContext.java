@@ -1,5 +1,6 @@
 package core.codemodel.types;
 
+import core.codemodel.elements.Mutable;
 import core.codemodel.events.Pi;
 import util.Util;
 

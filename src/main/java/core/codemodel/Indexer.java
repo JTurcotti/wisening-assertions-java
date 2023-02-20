@@ -2,9 +2,7 @@ package core.codemodel;
 
 import spoon.reflect.cu.SourcePositionHolder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -79,6 +77,10 @@ public class Indexer<OutputT, IndexingT, AuxT> {
         public BySourcePos(Function<Integer, OutputT> constructor) {
             super(constructor);
         }
+    }
+
+    public Collection<OutputT> outputs() {
+        return index.values();
     }
 }
 

@@ -7,14 +7,13 @@ import util.Util;
 import java.util.Map;
 
 public class Blame {
-    public interface Site {}
-    private final Map<Site, IntraflowEvent> data;
+    private final Map<BlameSite, IntraflowEvent> data;
 
     private Blame() {
         data = Map.of();
     }
 
-    private Blame(Map<Site, IntraflowEvent> data) {
+    private Blame(Map<BlameSite, IntraflowEvent> data) {
         this.data = Util.copyImmutableMap(data);
     }
 
@@ -22,8 +21,8 @@ public class Blame {
         return new Blame();
     }
 
-    public static Blame oneSite(Site site) {
-        return new Blame(Map.of(site, IntraflowEvent.one()));
+    public static Blame oneSite(BlameSite blameSite) {
+        return new Blame(Map.of(blameSite, IntraflowEvent.one()));
     }
 
     public Blame conjunctPhi(Phi phi) {
