@@ -12,6 +12,7 @@ import java.util.Map;
 public class TypecheckedProcedure {
 
     public int numArgs;
+    public int numRets;
 
     /**
      * Not always a literal name: for example function bodies

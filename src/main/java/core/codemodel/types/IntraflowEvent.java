@@ -9,57 +9,55 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-record SignedPi(Pi pi, boolean sign) implements Intraflow.AtomicEvent {}
-
 /**
  * Class representing intraprocedural flows - none of these methods should mutate
  */
-public class Intraflow {
+public class IntraflowEvent {
     public interface AtomicEvent {}
 
     //should be an unmodifiable set
     private final Set<Set<AtomicEvent>> dnf;
 
-    private Intraflow() {
+    private IntraflowEvent() {
         dnf = Set.of();
     }
 
-    private Intraflow(Set<Set<AtomicEvent>> dnf) {
+    private IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
         this.dnf = Set.copyOf(dnf);
     }
 
-    public static Intraflow one() {
-        return new Intraflow(Set.of(Set.of()));
+    public static IntraflowEvent one() {
+        return new IntraflowEvent(Set.of(Set.of()));
     }
 
     public boolean isOne() {
-        return dnf.size() == 1 && Util.choose(dnf).size() == 0;
+        return dnf.size() == 1 && Util.choose(dnf).isEmpty();
     }
 
-    public static Intraflow zero() {
-        return new Intraflow();
+    public static IntraflowEvent zero() {
+        return new IntraflowEvent();
     }
 
     public boolean isZero() {
-        return dnf.size() == 0;
+        return dnf.isEmpty();
     }
 
-    public Intraflow conjunctPhi(Phi phi) {
-        return new Intraflow(dnf.stream()
+    public IntraflowEvent conjunctPhi(Phi phi) {
+        return new IntraflowEvent(dnf.stream()
                 .map(conj -> Stream.concat(conj.stream(), Stream.of(phi))
                         .collect(Collectors.toUnmodifiableSet()))
                 .collect(Collectors.toUnmodifiableSet()));
     }
 
-    public Intraflow conjunctPi(Pi pi, boolean sign) {
-        return new Intraflow(dnf.stream()
+    public IntraflowEvent conjunctPi(Pi pi, boolean sign) {
+        return new IntraflowEvent(dnf.stream()
                 .filter(conj -> conj.stream().noneMatch((new SignedPi(pi, !sign))::equals))
                 .map(conj -> Stream.concat(conj.stream(), Stream.of(new SignedPi(pi, sign)))
                         .collect(Collectors.toUnmodifiableSet()))
                 .collect(Collectors.toUnmodifiableSet()));
     }
 
-    private Intraflow conjunctAe(AtomicEvent ae) {
+    private IntraflowEvent conjunctAe(AtomicEvent ae) {
         return switch (ae) {
             case Phi phi -> conjunctPhi(phi);
             case SignedPi sp -> conjunctPi(sp.pi(), sp.sign());
@@ -67,9 +65,9 @@ public class Intraflow {
         };
     }
 
-    private Intraflow conjunctConj(Set<AtomicEvent> conj) {
+    private IntraflowEvent conjunctConj(Set<AtomicEvent> conj) {
         if (conj.isEmpty()) {
-            return new Intraflow(dnf);
+            return new IntraflowEvent(dnf);
         } else {
             AtomicEvent ae = Util.choose(conj);
             return conjunctAe(ae).conjunctConj(conj.stream().filter(s -> !s.equals(ae))
@@ -96,7 +94,7 @@ public class Intraflow {
         return Optional.empty();
     }
 
-    private Intraflow simplify() {
+    private IntraflowEvent simplify() {
         boolean updated;
         Set<Set<AtomicEvent>> dnf = this.dnf;
         outer: do {
@@ -117,16 +115,16 @@ public class Intraflow {
                 }
             }
         } while (updated);
-        return new Intraflow(dnf);
+        return new IntraflowEvent(dnf);
     }
 
-    public Intraflow disjunct(Intraflow other) {
-        return new Intraflow(Stream.concat(dnf.stream(), other.dnf.stream())
+    public IntraflowEvent disjunct(IntraflowEvent other) {
+        return new IntraflowEvent(Stream.concat(dnf.stream(), other.dnf.stream())
                 .collect(Collectors.toUnmodifiableSet()))
                 .simplify();
     }
 
-    public Intraflow conjunct(Intraflow other) {
-        return dnf.stream().map(other::conjunctConj).reduce(zero(), Intraflow::disjunct).simplify();
+    public IntraflowEvent conjunct(IntraflowEvent other) {
+        return dnf.stream().map(other::conjunctConj).reduce(zero(), IntraflowEvent::disjunct).simplify();
     }
 }

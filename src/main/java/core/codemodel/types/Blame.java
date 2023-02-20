@@ -5,19 +5,16 @@ import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Blame {
     public interface Site {}
-    private final Map<Site, Intraflow> data;
+    private final Map<Site, IntraflowEvent> data;
 
     private Blame() {
         data = Map.of();
     }
 
-    private Blame(Map<Site, Intraflow> data) {
+    private Blame(Map<Site, IntraflowEvent> data) {
         this.data = Util.copyImmutableMap(data);
     }
 
@@ -26,7 +23,7 @@ public class Blame {
     }
 
     public static Blame oneSite(Site site) {
-        return new Blame(Map.of(site, Intraflow.one()));
+        return new Blame(Map.of(site, IntraflowEvent.one()));
     }
 
     public Blame conjunctPhi(Phi phi) {
@@ -37,25 +34,11 @@ public class Blame {
         return new Blame(Util.mapImmutableMap(data, flow -> flow.conjunctPi(pi, sign)));
     }
 
-    public Blame conjunctIntraflow(Intraflow flow) {
+    public Blame conjunctIntraflow(IntraflowEvent flow) {
         return new Blame(Util.mapImmutableMap(data, flow::conjunct));
     }
 
     public Blame disjunct(Blame other) {
-        return new Blame(Stream.concat(data.keySet().stream(), other.data.keySet().stream())
-                .distinct()
-                .collect(Collectors.toUnmodifiableMap(Function.identity(),
-                        key -> {
-                            if (data.containsKey(key)) {
-                                if (other.data.containsKey(key)) {
-                                    return data.get(key).disjunct(other.data.get(key));
-                                } else {
-                                    return data.get(key);
-                                }
-                            } else {
-                                return other.data.get(key);
-                            }
-                        }
-                )));
+        return new Blame(Util.mergeMaps(data, other.data, IntraflowEvent::disjunct));
     }
 }
