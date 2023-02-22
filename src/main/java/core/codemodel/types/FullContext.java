@@ -8,6 +8,7 @@ import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Map;
+import java.util.Set;
 
 public record FullContext(
         MutablesContext mutables,
@@ -17,8 +18,15 @@ public record FullContext(
         Map<Assertion, Blame> assertionBlames,
         Map<CallArgPair, Blame> callArgBlames) {
 
-    public FullContext() {
-        this(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
+    /*
+    Generate an empty FullContext corresponding to the beginning of a program
+     */
+    public static FullContext empty() {
+        return new FullContext(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
+    }
+
+    public static FullContext atEntry(Set<Mutable> entrySet) {
+        return new FullContext(MutablesContext.atEntry(entrySet), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
     }
 
     public Blame lookupMutable(Mutable mutable) {
@@ -48,7 +56,9 @@ public record FullContext(
     }
 
     public FullContext performAssignment(Mutable mutable, Blame blame) {
-        MutablesContext newMutables = mutables.disjunct(MutablesContext.assignment(mutable, blame));
+        //TODO: compress blames before assignment (merge lines with same event)
+        Blame conditionedBlame = conditionBlame(blame);
+        MutablesContext newMutables = mutables.disjunct(MutablesContext.assignment(mutable, conditionedBlame));
         return new FullContext(newMutables, pcNecessary, pcExact, resultBlames, assertionBlames, callArgBlames);
     }
 
@@ -65,7 +75,8 @@ public record FullContext(
     }*/
 
     public FullContext observeReturn(Map<Ret, Blame> blames) {
-        Map<Ret, Blame> newResultBlames = Util.mergeMaps(blames, resultBlames, Blame::disjunct);
+        Map<Ret, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
+        Map<Ret, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
         return new FullContext(mutables, pcNecessary, pcExact, newResultBlames, assertionBlames, callArgBlames);
     }
 

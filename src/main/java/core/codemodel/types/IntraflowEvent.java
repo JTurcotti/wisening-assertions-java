@@ -12,17 +12,14 @@ import java.util.stream.Stream;
 /**
  * Class representing intraprocedural flows - none of these methods should mutate
  */
-public class IntraflowEvent {
+public record IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
     public interface AtomicEvent {}
 
-    //should be an unmodifiable set
-    private final Set<Set<AtomicEvent>> dnf;
-
     private IntraflowEvent() {
-        dnf = Set.of();
+        this(Set.of());
     }
 
-    private IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
+    public IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
         this.dnf = Set.copyOf(dnf);
     }
 

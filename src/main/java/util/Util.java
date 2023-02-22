@@ -1,10 +1,7 @@
 package util;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,6 +58,11 @@ public class Util {
                         }
                 ));
     }
+
+    public static <T> Set<T> mergeSets(Set<? extends T> left, Set<? extends T> right) {
+        return Stream.concat(left.stream(), right.stream()).collect(Collectors.toUnmodifiableSet());
+    }
+
     public static <T> void forEachRev(List<T> l, Consumer<T> f) {
         if (!l.isEmpty()) {
             for (int i = l.size() - 1; i >= 0; i--) {
@@ -91,5 +93,9 @@ public class Util {
             return t1;
         }
         throw new IllegalArgumentException("Expected equality");
+    }
+
+    public static <T> UnaryOperator<T> unaryAndThen(UnaryOperator<T> fst, UnaryOperator<T> snd) {
+        return t -> snd.apply(fst.apply(t));
     }
 }

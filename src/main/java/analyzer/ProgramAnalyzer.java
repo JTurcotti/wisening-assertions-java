@@ -20,7 +20,7 @@ import java.util.*;
 public class ProgramAnalyzer {
     final CtModel model;
     final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
-    final Indexer<Line, SourcePos, Unit> lineIndexer = new Indexer<>(Line::new);
+    final Indexer.BySourceLine lineIndexer = new Indexer.BySourceLine();
     final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer = new Indexer.BySourcePos<>(Call::new);
     final Indexer<Pi, SourcePos, Unit> piIndexer = new Indexer<>(Pi::new);
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);

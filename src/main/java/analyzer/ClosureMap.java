@@ -288,6 +288,7 @@ public class ClosureMap {
                     Variable v = parentAnalyzer.varIndexer.lookupOrCreate(lv);
                     reads.remove(v);
                     writes.remove(v);
+                    processRead(lv.getAssignment());
                 }
                 case CtCFlowBreak ignored ->
                     throw new IllegalStateException("Unexpected statement " + stmt);
@@ -347,7 +348,8 @@ public class ClosureMap {
                     fixpointClosure.processRead(f.getExpression());
                     Util.forEachRev(f.getForUpdate(), fixpointClosure::processStmt);
                     fixpointClosure.processStmt(f.getBody());
-                    Util.forEachRev(f.getForInit(), fixpointClosure::processStmt);
+
+                    Util.forEachRev(f.getForInit(), this::processStmt);
 
                     data.put(proc, fixpointClosure);
 
@@ -362,7 +364,8 @@ public class ClosureMap {
                     ClosureType fixpointClosure = new ClosureType(fixpoint);
 
                     fixpointClosure.processStmt(f.getBody());
-                    fixpointClosure.processStmt(f.getVariable());
+                    //leave for-each loops as closed over their variable
+                    //fixpointClosure.processStmt(f.getVariable());
 
                     data.put(proc, fixpointClosure);
 

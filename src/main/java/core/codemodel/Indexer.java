@@ -1,6 +1,9 @@
 package core.codemodel;
 
+import core.codemodel.events.Line;
+import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePositionHolder;
+import spoon.reflect.declaration.CtElement;
 
 import java.util.*;
 import java.util.function.Function;
@@ -37,6 +40,7 @@ public class Indexer<OutputT, IndexingT, AuxT> {
         return n;
     }
 
+    //warning: using this method fails to associate aux data
     public OutputT next(IndexingT ind) {
         OutputT n = constructor.apply(next++);
         index.put(ind, n);
@@ -55,6 +59,7 @@ public class Indexer<OutputT, IndexingT, AuxT> {
         return lookup(i).flatMap(this::lookupAux);
     }
 
+    //warning: using this constructo fails to associate aux data
     public OutputT lookupOrCreate(IndexingT i) {
         if (index.containsKey(i)) {
             return index.get(i);
@@ -76,6 +81,35 @@ public class Indexer<OutputT, IndexingT, AuxT> {
 
         public BySourcePos(Function<Integer, OutputT> constructor) {
             super(constructor);
+        }
+    }
+
+    //warning: values in aux not necessarily very informative - could be too big (see unop case)
+    public static class BySourceLine extends Indexer<Line, SourcePos, Set<CtElement>> {
+        public Line lookupOrCreateField(CtFieldAccess<?> fa) {
+            return super.lookupOrCreate(SourcePos.fromFieldAccess(fa), Set.of(fa.getVariable()));
+        }
+
+        public Line lookupOrCreateUnop(CtUnaryOperator<?> unop) {
+            return super.lookupOrCreate(SourcePos.fromUnop(unop), Set.of(unop));
+        }
+
+        public Line lookupOrCreateBinop(CtBinaryOperator<?> binop) {
+            return super.lookupOrCreate(SourcePos.fromBinop(binop), Set.of(binop));
+        }
+
+        /*
+        Get a new line whose source position is the entire source position of the passed element
+         */
+        public Line lookupOrCreateEntire(CtElement elem) {
+            if (elem.getPosition().isValidPosition()) {
+                return super.lookupOrCreate(SourcePos.fromSpoon(elem.getPosition()), Set.of(elem));
+            }
+            throw new IllegalArgumentException("Position not defined for passed CtElement: " + elem);
+        }
+
+        public BySourceLine() {
+            super(Line::new);
         }
     }
 

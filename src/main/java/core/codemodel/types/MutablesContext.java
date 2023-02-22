@@ -5,6 +5,7 @@ import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,13 @@ public class MutablesContext {
 
     public static MutablesContext empty() {
         return new MutablesContext();
+    }
+
+    /*
+    Return a MutablesContext that has entries for a passed set of mutables, each of which is blamed fully for itself
+     */
+    public static MutablesContext atEntry(Set<Mutable> entrySet) {
+        return new MutablesContext(entrySet.stream().collect(Collectors.toUnmodifiableMap(Function.identity(), Blame::oneMutable)));
     }
 
     public static MutablesContext assignment(Mutable t, Blame b) {

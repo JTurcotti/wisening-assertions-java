@@ -1,5 +1,6 @@
 package core.codemodel.types;
 
+import core.codemodel.elements.Mutable;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;
@@ -23,6 +24,9 @@ public class Blame {
 
     public static Blame oneSite(BlameSite blameSite) {
         return new Blame(Map.of(blameSite, IntraflowEvent.one()));
+    }
+    public static Blame oneMutable(Mutable mutable) {
+        return oneSite(Mutable.asBlameSite(mutable));
     }
 
     public Blame conjunctPhi(Phi phi) {
