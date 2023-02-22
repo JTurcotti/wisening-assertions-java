@@ -1,9 +1,7 @@
 package analyzer;
 
-import core.codemodel.elements.Field;
-import core.codemodel.elements.Mutable;
-import core.codemodel.elements.Procedure;
-import core.codemodel.elements.Variable;
+import core.codemodel.elements.*;
+import core.codemodel.events.Phi;
 import core.codemodel.types.Blame;
 import core.codemodel.types.FullContext;
 import spoon.reflect.code.*;
@@ -16,8 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Typechecker {
     private final ProgramAnalyzer parentAnalyzer;
@@ -31,7 +31,7 @@ public class Typechecker {
     void performTypechecking() {
         this.parentAnalyzer.closures.data.forEach(
                 (procedure, closure) ->
-                    typecheckedProcedures.put(procedure, typecheckClosure(closure))
+                        typecheckedProcedures.put(procedure, typecheckClosure(closure))
         );
     }
 
@@ -68,9 +68,11 @@ public class Typechecker {
                 return typecheckAssignmentToExpression(rhs.left(), a.getAssigned(), rhs.right());
             }
             case CtIf i -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtSwitch<?> s -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtLocalVariable<?> l -> {
@@ -82,36 +84,45 @@ public class Typechecker {
                 return typecheckAssignmentToVariable(rhs.left(), l.getReference(), rhs.right());
             }
             case CtInvocation<?> i -> {
-                System.out.println("Unhandled: " + stmt);
+                return typecheckExpression(ctxt, i).left();
             }
             case CtWhile w -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtDo d -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtFor f -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtForEach f -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtTry t -> {
-                System.out.println("Unhandled: " + stmt);
+                //TODO: deal with exception handling
+                return typecheckStmtList(ctxt, t.getBody());
             }
             case CtReturn<?> r -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtBreak b -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtContinue c -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             case CtUnaryOperator<?> u -> {
                 return typecheckExpression(ctxt, u).left();
             }
             case CtThrow t -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + stmt);
             }
             default -> throw new IllegalArgumentException("Unexpected statement: " + stmt);
@@ -119,12 +130,12 @@ public class Typechecker {
         return ctxt;
     }
 
-    private UnaryOperator<Pair<FullContext, Blame>> typecheckExprCumulative(CtExpression<?> expr) {
+    private UnaryOperator<Pair<FullContext, Blame>> typecheckExpression(CtExpression<?> expr) {
         return input -> typecheckExpression(input.left(), expr).mapRight(input.right()::disjunct);
     }
 
-    private UnaryOperator<Pair<FullContext, Blame>> typecheckExprListCumulative(List<CtExpression<?>> exprs) {
-        return exprs.stream().map(this::typecheckExprCumulative)
+    private UnaryOperator<Pair<FullContext, Blame>> typecheckExprList(List<CtExpression<?>> exprs) {
+        return exprs.stream().map(this::typecheckExpression)
                 .reduce(UnaryOperator.identity(), Util::unaryAndThen);
     }
 
@@ -133,13 +144,29 @@ public class Typechecker {
     }
 
     private Pair<FullContext, Blame> typecheckTwoExprs(FullContext ctxt, CtExpression<?> expr1, CtExpression<?> expr2) {
-        return typecheckExprCumulative(expr2)
-                .apply(typecheckExprCumulative(expr1)
+        return typecheckExpression(expr2)
+                .apply(typecheckExpression(expr1)
                         .apply(wrapWithNoBlame(ctxt)));
     }
 
     private Pair<FullContext, Blame> typecheckExprList(FullContext ctxt, List<CtExpression<?>> exprs) {
-        return typecheckExprListCumulative(exprs).apply(wrapWithNoBlame(ctxt));
+        return typecheckExprList(exprs).apply(wrapWithNoBlame(ctxt));
+    }
+
+    private UnaryOperator<Pair<FullContext, List<Blame>>> typecheckExprBlameDisjoint(CtExpression<?> expr) {
+        return input -> typecheckExpression(input.left(), expr).mapRight(blame ->
+                Util.addToStream(input.right().stream(), blame).toList());
+    }
+
+    private UnaryOperator<Pair<FullContext, List<Blame>>>
+    typecheckExprListBlameDisjoint(List<CtExpression<?>> exprs) {
+        return exprs.stream().map(this::typecheckExprBlameDisjoint)
+                .reduce(UnaryOperator.identity(), Util::unaryAndThen);
+    }
+
+    private Pair<FullContext, List<Blame>>
+    typecheckExprListBlameDisjoint(FullContext ctxt, List<CtExpression<?>> exprs) {
+        return typecheckExprListBlameDisjoint(exprs).apply(new Pair<>(ctxt, List.of()));
     }
 
     private Pair<FullContext, Blame> typecheckExpression(FullContext ctxt, CtExpression<?> expr) {
@@ -148,7 +175,7 @@ public class Typechecker {
                 return typecheckTwoExprs(ctxt, a.getTarget(), a.getIndexExpression());
             }
             case CtNewArray<?> na -> {
-                return typecheckExprListCumulative(na.getElements())
+                return typecheckExprList(na.getElements())
                         .apply(typecheckExprList(ctxt,
                                 na.getDimensionExpressions().stream().map(e -> (CtExpression<?>) e)
                                         .collect(Collectors.toList())));
@@ -167,6 +194,7 @@ public class Typechecker {
                 return typecheckExpression(ctxt, fa.getTarget()).mapRight(faBlame::disjunct);
             }
             case CtSuperAccess<?> sa ->
+                //TODO: handle this
                     System.out.println("Unhandled: " + expr);
             case CtVariableAccess<?> va -> {
                 Blame vaBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(va));
@@ -174,7 +202,76 @@ public class Typechecker {
                 return new Pair<>(ctxt, ctxt.lookupMutable(v).disjunct(vaBlame));
             }
             case CtInvocation<?> inv -> {
-                System.out.println("Unhandled: " + expr);
+                if (inv.isImplicit()) {
+                    return new Pair<>(ctxt, Blame.zero());
+                }
+                //TODO: also consider possible overrides
+                Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv));
+
+                if (!parentAnalyzer.isIntrasourceCall(c)) {
+                    //call to a library method - no Phi's introduced just treated like an arithmetic assignment
+                    Pair<FullContext, Blame> invResult = typecheckExprList(inv.getArguments())
+                            .apply(typecheckExpression(ctxt, inv.getTarget()));
+                    return new Pair<>(
+                            Config.NONLOCAL_METHOD_MUTATES_SELF?
+                                    typecheckAssignmentToExpression(invResult.left(), inv.getTarget(), invResult.right()):
+                                    invResult.left(),
+                            invResult.right());
+                }
+
+                Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(
+                        () -> new IllegalStateException("Call made that could not be tied to a procedure"));
+                Pair<FullContext, List<Blame>> args = typecheckExprListBlameDisjoint(ctxt, inv.getArguments());
+                ctxt = args.left();
+                List<Blame> argBlames = args.right();
+                Blame retBlame = Blame.oneSite(new CallRetPair(c, new Ret(p, 0)));
+
+                if (inv.getExecutable().isStatic()) {
+                    Pair<FullContext, Blame> receiver = typecheckExpression(ctxt, inv.getTarget());
+                    //only passed args can be accessed by method call so no need to consider side effects
+                    return receiver.mapRight(Blame.conjunctListWithPhi(argBlames, i ->
+                            new Phi(p, new Arg(p, i), new Ret(p, 0)))
+                            .disjunct(retBlame)::disjunct);
+                }
+
+                if (inv.getTarget() instanceof CtThisAccess<?> || inv.getTarget() instanceof CtSuperAccess<?>) {
+                    List<Field> reads = parentAnalyzer.closures.lookupByCall(c).getFieldReads().stream().toList();
+                    Set<Field> writes = parentAnalyzer.closures.lookupByCall(c).getFieldWrites();
+
+                    List<Blame> fieldBlames = reads.stream().map(ctxt::lookupMutable).toList();
+
+                    Function<Phi.Output, Blame> blameGenerator = output ->
+                            Blame.conjunctListWithPhi(fieldBlames, i ->
+                                    new Phi(p, reads.get(i), output))
+                                    .disjunct(Blame.conjunctListWithPhi(argBlames, i ->
+                                            new Phi(p, new Arg(p, i), output)))
+                                    .disjunct(retBlame);
+
+                    for (Field write : writes) {
+                        ctxt = typecheckAssignmentToField(ctxt,
+                                parentAnalyzer.fieldIndexer.lookupAux(write).orElseThrow(
+                                        () -> new IllegalStateException("Expected field lookup to succeed: " + write)
+                                ).getReference(),
+                                blameGenerator.apply(write));
+                    }
+
+                    return new Pair<>(ctxt, blameGenerator.apply(new Ret(p, 0)));
+                }
+
+                Pair<FullContext, Blame> receiver = typecheckExpression(ctxt, inv.getTarget());
+                ctxt = receiver.left();
+
+                Function<Phi.Output, Blame> blameGenerator = output -> {
+                    Blame reciverBlame = parentAnalyzer.closures.lookupByCall(c).readsSelf()?
+                            receiver.right().conjunctPhi(new Phi(p, new Self(), output)): Blame.zero();
+                    return Blame.conjunctListWithPhi(argBlames, i -> new Phi(p, new Arg(p, i), output))
+                            .disjunct(reciverBlame)
+                            .disjunct(retBlame);
+                };
+
+                return new Pair<>(
+                        typecheckAssignmentToExpression(ctxt, inv.getTarget(), blameGenerator.apply(new Self())),
+                        blameGenerator.apply(new Ret(p, 0)));
             }
             case CtLiteral<?> lit -> {
                 return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(lit)));
@@ -189,13 +286,37 @@ public class Typechecker {
                         .mapRight(binopBlame::disjunct);
             }
             case CtTypeAccess<?> t -> {
+                if (t.isImplicit()) {
+                    return new Pair<>(ctxt, Blame.zero());
+                }
                 return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(t)));
             }
             case CtConditional<?> c -> {
+                //TODO: handle this
                 System.out.println("Unhandled: " + expr);
             }
-            case CtConstructorCall<?> c -> {
-                System.out.println("Unhandled: " + expr);
+            case CtConstructorCall<?> constr -> {
+                Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr));
+                Blame constrBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr));
+                if (!parentAnalyzer.isIntrasourceCall(c)) {
+                    return typecheckExprList(ctxt, constr.getArguments()).mapRight(constrBlame::disjunct);
+                }
+                Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(() ->
+                        new IllegalStateException("Expected procedure lookup to succeed"));
+                return typecheckExprListBlameDisjoint(ctxt, constr.getArguments())
+                        .mapRight(argBlames ->
+                                Blame.conjunctListWithPhi(argBlames, i -> new Phi(p, new Arg(p, i), new Ret(p, 0)))
+                                        .disjunct(Blame.oneSite(new CallRetPair(c, new Ret(p, 0))))
+                                        .disjunct(constrBlame));
+            }
+            case CtLambda<?> l -> {
+                return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(l)));
+            }
+            case CtThisAccess<?> ignored -> {
+                return new Pair<>(ctxt, Blame.oneSite(new Self()));
+            }
+            case null -> {
+                return new Pair<>(ctxt, Blame.zero());
             }
             default -> throw new IllegalArgumentException("Unexpected expression: " + expr);
         }
@@ -229,11 +350,26 @@ public class Typechecker {
                 return typecheckAssignmentToExpression(ctxt, fa.getTarget(), assignment.disjunct(faBlame));
             }
             case CtSuperAccess<?> sa -> {
-                    System.out.println("Unhandled: " + assigned);
+                //TODO: handle this
+                System.out.println("Unhandled: " + assigned);
             }
             case CtVariableAccess<?> va -> {
                 return typecheckAssignmentToVariable(ctxt, va.getVariable(), assignment);
             }
+            case CtConstructorCall<?> c -> {
+                //noop: it's a newly initialized object so there are no side effects
+            }
+            case CtTypeAccess<?> t -> {
+                //noop: it's a static method call
+            }
+            case CtThisAccess<?> ignored -> {
+                //noop - writes to fields of `this` already taken care of higher in stack
+            }
+            case CtInvocation<?> inv -> {
+                //for example a.foo().bar() is treated as a write to `a`
+                typecheckAssignmentToExpression(ctxt, inv.getTarget(), assignment);
+            }
+            case null -> {}
             default -> throw new IllegalArgumentException("Unexpected assignment to expression: " + assigned);
         }
         return ctxt;

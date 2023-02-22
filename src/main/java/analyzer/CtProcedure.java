@@ -7,10 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.cu.SourcePositionHolder;
-import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.*;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.visitor.filter.TypeFilter;
 import spoon.support.sniper.internal.SourceFragment;
@@ -47,6 +44,10 @@ public class CtProcedure implements SourcePositionHolder {
         return (underlying instanceof CtMethod<?> m && m.isAbstract());
     }
 
+    public boolean isConstructor() {
+        return (underlying instanceof CtConstructor<?>);
+    }
+
     public Optional<CtMethod<?>> asMethod() {
         if (underlying instanceof CtMethod<?> m) {
             return Optional.of(m);
@@ -78,6 +79,10 @@ public class CtProcedure implements SourcePositionHolder {
 
     public CtProcedure(CtMethod<?> method, ProgramAnalyzer parentAnalyzer) {
         this((CtBodyHolder) method, parentAnalyzer);
+    }
+
+    public CtProcedure(CtConstructor<?> constr, ProgramAnalyzer parentAnalyzer) {
+        this((CtBodyHolder) constr, parentAnalyzer);
     }
 
     public CtProcedure(CtLoop loop, ProgramAnalyzer parentAnalyzer) {

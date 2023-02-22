@@ -6,12 +6,10 @@ import core.codemodel.elements.Call;
 import core.codemodel.elements.Field;
 import core.codemodel.elements.Procedure;
 import core.codemodel.elements.Variable;
-import core.codemodel.events.Line;
 import core.codemodel.events.Pi;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import util.Unit;
 
@@ -39,9 +37,6 @@ public class ProgramAnalyzer {
         closures.determineOverrides();
         closures.transitivelyClose();
         typechecker.performTypechecking();
-    }
-
-    private void analyzeMethod(CtMethod<?> method) {
     }
 
     public boolean isIntrasourceCall(Call c) {

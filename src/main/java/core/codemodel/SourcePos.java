@@ -2,9 +2,11 @@ package core.codemodel;
 
 import org.apache.commons.lang3.ArrayUtils;
 import spoon.reflect.code.CtBinaryOperator;
+import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.cu.SourcePosition;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
 import java.util.Arrays;
@@ -58,6 +60,17 @@ public record SourcePos(String file, int[] position) {
                         //warning: this could contain spaced around operand, I don't see how to avoid that
                         binop.getLeftHandOperand().getPosition().getSourceEnd() + 1,
                         binop.getRightHandOperand().getPosition().getSourceStart() - 1
+                });
+    }
+
+    public static SourcePos fromConstr(CtConstructorCall<?> constr) {
+        if (constr.getArguments().isEmpty()) {
+            return fromSpoon(constr.getPosition());
+        }
+        return new SourcePos(constr.getPosition().getFile().getPath(),
+                new int[] {
+                        constr.getPosition().getSourceStart(),
+                        constr.getArguments().get(0).getPosition().getSourceStart() - 1
                 });
     }
 

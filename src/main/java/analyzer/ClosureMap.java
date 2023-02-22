@@ -2,6 +2,7 @@ package analyzer;
 
 import core.codemodel.elements.*;
 import spoon.reflect.code.*;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
@@ -9,6 +10,11 @@ import util.Util;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+/*
+TODO: test closure map better - for example the touchcondition logic for calls `a.foo()` being interpreted as
+ writes to `a` iff `foo()` writes to self
+*/
 
 public class ClosureMap {
     final Map<Procedure, ClosureType> data = new HashMap<>();
@@ -28,6 +34,8 @@ public class ClosureMap {
     void computeClosures() {
         parentAnalyzer.model.getElements(new TypeFilter<>(CtMethod.class))
                 .forEach(this::computeClosureForMethod);
+        parentAnalyzer.model.getElements(new TypeFilter<>(CtConstructor.class))
+                .forEach(this::computeClosureForConstructor);
     }
 
     void transitivelyClose() {
@@ -65,7 +73,16 @@ public class ClosureMap {
     }
 
     void computeClosureForMethod(CtMethod<?> method) {
-        CtProcedure procedure = new CtProcedure(method, parentAnalyzer);
+        computeClosureForProcedure(new CtProcedure(method, parentAnalyzer));
+    }
+
+    void computeClosureForConstructor(CtConstructor<?> constr) {
+        if (!constr.isImplicit()) {
+            computeClosureForProcedure(new CtProcedure(constr, parentAnalyzer));
+        }
+    }
+
+    void computeClosureForProcedure(CtProcedure procedure) {
         Procedure procKey = parentAnalyzer.procedureIndexer.lookupOrCreate(procedure);
 
         ClosureType closure = new ClosureType(procedure);
@@ -397,7 +414,7 @@ public class ClosureMap {
         }
 
         private ClosureType processRead(CtExpression<?> expr) {
-            if (expr == null) {
+            if (expr == null || expr.isImplicit()) {
                 return this;
             }
             switch (expr) {
@@ -512,11 +529,9 @@ public class ClosureMap {
                 }
                 case CtThisAccess<?> ignored ->
                     writes.merge(new Self(), condition, TouchCondition::or);
-                case CtInvocation<?> ignored -> {
-                    /*
-                    this is a case like a.b().c() - which could technically behave as a write to a if b() returns
-                    self, but I'm not gonna track that , I'm gonna ignore it
-                     */
+                case CtInvocation<?> inv -> {
+                    //for example a.foo().bar() is treated as a write to `a`
+                    processWrite(inv.getTarget());
                 }
                 case CtConstructorCall<?> ignored -> {
                     //can't think of anything to track here

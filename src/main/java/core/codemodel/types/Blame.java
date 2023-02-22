@@ -5,7 +5,10 @@ import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 public class Blame {
     private final Map<BlameSite, IntraflowEvent> data;
@@ -43,5 +46,11 @@ public class Blame {
 
     public Blame disjunct(Blame other) {
         return new Blame(Util.mergeMaps(data, other.data, IntraflowEvent::disjunct));
+    }
+
+    public static Blame conjunctListWithPhi(List<Blame> blames, IntFunction<Phi> phiGenerator) {
+        return IntStream.range(0, blames.size())
+                .mapToObj(i -> blames.get(i).conjunctPhi(phiGenerator.apply(i)))
+                .reduce(Blame.zero(), Blame::disjunct);
     }
 }

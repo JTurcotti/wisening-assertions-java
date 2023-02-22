@@ -3,6 +3,7 @@ package core.codemodel;
 import core.codemodel.events.Line;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePositionHolder;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
 import java.util.*;
@@ -96,6 +97,10 @@ public class Indexer<OutputT, IndexingT, AuxT> {
 
         public Line lookupOrCreateBinop(CtBinaryOperator<?> binop) {
             return super.lookupOrCreate(SourcePos.fromBinop(binop), Set.of(binop));
+        }
+
+        public Line lookupOrCreateConstr(CtConstructorCall<?> constr) {
+            return super.lookupOrCreate(SourcePos.fromConstr(constr), Set.of(constr));
         }
 
         /*
