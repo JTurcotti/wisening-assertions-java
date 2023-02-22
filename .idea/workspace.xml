@@ -4,16 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fill in some typechecking">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="more typechecking, focussing on invocations">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualBranch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/simple/controlflow/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +100,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="69195000" />
+      <workItem from="1676765368190" duration="73470000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -223,7 +221,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677085341247</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="more typechecking, focussing on invocations">
+      <created>1677097050918</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1677097050918</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -258,7 +263,8 @@
     <MESSAGE value="add full context for typechecking" />
     <MESSAGE value="refactoring and add typechecking skeleton" />
     <MESSAGE value="fill in some typechecking" />
-    <option name="LAST_COMMIT_MESSAGE" value="fill in some typechecking" />
+    <MESSAGE value="more typechecking, focussing on invocations" />
+    <option name="LAST_COMMIT_MESSAGE" value="more typechecking, focussing on invocations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -301,18 +307,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>320</line>
+          <line>344</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>353</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>197</line>
-          <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
@@ -321,7 +317,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>372</line>
+          <line>396</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -333,6 +329,16 @@
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java</url>
           <line>112</line>
           <option name="timeStamp" value="69" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
+          <line>376</line>
+          <option name="timeStamp" value="70" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
+          <line>126</line>
+          <option name="timeStamp" value="76" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1,7 +1,6 @@
 package analyzer;
 
 import core.codemodel.Indexer;
-import core.codemodel.SourcePos;
 import core.codemodel.elements.Call;
 import core.codemodel.elements.Field;
 import core.codemodel.elements.Procedure;
@@ -11,7 +10,6 @@ import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtVariable;
-import util.Unit;
 
 import java.util.*;
 
@@ -20,7 +18,7 @@ public class ProgramAnalyzer {
     final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
     final Indexer.BySourceLine lineIndexer = new Indexer.BySourceLine();
     final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer = new Indexer.BySourcePos<>(Call::new);
-    final Indexer<Pi, SourcePos, Unit> piIndexer = new Indexer<>(Pi::new);
+    final Indexer.BySourcePos<Pi, CtVirtualBranch> branchIndexer = new Indexer.BySourcePos<>(Pi::new);
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
     final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);
 

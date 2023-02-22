@@ -20,6 +20,7 @@ public record SourcePos(String file, int[] position) {
     }
 
     public static SourcePos fromFieldAccess(CtFieldAccess<?> fa) {
+        //TODO: use getOriginalSourceFragment to improve this
         if (fa.getVariable().getPosition().isValidPosition()) {
             return fromSpoon(fa.getVariable().getPosition());
         }
@@ -35,6 +36,7 @@ public record SourcePos(String file, int[] position) {
     }
 
     public static SourcePos fromUnop(CtUnaryOperator<?> unop) {
+        //TODO: use getOriginalSourceFragment to improve this
         int start, end;
         switch (unop.getKind()) {
             case COMPL, NEG, NOT, POS -> {
@@ -57,7 +59,7 @@ public record SourcePos(String file, int[] position) {
     public static SourcePos fromBinop(CtBinaryOperator<?> binop) {
         return new SourcePos(binop.getPosition().getFile().getPath(),
                 new int[] {
-                        //warning: this could contain spaced around operand, I don't see how to avoid that
+                        //TODO: use getOriginalSourceFragment to improve this
                         binop.getLeftHandOperand().getPosition().getSourceEnd() + 1,
                         binop.getRightHandOperand().getPosition().getSourceStart() - 1
                 });
@@ -67,6 +69,7 @@ public record SourcePos(String file, int[] position) {
         if (constr.getArguments().isEmpty()) {
             return fromSpoon(constr.getPosition());
         }
+        //TODO: use getOriginalSourceFragment to improve this
         return new SourcePos(constr.getPosition().getFile().getPath(),
                 new int[] {
                         constr.getPosition().getSourceStart(),

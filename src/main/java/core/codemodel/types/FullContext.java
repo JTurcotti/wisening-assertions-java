@@ -77,7 +77,7 @@ public record FullContext(
     public FullContext observeReturn(Map<Ret, Blame> blames) {
         Map<Ret, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
         Map<Ret, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
-        return new FullContext(mutables, pcNecessary, pcExact, newResultBlames, assertionBlames, callArgBlames);
+        return new FullContext(MutablesContext.empty(), pcNecessary, IntraflowEvent.zero(), newResultBlames, assertionBlames, callArgBlames);
     }
 
     public FullContext observeAssertion(Assertion assertion, Blame blame) {
@@ -120,5 +120,11 @@ public record FullContext(
                 Util.mergeMaps(callArgBlames, other.callArgBlames, Blame::disjunct);
         return new FullContext(newMutables, newPcNecessary, newPcExact,
                 newResultBlames, newAssertionBlames, newCallArgBlames);
+    }
+
+    public void assertReachable() {
+        if (pcExact.isZero()) {
+            throw new IllegalStateException("This point is unreachable and should not be");
+        }
     }
 }
