@@ -6,8 +6,6 @@ import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.CtElement;
 import spoon.support.sniper.internal.SourceFragment;
 
-import java.util.Optional;
-
 public class CtVirtualBranch implements SourcePositionHolder {
 
     public final CtElement underlying;

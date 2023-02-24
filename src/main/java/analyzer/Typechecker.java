@@ -11,7 +11,6 @@ import spoon.reflect.reference.CtVariableReference;
 import util.Pair;
 import util.Util;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -45,8 +44,13 @@ public class Typechecker {
         }
 
         private FullContext typecheck() {
-            Set<Mutable> readSet = Util.mergeSets(closure.getFieldReads(), closure.getVariableReads());
-            return typecheckStmtList(FullContext.atEntry(readSet), closure.procedure.body);
+            //TODO: appropriately wrap loops
+            Set<PhiInput> params = closure.procedure.parameters.stream()
+                    .map(parentAnalyzer.varIndexer::lookupOrCreate)
+                    .collect(Collectors.toUnmodifiableSet());
+            return typecheckStmtList(FullContext.atEntry(
+                    Util.mergeSets(closure.getInputs(), params)
+            ), closure.procedure.body);
         }
 
         private FullContext typecheckStmtList(FullContext ctxt, CtStatementList stmts) {
@@ -94,6 +98,8 @@ public class Typechecker {
                 Call call, Procedure proc,
                 List<CtExpression<?>> args,
                 Set<PhiInput> inputs, Set<PhiOutput> outputs) {
+            //TODO: don't pull argument to for each loop from context, but refresh to original
+
             boolean touchesMutables =
                     inputs.stream().anyMatch(Mutable.class::isInstance) ||
                             outputs.stream().anyMatch(Mutable.class::isInstance);
@@ -178,14 +184,16 @@ public class Typechecker {
                     ctxt = selector.left();
                     Blame selectorBlame = selector.right();
 
-                    UnaryOperator<FullContext> fallback = UnaryOperator.identity();
+                    //if there's a default case, use it as the final fallback, otherwise no fallback
+                    UnaryOperator<FullContext> fallback = s.getCases().stream()
+                            .filter(c -> c.getCaseExpression() == null)
+                            .map(c -> typecheckCond(null, selectorBlame, new CtVirtualBranch(c),
+                                    typecheckStmtList(c), UnaryOperator.identity()))
+                            .findFirst()
+                            .orElse(UnaryOperator.identity());
 
                     for (CtCase<?> c : Util.reversed(s.getCases())) {
-                        if (c.getCaseExpression() == null) {
-                            //default case
-                            fallback = typecheckCond(null, selectorBlame, new CtVirtualBranch(c),
-                                    typecheckStmtList(c), UnaryOperator.identity());
-                        } else {
+                        if (c.getCaseExpression() != null) {
                             fallback = typecheckCond(c.getCaseExpression(), selectorBlame, new CtVirtualBranch(c),
                                     typecheckStmtList(c), fallback);
                         }
@@ -204,44 +212,58 @@ public class Typechecker {
                 case CtInvocation<?> i -> {
                     return typecheckExpression(ctxt, i).left();
                 }
-                case CtWhile w -> {
-                    ClosureMap.ClosureType closure = parentAnalyzer.closures.lookupByElement(w);
-                    System.out.println("Unhandled: " + stmt);
-                }
-                case CtDo d -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
-                }
-                case CtFor f -> {
-                    System.out.println("Unhandled: " + stmt);
-                    //TODO: handle this
-                    for (CtStatement init: f.getForInit()) {
-                        ctxt = typecheckStmt(ctxt, init);
+                case CtLoop loop -> {
+                    if (loop instanceof CtForEach fe) {
+                        //if a for each loop, initialize the iterator
+                        Variable v = parentAnalyzer.varIndexer.lookupOrCreate(fe.getVariable());
+                        Pair<FullContext, Blame> checkCollection = typecheckExpression(ctxt, fe.getExpression());
+                        ctxt = checkCollection.left().performAssignment(v, checkCollection.right());
                     }
-                    return ctxt;
-                }
-                case CtForEach f -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
+
+                    if (loop instanceof CtFor f) {
+                        //if a for loop, typecheck the init statements
+                        for (CtStatement s : f.getForInit()) {
+                            ctxt = typecheckStmt(ctxt, s);
+                        }
+                    }
+
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(loop));
+                    Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(() ->
+                            new IllegalStateException("Expected procedure lookup to succeed"));
+                    ClosureMap.ClosureType loopClosure = parentAnalyzer.closures.lookupByElement(loop);
+                    return typecheckInvocation(ctxt, null, Blame.zero(), c, p, List.of(),
+                            loopClosure.getInputs(), loopClosure.getOutputs()).left();
                 }
                 case CtTry t -> {
                     //TODO: deal with exception handling - or at least some minimal switch-like processing
                     //return typecheckStmtList(ctxt, t.getBody());
                 }
                 case CtReturn<?> r -> {
-                    if (r.getReturnedExpression() == null) {
-                        return ctxt.observeReturn(Map.of());
+                    Map<PhiOutput, Blame> results = Map.of();
+                    if (r.getReturnedExpression() != null) {
+                        Pair<FullContext, Blame> retBlame = typecheckExpression(ctxt, r.getReturnedExpression());
+                        ctxt = retBlame.left();
+                        results = Map.of(new Ret(procedure), retBlame.right());
                     }
-                    Pair<FullContext, Blame> retBlame = typecheckExpression(ctxt, r.getReturnedExpression());
-                    return ctxt.observeReturn(Map.of(new Ret(procedure), retBlame.right()));
+                    return ctxt.observeReturn(Util.mergeDisjointMaps(results, ctxt.lookupPhiOutputs(closure.getOutputs())));
                 }
                 case CtBreak b -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
+                    if (b.getParent(parent -> parent instanceof CtLoop || parent instanceof CtSwitch<?>) instanceof CtLoop) {
+                        return ctxt.observeReturn(ctxt.lookupPhiOutputs(closure.getOutputs()));
+                    }
+                    //ignore breaks in switch statements
+                    //TODO: make switch statement handling break-sensitive
+                    return ctxt;
                 }
                 case CtContinue c -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
+                    Pair<FullContext, Blame> checkContinue = typecheckInvocation(
+                            ctxt, null, Blame.zero(),
+                            parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(c)),
+                            procedure,
+                            List.of(),
+                            closure.getInputs(), closure.getOutputs()
+                    );
+                    return checkContinue.left().observeReturn(ctxt.lookupPhiOutputs(closure.getOutputs()));
                 }
                 case CtUnaryOperator<?> u -> {
                     return typecheckExpression(ctxt, u).left();
@@ -376,9 +398,9 @@ public class Typechecker {
                         ClosureMap.ClosureType closure = parentAnalyzer.closures.lookupByCall(c);
 
                         if (inv.getTarget() instanceof CtThisAccess<?> || inv.getTarget() instanceof CtSuperAccess<?>) {
-                            argSet = Stream.concat(argSet.stream(), closure.getFieldReads().stream())
+                            argSet = Stream.concat(argSet.stream(), closure.getInputs().stream())
                                     .collect(Collectors.toUnmodifiableSet());
-                            retSet = Stream.concat(retSet.stream(), closure.getFieldWrites().stream()
+                            retSet = Stream.concat(retSet.stream(), closure.getOutputs().stream()
                             ).collect(Collectors.toUnmodifiableSet());
                         } else {
                             if (closure.readsSelf()) {
@@ -390,13 +412,13 @@ public class Typechecker {
                         }
                     }
 
-                    //TODO: add syntactic blame for call
                     return typecheckInvocation(ctxt, inv.getTarget(), callBlame, c, p, inv.getArguments(), argSet, retSet);
                 }
                 case CtLiteral<?> lit -> {
                     return typecheckOpaque(ctxt, lit);
                 }
                 case CtUnaryOperator<?> unop -> {
+                    ///TODO: handle ++ as a write
                     Blame unopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop));
                     return typecheckExpression(ctxt, unop.getOperand()).mapRight(unopBlame::disjunct);
                 }

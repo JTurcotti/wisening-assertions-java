@@ -3,8 +3,6 @@ package core.codemodel;
 import org.apache.commons.lang3.ArrayUtils;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
-import spoon.reflect.declaration.CtConstructor;
-import spoon.reflect.declaration.CtElement;
 
 import java.util.Arrays;
 

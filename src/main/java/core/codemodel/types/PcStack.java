@@ -6,7 +6,6 @@ import util.Util;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 record PcStack(List<Pair<SignedPi, Blame>> stack) {
     PcStack() {

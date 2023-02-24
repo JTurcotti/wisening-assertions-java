@@ -2,7 +2,9 @@ package supervisor;
 
 import core.codemodel.events.*;
 import core.dependencies.*;
-import core.formula.*;
+import core.formula.ErrorFormulaProvider;
+import core.formula.FormulaProvider;
+import core.formula.TotalFormulaProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;

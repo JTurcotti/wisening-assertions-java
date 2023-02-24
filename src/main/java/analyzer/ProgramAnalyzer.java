@@ -11,7 +11,8 @@ import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtVariable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 
 public class ProgramAnalyzer {
     final CtModel model;

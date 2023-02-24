@@ -1,10 +1,12 @@
 package core.codemodel.types;
 
 import core.codemodel.elements.Mutable;
+import core.codemodel.elements.PhiInput;
 import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;

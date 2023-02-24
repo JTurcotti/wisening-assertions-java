@@ -59,6 +59,12 @@ public class Util {
                 ));
     }
 
+    public static <K, V> Map<K, V> mergeDisjointMaps(Map<K, V> left, Map<K, V> right) {
+        return mergeMaps(left, right, (ignored, ignored2) -> {
+            throw new IllegalArgumentException("Passed maps are not disjoint");
+        });
+    }
+
     public static <T> Set<T> mergeSets(Set<? extends T> left, Set<? extends T> right) {
         return Stream.concat(left.stream(), right.stream()).collect(Collectors.toUnmodifiableSet());
     }

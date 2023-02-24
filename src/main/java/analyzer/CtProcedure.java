@@ -2,16 +2,17 @@ package analyzer;
 
 import core.codemodel.SourcePos;
 import core.codemodel.elements.Field;
-import core.codemodel.elements.Procedure;
 import org.jetbrains.annotations.Nullable;
-import spoon.reflect.code.*;
+import spoon.reflect.code.CtBlock;
+import spoon.reflect.code.CtBodyHolder;
+import spoon.reflect.code.CtLoop;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.*;
-import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.visitor.filter.TypeFilter;
 import spoon.support.sniper.internal.SourceFragment;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CtProcedure implements SourcePositionHolder {
@@ -21,6 +22,8 @@ public class CtProcedure implements SourcePositionHolder {
     public final CtElement underlying;
 
     private final ProgramAnalyzer parentAnalyzer;
+
+    public final List<CtParameter<?>> parameters;
 
     @Override
     public SourcePosition getPosition() {
@@ -44,8 +47,16 @@ public class CtProcedure implements SourcePositionHolder {
         return (underlying instanceof CtMethod<?> m && m.isAbstract());
     }
 
+    public boolean isMethod() {
+        return (underlying instanceof CtMethod<?>);
+    }
+
     public boolean isConstructor() {
         return (underlying instanceof CtConstructor<?>);
+    }
+
+    public boolean isLoop() {
+        return (underlying instanceof CtLoop);
     }
 
     public Optional<CtMethod<?>> asMethod() {
@@ -62,10 +73,11 @@ public class CtProcedure implements SourcePositionHolder {
         return asMethod().get().isOverriding(superProc.asMethod().get());
     }
 
-    private CtProcedure(CtBodyHolder e, ProgramAnalyzer parentAnalyzer) {
+    private CtProcedure(CtBodyHolder e, List<CtParameter<?>> parameters, ProgramAnalyzer parentAnalyzer) {
         this.declaringType = e.getParent(new TypeFilter<>(CtType.class));
         this.underlying = e;
         this.parentAnalyzer = parentAnalyzer;
+        this.parameters = parameters;
         if (e.getBody() instanceof CtBlock<?> block) {
             this.body = block;
         } else {
@@ -78,15 +90,15 @@ public class CtProcedure implements SourcePositionHolder {
     }
 
     public CtProcedure(CtMethod<?> method, ProgramAnalyzer parentAnalyzer) {
-        this((CtBodyHolder) method, parentAnalyzer);
+        this(method, method.getParameters(), parentAnalyzer);
     }
 
     public CtProcedure(CtConstructor<?> constr, ProgramAnalyzer parentAnalyzer) {
-        this((CtBodyHolder) constr, parentAnalyzer);
+        this(constr, constr.getParameters(), parentAnalyzer);
     }
 
     public CtProcedure(CtLoop loop, ProgramAnalyzer parentAnalyzer) {
-        this((CtBodyHolder) loop, parentAnalyzer);
+        this(loop, List.of(), parentAnalyzer);
     }
 
     /*

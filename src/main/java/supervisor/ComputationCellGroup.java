@@ -1,7 +1,7 @@
 package supervisor;
 
-import core.dependencies.Dependency;
 import core.codemodel.events.Event;
+import core.dependencies.Dependency;
 import core.formula.FormulaProvider;
 
 import java.util.*;

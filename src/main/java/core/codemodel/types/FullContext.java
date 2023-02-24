@@ -1,14 +1,14 @@
 package core.codemodel.types;
 
-import core.codemodel.elements.CallInput;
-import core.codemodel.elements.Mutable;
-import core.codemodel.elements.PhiOutput;
+import core.codemodel.elements.*;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public record FullContext(
         MutablesContext mutables,
@@ -25,8 +25,11 @@ public record FullContext(
         return new FullContext(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
     }
 
-    public static FullContext atEntry(Set<Mutable> entrySet) {
-        return new FullContext(MutablesContext.atEntry(entrySet), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
+    public static FullContext atEntry(Set<PhiInput> entrySet) {
+        return new FullContext(
+                MutablesContext.atEntry(entrySet.stream().map(PhiInput::assertMutable)
+                        .collect(Collectors.toUnmodifiableSet())),
+                new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
     }
 
     public Blame lookupMutable(Mutable mutable) {
@@ -34,6 +37,18 @@ public record FullContext(
             return mutables.data.get(mutable);
         }
         throw new IllegalArgumentException("Context does not contain requested mutable: " + mutable);
+    }
+
+    public Blame lookupPhiOutput(PhiOutput output) {
+        return switch (output) {
+            case Field f -> lookupMutable(f);
+            case Variable v -> lookupMutable(v);
+            default -> throw new IllegalArgumentException("Requested PhiOutput cannot be looked up because it is not a mutable: " + output);
+        };
+    }
+
+    public Map<PhiOutput, Blame> lookupPhiOutputs(Set<PhiOutput> outputs) {
+        return outputs.stream().collect(Collectors.toUnmodifiableMap(Function.identity(), this::lookupPhiOutput));
     }
 
     /*

@@ -6,6 +6,7 @@ import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
 
@@ -103,6 +104,12 @@ public class ClosureMap {
 
         closure.processStmtList(procedure.body);
 
+        for (CtParameter<?> p : procedure.parameters) {
+            Variable v = parentAnalyzer.varIndexer.lookupOrCreate(p);
+            closure.reads.remove(v);
+            closure.writes.remove(v);
+        }
+
         data.put(procKey, closure);
     }
 
@@ -189,7 +196,7 @@ public class ClosureMap {
 
 
         //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
-        Set<Field> getFieldReads() {
+        private Set<Field> getFieldReads() {
             return Stream.concat(fieldReads.stream(),
                     reads.stream().flatMap(c -> {
                         if (c instanceof Field f) {
@@ -207,7 +214,7 @@ public class ClosureMap {
         }
 
         //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
-        Set<Field> getFieldWrites() {
+        private Set<Field> getFieldWrites() {
             return Stream.concat(fieldWrites.stream(),
                     writes.keySet().stream().flatMap(c -> {
                         if (c instanceof Field f && (writes.get(c).satisfied(ClosureMap.this))) {
@@ -225,16 +232,29 @@ public class ClosureMap {
         }
 
         //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
-        Set<Variable> getVariableReads() {
+        private Set<Variable> getVariableReads() {
             return reads.stream().map(ClosedOver::asVariable).flatMap(Optional::stream)
                     .collect(Collectors.toUnmodifiableSet());
         }
 
         //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
-        Set<Variable> getVariableWrites() {
+        private Set<Variable> getVariableWrites() {
             return writes.keySet().stream().flatMap(c ->
                     c instanceof Variable v && writes.get(v).satisfied(ClosureMap.this)?
                             Stream.of(v): Stream.empty())
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+
+        Set<PhiInput> getInputs() {
+            return Stream.concat(
+                            Stream.concat(getFieldWrites().stream(), getVariableWrites().stream()),
+                            Stream.concat(getFieldReads().stream(), getVariableReads().stream()))
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+
+        //WARNING: not guaranteed to return correct value until determineOverrides and transitivelyClose are called
+        Set<PhiOutput> getOutputs() {
+            return Stream.concat(getFieldWrites().stream(), getVariableWrites().stream())
                     .collect(Collectors.toUnmodifiableSet());
         }
 
@@ -423,7 +443,7 @@ public class ClosureMap {
 
                     data.put(proc, new ClosureType(fixpoint).processStmt(f.getBody()));
 
-                    merge(copy().processStmt(f.getBody()).processStmt(f.getVariable()));
+                    merge(copy().processStmt(f.getBody()).processStmt(f.getVariable()).processRead(f.getExpression()));
 
                     Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
                     calls.add(call);

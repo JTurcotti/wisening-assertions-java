@@ -3,7 +3,6 @@ package core.codemodel;
 import core.codemodel.events.Line;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePositionHolder;
-import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
 import java.util.*;
