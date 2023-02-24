@@ -103,6 +103,10 @@ public class Indexer<OutputT, IndexingT, AuxT> {
             return super.lookupOrCreate(SourcePos.fromConstr(constr), Set.of(constr));
         }
 
+        public Line lookupOrCreateInv(CtInvocation<?> inv) {
+            return super.lookupOrCreate(SourcePos.fromInvocation(inv), Set.of(inv));
+        }
+
         /*
         Get a new line whose source position is the entire source position of the passed element
          */

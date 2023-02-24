@@ -1,8 +1,10 @@
 package analyzer;
 
+import core.codemodel.SourcePos;
 import core.codemodel.elements.*;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtConstructor;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
@@ -30,6 +32,17 @@ public class ClosureMap {
             throw new IllegalStateException("Closure map incomplete - no entry for procedure: " + callProc);
         }
         return data.get(callProc);
+    }
+
+    ClosureType lookupByElement(CtElement elem) {
+        Optional<Procedure> proc = parentAnalyzer.procedureIndexer.lookup(SourcePos.fromSpoon(elem.getPosition()));
+        if (proc.isEmpty()) {
+            throw new IllegalStateException("The provided element is not associated with a procedure: " + elem);
+        }
+        if (!data.containsKey(proc.get())) {
+            throw new IllegalStateException("Closure map incomplete - no entry for procedure: " + proc);
+        }
+        return data.get(proc.get());
     }
 
     void computeClosures() {

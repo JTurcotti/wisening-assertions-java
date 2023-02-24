@@ -1,8 +1,8 @@
 package core.codemodel.types;
 
-import core.codemodel.elements.CallArgPair;
+import core.codemodel.elements.CallInput;
 import core.codemodel.elements.Mutable;
-import core.codemodel.elements.Ret;
+import core.codemodel.elements.PhiOutput;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
 import util.Util;
@@ -14,9 +14,9 @@ public record FullContext(
         MutablesContext mutables,
         PcStack pcNecessary,
         IntraflowEvent pcExact,
-        Map<Ret, Blame> resultBlames,
+        Map<PhiOutput, Blame> resultBlames,
         Map<Assertion, Blame> assertionBlames,
-        Map<CallArgPair, Blame> callArgBlames) {
+        Map<CallInput, Blame> callArgBlames) {
 
     /*
     Generate an empty FullContext corresponding to the beginning of a program
@@ -74,9 +74,9 @@ public record FullContext(
                 .mapToObj(i -> blames1.get(i).disjunct(blames2.get(i))).toList();
     }*/
 
-    public FullContext observeReturn(Map<Ret, Blame> blames) {
-        Map<Ret, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
-        Map<Ret, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
+    public FullContext observeReturn(Map<PhiOutput, Blame> blames) {
+        Map<PhiOutput, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
+        Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
         return new FullContext(MutablesContext.empty(), pcNecessary, IntraflowEvent.zero(), newResultBlames, assertionBlames, callArgBlames);
     }
 
@@ -89,12 +89,12 @@ public record FullContext(
         return new FullContext(mutables, pcNecessary, pcExact, resultBlames, newAssertionBlames, callArgBlames);
     }
 
-    public FullContext observeCallArg(CallArgPair callArg, Blame blame) {
+    public FullContext observeCallArg(CallInput callArg, Blame blame) {
         //TODO: conjunct in event pcExact that flow reaches this call
         if (callArgBlames.containsKey(callArg)) {
             throw new IllegalArgumentException("Provided call arg is already in context");
         }
-        Map<CallArgPair, Blame> newCallArgBlames = Util.addToImmutableMap(callArgBlames, callArg, blame);
+        Map<CallInput, Blame> newCallArgBlames = Util.addToImmutableMap(callArgBlames, callArg, blame);
         return new FullContext(mutables, pcNecessary, pcExact, resultBlames, assertionBlames, newCallArgBlames);
     }
 
@@ -113,10 +113,10 @@ public record FullContext(
                 Util::assertEq
         ).orElseThrow(IllegalArgumentException::new);
         IntraflowEvent newPcExact = pcExact.disjunct(other.pcExact);
-        Map<Ret, Blame> newResultBlames = Util.mergeMaps(resultBlames, other.resultBlames, Blame::disjunct);
+        Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(resultBlames, other.resultBlames, Blame::disjunct);
         Map<Assertion, Blame> newAssertionBlames =
                 Util.mergeMaps(assertionBlames, other.assertionBlames, Blame::disjunct);
-        Map<CallArgPair, Blame> newCallArgBlames =
+        Map<CallInput, Blame> newCallArgBlames =
                 Util.mergeMaps(callArgBlames, other.callArgBlames, Blame::disjunct);
         return new FullContext(newMutables, newPcNecessary, newPcExact,
                 newResultBlames, newAssertionBlames, newCallArgBlames);

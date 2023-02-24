@@ -1,10 +1,7 @@
 package core.codemodel;
 
 import org.apache.commons.lang3.ArrayUtils;
-import spoon.reflect.code.CtBinaryOperator;
-import spoon.reflect.code.CtConstructorCall;
-import spoon.reflect.code.CtFieldAccess;
-import spoon.reflect.code.CtUnaryOperator;
+import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
@@ -74,6 +71,18 @@ public record SourcePos(String file, int[] position) {
                 new int[] {
                         constr.getPosition().getSourceStart(),
                         constr.getArguments().get(0).getPosition().getSourceStart() - 1
+                });
+    }
+
+    public static SourcePos fromInvocation(CtInvocation<?> inv) {
+        if (inv.getArguments().isEmpty()) {
+            return fromSpoon(inv.getPosition());
+        }
+        //TODO: use getOriginalSourceFragment to improve this
+        return new SourcePos(inv.getPosition().getFile().getPath(),
+                new int[] {
+                        inv.getPosition().getSourceStart(),
+                        inv.getArguments().get(0).getPosition().getSourceStart() - 1
                 });
     }
 

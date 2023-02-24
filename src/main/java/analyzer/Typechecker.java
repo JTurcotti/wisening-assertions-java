@@ -11,10 +11,13 @@ import spoon.reflect.reference.CtVariableReference;
 import util.Pair;
 import util.Util;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Typechecker {
     private final ProgramAnalyzer parentAnalyzer;
@@ -83,6 +86,68 @@ public class Typechecker {
             return c -> typecheckCond(c, guardExpr, extraGuardBlame, branch, trueBranch, falseBranch);
         }
 
+        private Pair<FullContext, Blame> typecheckInvocation(
+                FullContext ctxt,
+                //receiver = null if self is an input or input, receiver != null if fields are input or output
+                CtExpression<?> receiver,
+                Blame callBlame, //the syntactic blame for the call itself
+                Call call, Procedure proc,
+                List<CtExpression<?>> args,
+                Set<PhiInput> inputs, Set<PhiOutput> outputs) {
+            boolean touchesMutables =
+                    inputs.stream().anyMatch(Mutable.class::isInstance) ||
+                            outputs.stream().anyMatch(Mutable.class::isInstance);
+            boolean touchesSelf =
+                    inputs.stream().anyMatch(Self.class::isInstance) ||
+                    outputs.stream().anyMatch(Self.class::isInstance);
+            if (touchesSelf && touchesMutables) {
+                throw new IllegalArgumentException("Invocations that touch self should not be closed over fields or vars");
+            }
+
+            Optional<Blame> receiverBlame = Optional.empty();
+            if (receiver != null) {
+                Pair<FullContext, Blame> checkReceiver = typecheckExpression(ctxt, receiver);
+                ctxt = checkReceiver.left();
+                receiverBlame = Optional.of(checkReceiver.right());
+            }
+            final Optional<Blame> finalReceiverBlame = receiverBlame;
+
+
+            Pair<FullContext, List<Blame>> checkArgs = typecheckExprListBlameDisjoint(ctxt, args);
+            ctxt = checkArgs.left();
+            List<Blame> argBlames = checkArgs.right();
+
+            final FullContext ctxtAtInput = ctxt;
+
+            List<PhiInput> inputList = inputs.stream().toList();
+            List<Blame> inputBlames = inputList.stream().map(input ->
+                    switch (input) {
+                        case Arg a -> argBlames.get(a.num());
+                        case Field f -> ctxtAtInput.lookupMutable(f);
+                        case Self s -> finalReceiverBlame.get();
+                        case Variable v -> ctxtAtInput.lookupMutable(v);
+                    }).toList();
+            Function<PhiOutput, Blame> blameGenerator = output ->
+                    Blame.conjunctListWithPhi(inputBlames, i ->
+                            new Phi(proc, inputList.get(i), output))
+                            .disjunct(Blame.oneSite(new CallOutput(call, output)))
+                            .disjunct(callBlame);
+            Blame retBlame = Blame.zero();
+            for (PhiOutput output : outputs) {
+               switch (output) {
+                   case Field f ->
+                           ctxt = ctxt.performAssignment(f, blameGenerator.apply(f));
+                   case Ret r ->
+                       retBlame = blameGenerator.apply(r);
+                   case Self s ->
+                       ctxt = typecheckAssignmentToExpression(ctxt, receiver, blameGenerator.apply(s));
+                   case Variable v ->
+                       ctxt = ctxt.performAssignment(v, blameGenerator.apply(v));
+               }
+            }
+            return new Pair<>(ctxt, retBlame);
+        }
+
         private UnaryOperator<FullContext> typecheckStmt(CtStatement stmt) {
             return ctxt -> typecheckStmt(ctxt, stmt);
         }
@@ -140,7 +205,7 @@ public class Typechecker {
                     return typecheckExpression(ctxt, i).left();
                 }
                 case CtWhile w -> {
-                    //TODO: handle this
+                    ClosureMap.ClosureType closure = parentAnalyzer.closures.lookupByElement(w);
                     System.out.println("Unhandled: " + stmt);
                 }
                 case CtDo d -> {
@@ -160,7 +225,7 @@ public class Typechecker {
                     System.out.println("Unhandled: " + stmt);
                 }
                 case CtTry t -> {
-                    //TODO: deal with exception handling
+                    //TODO: deal with exception handling - or at least some minimal switch-like processing
                     //return typecheckStmtList(ctxt, t.getBody());
                 }
                 case CtReturn<?> r -> {
@@ -168,7 +233,7 @@ public class Typechecker {
                         return ctxt.observeReturn(Map.of());
                     }
                     Pair<FullContext, Blame> retBlame = typecheckExpression(ctxt, r.getReturnedExpression());
-                    return ctxt.observeReturn(Map.of(new Ret(procedure, 0), retBlame.right()));
+                    return ctxt.observeReturn(Map.of(new Ret(procedure), retBlame.right()));
                 }
                 case CtBreak b -> {
                     //TODO: handle this
@@ -285,11 +350,13 @@ public class Typechecker {
                     //TODO: handle callarg tracking
 
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv));
+                    Blame callBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateInv(inv));
 
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
                         //call to a library method - no Phi's introduced just treated like an arithmetic assignment
                         Pair<FullContext, Blame> invResult = typecheckExprList(inv.getArguments())
-                                .apply(typecheckExpression(ctxt, inv.getTarget()));
+                                .apply(typecheckExpression(ctxt, inv.getTarget()))
+                                .mapRight(callBlame::disjunct);
                         return new Pair<>(
                                 Config.NONLOCAL_METHOD_MUTATES_SELF ?
                                         typecheckAssignmentToExpression(invResult.left(), inv.getTarget(), invResult.right()) :
@@ -299,57 +366,32 @@ public class Typechecker {
 
                     Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(
                             () -> new IllegalStateException("Call made that could not be tied to a procedure"));
-                    Pair<FullContext, List<Blame>> args = typecheckExprListBlameDisjoint(ctxt, inv.getArguments());
-                    ctxt = args.left();
-                    List<Blame> argBlames = args.right();
-                    Blame retBlame = Blame.oneSite(new CallRetPair(c, new Ret(p, 0)));
 
-                    if (inv.getExecutable().isStatic()) {
-                        Pair<FullContext, Blame> receiver = typecheckExpression(ctxt, inv.getTarget());
-                        //only passed args can be accessed by method call so no need to consider side effects
-                        return receiver.mapRight(Blame.conjunctListWithPhi(argBlames, i ->
-                                        new Phi(p, new Arg(p, i), new Ret(p, 0)))
-                                .disjunct(retBlame)::disjunct);
-                    }
+                    Set<PhiInput> argSet = IntStream.range(0, inv.getArguments().size())
+                            .mapToObj(i -> new Arg(p, i))
+                            .collect(Collectors.toUnmodifiableSet());
+                    Set<PhiOutput> retSet = Set.of(new Ret(p));
 
-                    if (inv.getTarget() instanceof CtThisAccess<?> || inv.getTarget() instanceof CtSuperAccess<?>) {
-                        List<Field> reads = parentAnalyzer.closures.lookupByCall(c).getFieldReads().stream().toList();
-                        Set<Field> writes = parentAnalyzer.closures.lookupByCall(c).getFieldWrites();
+                    if (!inv.getExecutable().isStatic()) {
+                        ClosureMap.ClosureType closure = parentAnalyzer.closures.lookupByCall(c);
 
-                        List<Blame> fieldBlames = reads.stream().map(ctxt::lookupMutable).toList();
-
-                        Function<Phi.Output, Blame> blameGenerator = output ->
-                                Blame.conjunctListWithPhi(fieldBlames, i ->
-                                                new Phi(p, reads.get(i), output))
-                                        .disjunct(Blame.conjunctListWithPhi(argBlames, i ->
-                                                new Phi(p, new Arg(p, i), output)))
-                                        .disjunct(retBlame);
-
-                        for (Field write : writes) {
-                            ctxt = typecheckAssignmentToField(ctxt,
-                                    parentAnalyzer.fieldIndexer.lookupAux(write).orElseThrow(
-                                            () -> new IllegalStateException("Expected field lookup to succeed: " + write)
-                                    ).getReference(),
-                                    blameGenerator.apply(write));
+                        if (inv.getTarget() instanceof CtThisAccess<?> || inv.getTarget() instanceof CtSuperAccess<?>) {
+                            argSet = Stream.concat(argSet.stream(), closure.getFieldReads().stream())
+                                    .collect(Collectors.toUnmodifiableSet());
+                            retSet = Stream.concat(retSet.stream(), closure.getFieldWrites().stream()
+                            ).collect(Collectors.toUnmodifiableSet());
+                        } else {
+                            if (closure.readsSelf()) {
+                                argSet = Util.addToStream(argSet.stream(), new Self()).collect(Collectors.toUnmodifiableSet());
+                            }
+                            if (closure.writesSelf()) {
+                                retSet = Util.addToStream(retSet.stream(), new Self()).collect(Collectors.toUnmodifiableSet());
+                            }
                         }
-
-                        return new Pair<>(ctxt, blameGenerator.apply(new Ret(p, 0)));
                     }
 
-                    Pair<FullContext, Blame> receiver = typecheckExpression(ctxt, inv.getTarget());
-                    ctxt = receiver.left();
-
-                    Function<Phi.Output, Blame> blameGenerator = output -> {
-                        Blame reciverBlame = parentAnalyzer.closures.lookupByCall(c).readsSelf() ?
-                                receiver.right().conjunctPhi(new Phi(p, new Self(), output)) : Blame.zero();
-                        return Blame.conjunctListWithPhi(argBlames, i -> new Phi(p, new Arg(p, i), output))
-                                .disjunct(reciverBlame)
-                                .disjunct(retBlame);
-                    };
-
-                    return new Pair<>(
-                            typecheckAssignmentToExpression(ctxt, inv.getTarget(), blameGenerator.apply(new Self())),
-                            blameGenerator.apply(new Ret(p, 0)));
+                    //TODO: add syntactic blame for call
+                    return typecheckInvocation(ctxt, inv.getTarget(), callBlame, c, p, inv.getArguments(), argSet, retSet);
                 }
                 case CtLiteral<?> lit -> {
                     return typecheckOpaque(ctxt, lit);
@@ -388,11 +430,13 @@ public class Typechecker {
                     }
                     Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(() ->
                             new IllegalStateException("Expected procedure lookup to succeed"));
-                    return typecheckExprListBlameDisjoint(ctxt, constr.getArguments())
-                            .mapRight(argBlames ->
-                                    Blame.conjunctListWithPhi(argBlames, i -> new Phi(p, new Arg(p, i), new Ret(p, 0)))
-                                            .disjunct(Blame.oneSite(new CallRetPair(c, new Ret(p, 0))))
-                                            .disjunct(constrBlame));
+
+                    Set<PhiInput> argSet = IntStream.range(0, constr.getArguments().size())
+                            .mapToObj(i -> new Arg(p, i))
+                            .collect(Collectors.toUnmodifiableSet());
+                    Set<PhiOutput> retSet = Set.of(new Ret(p));
+
+                    return typecheckInvocation(ctxt, null, constrBlame, c, p, constr.getArguments(), argSet, retSet);
                 }
                 case CtLambda<?> l -> {
                     return typecheckOpaque(ctxt, l);
