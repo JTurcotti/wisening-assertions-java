@@ -57,6 +57,36 @@ public class Typechecker {
             return ctxt;
         }
 
+        private UnaryOperator<FullContext> typecheckStmtList(CtStatementList stmts) {
+            return c -> typecheckStmtList(c, stmts);
+        }
+
+        private FullContext typecheckCond(FullContext ctxt,
+                                          CtExpression<?> guardExpr,
+                                          Blame extraGuardBlame,
+                                          CtVirtualBranch branch,
+                                          UnaryOperator<FullContext> trueBranch,
+                                          UnaryOperator<FullContext> falseBrance) {
+            Pair<FullContext, Blame> guard = typecheckExpression(ctxt, guardExpr);
+            Blame guardBlame = guard.right().disjunct(extraGuardBlame);
+            Pi pi = parentAnalyzer.branchIndexer.lookupOrCreate(branch);
+            return trueBranch.apply(guard.left().takeBranch(pi, true, guardBlame))
+                    .mergeAcrossBranch(pi,
+                            falseBrance.apply(guard.left().takeBranch(pi, false, guardBlame)));
+        }
+
+        private UnaryOperator<FullContext> typecheckCond(CtExpression<?> guardExpr,
+                                                         Blame extraGuardBlame,
+                                                         CtVirtualBranch branch,
+                                                         UnaryOperator<FullContext> trueBranch,
+                                                         UnaryOperator<FullContext> falseBranch) {
+            return c -> typecheckCond(c, guardExpr, extraGuardBlame, branch, trueBranch, falseBranch);
+        }
+
+        private UnaryOperator<FullContext> typecheckStmt(CtStatement stmt) {
+            return ctxt -> typecheckStmt(ctxt, stmt);
+        }
+
         private FullContext typecheckStmt(FullContext ctxt, CtStatement stmt) {
             switch (stmt) {
                 case CtAssert<?> a -> {
@@ -75,21 +105,28 @@ public class Typechecker {
                     return typecheckAssignmentToExpression(rhs.left(), a.getAssigned(), rhs.right());
                 }
                 case CtIf i -> {
-                    Pair<FullContext, Blame> guard = typecheckExpression(ctxt, i.getCondition());
-                    ctxt = guard.left();
-                    Blame guardBlame = guard.right();
-                    Pi pi = parentAnalyzer.branchIndexer.lookupOrCreate(new CtVirtualBranch(i));
-                    return typecheckStmtList(
-                            ctxt.takeBranch(pi, true, guardBlame),
-                            i.getThenStatement())
-                            .mergeAcrossBranch(pi,
-                                    typecheckStmtList(
-                                            ctxt.takeBranch(pi, false, guardBlame),
-                                            i.getElseStatement()));
+                    return typecheckCond(ctxt, i.getCondition(), Blame.zero(), new CtVirtualBranch(i),
+                            typecheckStmt(i.getThenStatement()), typecheckStmt(i.getElseStatement()));
                 }
                 case CtSwitch<?> s -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
+                    Pair<FullContext, Blame> selector = typecheckExpression(ctxt, s.getSelector());
+                    ctxt = selector.left();
+                    Blame selectorBlame = selector.right();
+
+                    UnaryOperator<FullContext> fallback = UnaryOperator.identity();
+
+                    for (CtCase<?> c : Util.reversed(s.getCases())) {
+                        if (c.getCaseExpression() == null) {
+                            //default case
+                            fallback = typecheckCond(null, selectorBlame, new CtVirtualBranch(c),
+                                    typecheckStmtList(c), UnaryOperator.identity());
+                        } else {
+                            fallback = typecheckCond(c.getCaseExpression(), selectorBlame, new CtVirtualBranch(c),
+                                    typecheckStmtList(c), fallback);
+                        }
+                    }
+
+                    return fallback.apply(ctxt);
                 }
                 case CtLocalVariable<?> l -> {
                     if (l.getAssignment() == null) {
@@ -148,6 +185,12 @@ public class Typechecker {
                     //TODO: handle this
                     System.out.println("Unhandled: " + stmt);
                 }
+                case CtBlock<?> b -> {
+                    return typecheckStmtList(ctxt, b);
+                }
+                case null -> {
+                    return ctxt;
+                }
                 default -> throw new IllegalArgumentException("Unexpected statement: " + stmt);
             }
             return ctxt;
@@ -192,6 +235,15 @@ public class Typechecker {
             return typecheckExprListBlameDisjoint(exprs).apply(new Pair<>(ctxt, List.of()));
         }
 
+        /*
+        This should be used when we don't want to do anything with an expression except assign an
+        opaque blame to its entire source position
+         */
+        private Pair<FullContext, Blame> typecheckOpaque(FullContext ctxt, CtExpression<?> expr) {
+            return new Pair<>(ctxt, expr.isImplicit()? Blame.zero():
+                    Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(expr)));
+        }
+
         private Pair<FullContext, Blame> typecheckExpression(FullContext ctxt, CtExpression<?> expr) {
             switch (expr) {
                 case CtArrayAccess<?, ?> a -> {
@@ -216,7 +268,9 @@ public class Typechecker {
                     }
                     return typecheckExpression(ctxt, fa.getTarget()).mapRight(faBlame::disjunct);
                 }
-                case CtSuperAccess<?> sa -> throw new IllegalArgumentException("Unexpected: " + sa);
+                case CtSuperAccess<?> sa -> {
+                    return typecheckOpaque(ctxt, sa).mapRight(Blame.oneSite(new Self())::disjunct);
+                }
                 case CtVariableAccess<?> va -> {
                     Blame vaBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(va));
                     Variable v = parentAnalyzer.varIndexer.lookupOrCreate(va.getVariable().getDeclaration());
@@ -298,7 +352,7 @@ public class Typechecker {
                             blameGenerator.apply(new Ret(p, 0)));
                 }
                 case CtLiteral<?> lit -> {
-                    return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(lit)));
+                    return typecheckOpaque(ctxt, lit);
                 }
                 case CtUnaryOperator<?> unop -> {
                     Blame unopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop));
@@ -310,14 +364,21 @@ public class Typechecker {
                             .mapRight(binopBlame::disjunct);
                 }
                 case CtTypeAccess<?> t -> {
-                    if (t.isImplicit()) {
-                        return new Pair<>(ctxt, Blame.zero());
-                    }
-                    return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(t)));
+                    return typecheckOpaque(ctxt, t);
                 }
                 case CtConditional<?> c -> {
-                    //TODO: handle this
-                    System.out.println("Unhandled: " + expr);
+                    Pair<FullContext, Blame> guard = typecheckExpression(ctxt, c.getCondition());
+                    ctxt = guard.left();
+                    Blame guardBlame = guard.right();
+                    Pi pi = parentAnalyzer.branchIndexer.lookupOrCreate(new CtVirtualBranch(c));
+                    Pair<FullContext, Blame> thenExpr = typecheckExpression(ctxt.takeBranch(pi, true, guardBlame),
+                            c.getThenExpression());
+                    Pair<FullContext, Blame> elseExpr = typecheckExpression(ctxt.takeBranch(pi, false, guardBlame),
+                            c.getElseExpression());
+                    return new Pair<>(
+                            thenExpr.left().mergeAcrossBranch(pi, elseExpr.left()),
+                            thenExpr.right().disjunct(elseExpr.right())
+                    );
                 }
                 case CtConstructorCall<?> constr -> {
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr));
@@ -334,17 +395,20 @@ public class Typechecker {
                                             .disjunct(constrBlame));
                 }
                 case CtLambda<?> l -> {
-                    return new Pair<>(ctxt, Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(l)));
+                    return typecheckOpaque(ctxt, l);
                 }
-                case CtThisAccess<?> ignored -> {
-                    return new Pair<>(ctxt, Blame.oneSite(new Self()));
+                case CtExecutableReferenceExpression<?, ?> ere -> {
+                    //TODO: consider handling this better
+                    return typecheckOpaque(ctxt, ere);
+                }
+                case CtThisAccess<?> t -> {
+                    return typecheckOpaque(ctxt, t).mapRight(Blame.oneSite(new Self())::disjunct);
                 }
                 case null -> {
                     return new Pair<>(ctxt, Blame.zero());
                 }
                 default -> throw new IllegalArgumentException("Unexpected expression: " + expr);
             }
-            return new Pair<>(ctxt, Blame.zero());
         }
 
         private FullContext typecheckAssignmentToVariable(

@@ -8,6 +8,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,6 +133,19 @@ public class ClosureMap {
                             c.lookupByCall(call).writesSelf :
                             Config.NONLOCAL_METHOD_MUTATES_SELF
             );
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(condition);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof TouchCondition other) {
+                return condition.equals(other.condition);
+            }
+            return false;
         }
     }
 
@@ -266,6 +280,20 @@ public class ClosureMap {
 
         ClosureType merge(ClosureType other) {
             reads.addAll(other.reads);
+
+            //add all writes that potentially occur only in one branch to the read set
+            //this will overapproximate because some of these assymetries only occur
+            //conditionally, but overapproximating reads is not a big deal - overapproximating
+            //writes leads to false implicit flows
+            reads.addAll(Stream.concat(
+                    writes.keySet().stream(),
+                            other.writes.keySet().stream()).distinct()
+                    .filter(c -> writes.containsKey(c) != other.writes.containsKey(c) ||
+                            (writes.containsKey(c) && other.writes.containsKey(c) &&
+                                    !writes.get(c).equals(other.writes.get(c)))
+                    )
+                    .toList());
+
             other.writes.forEach((v, tc) -> writes.merge(v, tc, TouchCondition::or));
             calls.addAll(other.calls);
             return this;
@@ -330,12 +358,12 @@ public class ClosureMap {
                     CtProcedure fixpoint = new CtProcedure(w, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
-                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+                    UnaryOperator<ClosureType> processing = c ->
+                            c.processStmt(w.getBody()).processRead(w.getLoopingExpression());
 
-                    fixpointClosure.processStmt(w.getBody());
-                    fixpointClosure.processRead(w.getLoopingExpression());
+                    merge(processing.apply(copy()));
 
-                    data.put(proc, fixpointClosure);
+                    data.put(proc, processing.apply(new ClosureType(fixpoint)));
 
                     Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w));
                     calls.add(call);
@@ -345,12 +373,12 @@ public class ClosureMap {
                     CtProcedure fixpoint = new CtProcedure(d, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
-                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+                    UnaryOperator<ClosureType> processing = c ->
+                            c.processRead(d.getLoopingExpression()).processStmt(d.getBody());
 
-                    fixpointClosure.processRead(d.getLoopingExpression());
-                    fixpointClosure.processStmt(d.getBody());
+                    merge(processing.apply(copy()));
 
-                    data.put(proc, fixpointClosure);
+                    data.put(proc, processing.apply(new ClosureType(fixpoint)));
 
                     Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d));
                     calls.add(call);
@@ -360,15 +388,17 @@ public class ClosureMap {
                     CtProcedure fixpoint = new CtProcedure(f, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
-                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+                    UnaryOperator<ClosureType> processing = c -> {
+                        c.processRead(f.getExpression());
+                        Util.forEachRev(f.getForUpdate(), c::processStmt);
+                        return c.processStmt(f.getBody());
+                    };
 
-                    fixpointClosure.processRead(f.getExpression());
-                    Util.forEachRev(f.getForUpdate(), fixpointClosure::processStmt);
-                    fixpointClosure.processStmt(f.getBody());
+                    data.put(proc, processing.apply(new ClosureType(fixpoint)));
+
+                    merge(processing.apply(copy()));
 
                     Util.forEachRev(f.getForInit(), this::processStmt);
-
-                    data.put(proc, fixpointClosure);
 
                     Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
                     calls.add(call);
@@ -378,13 +408,9 @@ public class ClosureMap {
                     CtProcedure fixpoint = new CtProcedure(f, parentAnalyzer);
                     Procedure proc = parentAnalyzer.procedureIndexer.lookupOrCreate(fixpoint);
 
-                    ClosureType fixpointClosure = new ClosureType(fixpoint);
+                    data.put(proc, new ClosureType(fixpoint).processStmt(f.getBody()));
 
-                    fixpointClosure.processStmt(f.getBody());
-                    //leave for-each loops as closed over their variable
-                    //fixpointClosure.processStmt(f.getVariable());
-
-                    data.put(proc, fixpointClosure);
+                    merge(copy().processStmt(f.getBody()).processStmt(f.getVariable()));
 
                     Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
                     calls.add(call);

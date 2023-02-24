@@ -1,9 +1,6 @@
 package analyzer;
 
-import spoon.reflect.code.CtConditional;
-import spoon.reflect.code.CtIf;
-import spoon.reflect.code.CtSwitch;
-import spoon.reflect.code.CtTry;
+import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.CtElement;
@@ -14,26 +11,25 @@ import java.util.Optional;
 public class CtVirtualBranch implements SourcePositionHolder {
 
     public final CtElement underlying;
-    public final Optional<Integer> switchCase;
 
     public CtVirtualBranch(CtIf i) {
         this.underlying = i;
-        switchCase = Optional.empty();
     }
 
-    public CtVirtualBranch(CtSwitch<?> s, int whichCase) {
+    public CtVirtualBranch(CtCase<?> s) {
         this.underlying = s;
-        switchCase = Optional.of(whichCase);
     }
 
     public CtVirtualBranch(CtConditional<?> cond) {
         this.underlying = cond;
-        switchCase = Optional.empty();
     }
 
-    public CtVirtualBranch(CtTry t, int whichCatch) {
+    public CtVirtualBranch(CtTry t) {
         this.underlying = t;
-        switchCase = Optional.of(whichCatch);
+    }
+
+    public CtVirtualBranch(CtCatch t) {
+        this.underlying = t;
     }
 
     @Override

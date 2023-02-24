@@ -71,6 +71,12 @@ public class Util {
         }
     }
 
+    public static <T> List<T> reversed(List<T> l) {
+        List<T> copied = l.subList(0, l.size());
+        Collections.reverse(copied);
+        return copied;
+    }
+
     @SafeVarargs
     public static <T> Stream<T> addToStream(Stream<T> stream, T... t) {
         return Stream.concat(stream, Stream.of(t));
