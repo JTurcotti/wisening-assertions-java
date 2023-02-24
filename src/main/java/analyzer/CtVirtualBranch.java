@@ -30,6 +30,10 @@ public class CtVirtualBranch implements SourcePositionHolder {
         this.underlying = t;
     }
 
+    public CtVirtualBranch(CtLoop l) {
+        this.underlying = l;
+    }
+
     @Override
     public SourcePosition getPosition() {
         return underlying.getPosition();

@@ -6,6 +6,7 @@ import core.codemodel.events.Pi;
 import core.codemodel.types.Blame;
 import core.codemodel.types.FullContext;
 import spoon.reflect.code.*;
+import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtVariableReference;
 import util.Pair;
@@ -44,13 +45,67 @@ public class Typechecker {
         }
 
         private FullContext typecheck() {
-            //TODO: appropriately wrap loops
-            Set<PhiInput> params = closure.procedure.parameters.stream()
-                    .map(parentAnalyzer.varIndexer::lookupOrCreate)
-                    .collect(Collectors.toUnmodifiableSet());
-            return typecheckStmtList(FullContext.atEntry(
-                    Util.mergeSets(closure.getInputs(), params)
-            ), closure.procedure.body);
+            if (closure.procedure.underlying instanceof CtExecutable<?>) {
+                Set<PhiInput> params = closure.procedure.parameters.stream()
+                        .map(parentAnalyzer.varIndexer::lookupOrCreate)
+                        .collect(Collectors.toUnmodifiableSet());
+                return typecheckStmtList(FullContext.atEntry(
+                        Util.mergeSets(closure.getInputs(), params)
+                ), closure.procedure.body);
+            }
+            if (closure.procedure.underlying instanceof CtLoop l) {
+                //TODO: this is wrong, such a call is already defined
+                Call recurCall = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(l, l.getBody()));
+                UnaryOperator<FullContext> recur = typecheckInvocation(
+                        null, Blame.zero(), recurCall, procedure, List.of(),
+                        closure.getInputs(), closure.getOutputs());
+                FullContext entry = FullContext.atEntry(closure.getInputs());
+
+                switch (closure.procedure.underlying) {
+                    case CtWhile w -> {
+                        return typecheckCond(entry,
+                                w.getLoopingExpression(), Blame.zero(),
+                                new CtVirtualBranch(w),
+                                Util.unaryAndThen(typecheckStmt(w.getBody()), recur),
+                                UnaryOperator.identity())
+                                .observeReturn(Map.of());
+                    }
+                    case CtDo d -> {
+                        //TODO: technically this desugaring doesn't work because `continue` will bypass the check
+                        return typecheckCond(typecheckStmt(entry, d.getBody()),
+                                d.getLoopingExpression(), Blame.zero(),
+                                new CtVirtualBranch(d),
+                                recur, UnaryOperator.identity())
+                                .observeReturn(Map.of());
+                    }
+                    case CtFor f -> {
+                        return typecheckCond(entry,
+                                f.getExpression(), Blame.zero(),
+                                new CtVirtualBranch(f),
+                                c -> {
+                                    c = typecheckStmt(c, f.getBody());
+                                    for (CtStatement s : f.getForUpdate()) {
+                                        c = typecheckStmt(c, s);
+                                    }
+                                    return recur.apply(c);
+                                }, UnaryOperator.identity())
+                                .observeReturn(Map.of());
+                    }
+                    case CtForEach fe -> {
+                        Variable v = parentAnalyzer.varIndexer.lookupOrCreate(fe.getVariable());
+                        return typecheckCond(entry,
+                                null, Blame.oneSite(v),
+                                new CtVirtualBranch(fe),
+                                Util.unaryAndThen(typecheckStmt(fe.getBody()), recur),
+                                UnaryOperator.identity())
+                                //this "assignment" ensures that the blame for the looping variable is reset
+                                .performAssignment(v, Blame.oneSite(v))
+                                .observeReturn(Map.of());
+                    }
+                    default -> throw new IllegalArgumentException("Unrecognized procedure type: " + closure.procedure.underlying);
+                }
+            }
+            throw new IllegalArgumentException("Unrecognized procedure type: " + closure.procedure.underlying);
         }
 
         private FullContext typecheckStmtList(FullContext ctxt, CtStatementList stmts) {
@@ -90,6 +145,16 @@ public class Typechecker {
             return c -> typecheckCond(c, guardExpr, extraGuardBlame, branch, trueBranch, falseBranch);
         }
 
+        private UnaryOperator<FullContext> typecheckInvocation(
+                //receiver = null if self is an input or input, receiver != null if fields are input or output
+                CtExpression<?> receiver,
+                Blame callBlame, //the syntactic blame for the call itself
+                Call call, Procedure proc,
+                List<CtExpression<?>> args,
+                Set<PhiInput> inputs, Set<PhiOutput> outputs) {
+            return ctxt -> typecheckInvocation(ctxt, receiver, callBlame, call, proc, args, inputs, outputs).left();
+        }
+
         private Pair<FullContext, Blame> typecheckInvocation(
                 FullContext ctxt,
                 //receiver = null if self is an input or input, receiver != null if fields are input or output
@@ -98,6 +163,10 @@ public class Typechecker {
                 Call call, Procedure proc,
                 List<CtExpression<?>> args,
                 Set<PhiInput> inputs, Set<PhiOutput> outputs) {
+            if (ctxt.pcExact().isZero()) {
+                return new Pair<>(ctxt, Blame.zero());
+            }
+
             //TODO: don't pull argument to for each loop from context, but refresh to original
 
             boolean touchesMutables =

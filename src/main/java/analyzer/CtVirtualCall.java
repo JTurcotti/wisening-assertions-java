@@ -4,6 +4,7 @@ import core.codemodel.SourcePos;
 import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.code.CtContinue;
 import spoon.reflect.code.CtLoop;
+import spoon.reflect.code.CtStatement;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.CtElement;
@@ -48,6 +49,11 @@ public class CtVirtualCall implements SourcePositionHolder {
 
     public CtVirtualCall(CtLoop loop) {
         this.underlying = loop;
+        this.isVirtual = true;
+    }
+
+    public CtVirtualCall(CtLoop loop, CtStatement body) {
+        this.underlying = body;
         this.isVirtual = true;
     }
 

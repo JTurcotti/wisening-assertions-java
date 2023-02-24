@@ -4,33 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="make invocation more abstract">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fix bugs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualBranch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualBranch.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/PcStack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/PcStack.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/FormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/FormulaProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +97,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="97368000" />
+      <workItem from="1676765368190" duration="101363000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -268,7 +246,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677260785001</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="fix bugs">
+      <created>1677272087107</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1677272087107</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -295,7 +280,6 @@
     <MESSAGE value="refactoring into package structure" />
     <MESSAGE value="lots of work" />
     <MESSAGE value="start working on closure analysis" />
-    <MESSAGE value="fix bugs" />
     <MESSAGE value="loop handling" />
     <MESSAGE value="code smells" />
     <MESSAGE value="add transitive closure operation to closure map" />
@@ -307,7 +291,8 @@
     <MESSAGE value="more typechecking, focussing on branches" />
     <MESSAGE value="more typechecking, focussing on branches like switch" />
     <MESSAGE value="make invocation more abstract" />
-    <option name="LAST_COMMIT_MESSAGE" value="make invocation more abstract" />
+    <MESSAGE value="fix bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bugs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -350,7 +335,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>470</line>
+          <line>544</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -360,7 +345,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>521</line>
+          <line>595</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -375,7 +360,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>501</line>
+          <line>575</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -390,19 +375,14 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>275</line>
+          <line>349</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <condition expression="procedure.num == 143" language="JAVA" />
+          <condition expression="procedure.num == 10" language="JAVA" />
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>59</line>
-          <option name="timeStamp" value="93" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>76</line>
-          <option name="timeStamp" value="94" />
+          <line>95</line>
+          <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
