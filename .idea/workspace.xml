@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add loop desugaring code - it's probably buggy">
-      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtWiseningAssert.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/simple/controlflow/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/simple/controlflow/Main.java" afterDir="false" />
-    </list>
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add tracking for assertion and call input blames" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -106,7 +92,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="110129000" />
+      <workItem from="1676765368190" duration="110788000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -269,7 +255,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677275930004</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="add tracking for assertion and call input blames">
+      <created>1677360758301</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1677360758301</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -309,7 +302,8 @@
     <MESSAGE value="make invocation more abstract" />
     <MESSAGE value="fix bugs" />
     <MESSAGE value="add loop desugaring code - it's probably buggy" />
-    <option name="LAST_COMMIT_MESSAGE" value="add loop desugaring code - it's probably buggy" />
+    <MESSAGE value="add tracking for assertion and call input blames" />
+    <option name="LAST_COMMIT_MESSAGE" value="add tracking for assertion and call input blames" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

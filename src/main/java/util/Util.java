@@ -1,11 +1,5 @@
 package util;
 
-import core.codemodel.elements.Mutable;
-import spoon.reflect.code.CtAssert;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtVariable;
-
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;

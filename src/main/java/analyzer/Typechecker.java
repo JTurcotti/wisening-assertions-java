@@ -1,7 +1,6 @@
 package analyzer;
 
 import core.codemodel.elements.*;
-import core.codemodel.events.Assertion;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import core.codemodel.types.Blame;
@@ -55,7 +54,6 @@ public class Typechecker {
                 ), closure.procedure.body);
             }
             if (closure.procedure.underlying instanceof CtLoop l) {
-                //TODO: this is wrong, such a call is already defined
                 Call recurCall = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(l, l.getBody()));
                 UnaryOperator<FullContext> recur = typecheckInvocation(
                         null, Blame.zero(), recurCall, procedure, List.of(),
@@ -453,8 +451,6 @@ public class Typechecker {
                         return new Pair<>(ctxt, Blame.zero());
                     }
                     //TODO: also consider possible overrides
-
-                    //TODO: handle callarg tracking
 
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv));
                     Blame callBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateInv(inv));

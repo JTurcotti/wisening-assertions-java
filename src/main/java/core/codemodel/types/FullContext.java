@@ -1,7 +1,6 @@
 package core.codemodel.types;
 
 import core.codemodel.elements.*;
-import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
 import util.Pair;
 import util.Util;

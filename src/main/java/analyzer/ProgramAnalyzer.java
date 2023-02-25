@@ -15,7 +15,6 @@ import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.visitor.Filter;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class ProgramAnalyzer {
     final CtModel model;
