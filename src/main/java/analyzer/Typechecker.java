@@ -1,6 +1,7 @@
 package analyzer;
 
 import core.codemodel.elements.*;
+import core.codemodel.events.Assertion;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import core.codemodel.types.Blame;
@@ -196,12 +197,17 @@ public class Typechecker {
 
             List<PhiInput> inputList = inputs.stream().toList();
             List<Blame> inputBlames = inputList.stream().map(input ->
-                    switch (input) {
+                    ctxtAtInput.conditionCallInput(switch (input) {
                         case Arg a -> argBlames.get(a.num());
                         case Field f -> ctxtAtInput.lookupMutable(f);
                         case Self s -> finalReceiverBlame.get();
                         case Variable v -> ctxtAtInput.lookupMutable(v);
-                    }).toList();
+                    })).toList();
+            parentAnalyzer.callIndexer.lookupAux(call).ifPresentOrElse(ctCall -> {
+                ctCall.setInputBlames(IntStream.range(0, inputList.size()).boxed()
+                        .collect(Collectors.toUnmodifiableMap(inputList::get, inputBlames::get)));
+            }, () -> {throw new IllegalStateException("Expected call to be associated with a CtVirtualCall");});
+
             Function<PhiOutput, Blame> blameGenerator = output ->
                     Blame.conjunctListWithPhi(inputBlames, i ->
                             new Phi(proc, inputList.get(i), output))
@@ -230,7 +236,17 @@ public class Typechecker {
         private FullContext typecheckStmt(FullContext ctxt, CtStatement stmt) {
             switch (stmt) {
                 case CtAssert<?> a -> {
-                    //TODO: handle assertions
+                    Set<Mutable> targetted = parentAnalyzer.parseWiseningAssertionTargets(a);
+                    Optional<Blame> targettedBlame = targetted.stream()
+                            .map(ctxt::lookupMutable)
+                            .map(ctxt::conditionAssertionBlame)
+                            .reduce(Blame::disjunct);
+
+                    targettedBlame.ifPresent(blame ->
+                            parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, blame)));
+
+                    Pair<FullContext, Blame> result = typecheckExpression(ctxt, a.getAssertExpression());
+                    return result.left().zeroMutables(targetted);
                 }
                 case CtOperatorAssignment<?, ?> op -> {
                     Pair<FullContext, Blame> lhs = typecheckExpression(ctxt, op.getAssigned());

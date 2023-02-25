@@ -53,4 +53,8 @@ public class Blame {
                 .mapToObj(i -> blames.get(i).conjunctPhi(phiGenerator.apply(i)))
                 .reduce(Blame.zero(), Blame::disjunct);
     }
+
+    public Blame substPi(SignedPi subst) {
+        return new Blame(Util.mapImmutableMap(data, flow -> flow.substPi(subst)));
+    }
 }

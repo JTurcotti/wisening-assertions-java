@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fix bugs">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add loop desugaring code - it's probably buggy">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtWiseningAssert.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualBranch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualBranch.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/MutablesContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/simple/controlflow/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/simple/controlflow/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +106,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="101363000" />
+      <workItem from="1676765368190" duration="110129000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -253,7 +262,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677272087107</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="add loop desugaring code - it's probably buggy">
+      <created>1677275930004</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1677275930004</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -292,7 +308,8 @@
     <MESSAGE value="more typechecking, focussing on branches like switch" />
     <MESSAGE value="make invocation more abstract" />
     <MESSAGE value="fix bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix bugs" />
+    <MESSAGE value="add loop desugaring code - it's probably buggy" />
+    <option name="LAST_COMMIT_MESSAGE" value="add loop desugaring code - it's probably buggy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -335,7 +352,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>544</line>
+          <line>560</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -345,7 +362,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>595</line>
+          <line>611</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -360,28 +377,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>575</line>
+          <line>591</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>141</line>
+          <line>134</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
-          <line>38</line>
+          <line>42</line>
           <option name="timeStamp" value="79" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>349</line>
+          <line>365</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <condition expression="procedure.num == 10" language="JAVA" />
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>95</line>
+          <line>96</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>

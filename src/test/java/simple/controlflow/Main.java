@@ -17,4 +17,19 @@ public class Main {
             return 0;
         }
     }
+
+    int bar(int n) {
+        for (int i = 0; i < n; i++) {
+            if (foo(i) > 4) {
+                return 3;
+            }
+        }
+        //x
+        //n, a
+        assert n > 5;
+        if (foo(0) > 5) {
+            return bar(n-1);
+        }
+        return 0;
+    }
 }

@@ -1,18 +1,21 @@
 package analyzer;
 
 import core.codemodel.Indexer;
-import core.codemodel.elements.Call;
-import core.codemodel.elements.Field;
-import core.codemodel.elements.Procedure;
-import core.codemodel.elements.Variable;
+import core.codemodel.elements.*;
+import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
+import spoon.reflect.code.CtAssert;
+import spoon.reflect.code.CtComment;
+import spoon.reflect.code.CtFieldAccess;
+import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.visitor.Filter;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 
 public class ProgramAnalyzer {
     final CtModel model;
@@ -22,6 +25,7 @@ public class ProgramAnalyzer {
     final Indexer.BySourcePos<Pi, CtVirtualBranch> branchIndexer = new Indexer.BySourcePos<>(Pi::new);
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
     final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);
+    final Indexer.BySourcePos<Assertion, CtWiseningAssert> assertionIndexer = new Indexer.BySourcePos<>(Assertion::new);
 
     final Typechecker typechecker = new Typechecker(this);
     final ClosureMap closures = new ClosureMap(this);
@@ -52,5 +56,30 @@ public class ProgramAnalyzer {
 
     public Collection<Procedure> procedures() {
         return procedureIndexer.outputs();
+    }
+
+
+    /*
+    Given an assertion, parse the list of mutables it targets
+     */
+    public Set<Mutable> parseWiseningAssertionTargets(CtAssert<?> a) {
+        //by default, any variables or fields mentioned in the assertion are targeted
+        Filter<CtVariableAccess<?>> filter = ignored -> true;
+        if (!a.getComments().isEmpty()) {
+            Set<String> commented = new HashSet<>();
+            for (CtComment c : a.getComments()) {
+                Arrays.stream(c.getContent().split(",")).map(String::trim).forEach(commented::add);
+            }
+            filter = va -> commented.contains(va.getVariable().getSimpleName());
+        }
+        Set<Mutable> targets = new HashSet<>();
+        for (CtVariableAccess<?> v : a.getElements(filter)) {
+            if (v instanceof CtFieldAccess<?> f) {
+                targets.add(fieldIndexer.lookupOrCreate(f.getVariable().getDeclaration()));
+            } else {
+                targets.add(varIndexer.lookupOrCreate(v.getVariable().getDeclaration()));
+            }
+        }
+        return targets;
     }
 }

@@ -124,4 +124,12 @@ public record IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
     public IntraflowEvent conjunct(IntraflowEvent other) {
         return dnf.stream().map(other::conjunctConj).reduce(zero(), IntraflowEvent::disjunct).simplify();
     }
+
+    public IntraflowEvent substPi(SignedPi subst) {
+        return new IntraflowEvent(dnf.stream().flatMap(conj ->
+                conj.stream().anyMatch(ae -> ae instanceof SignedPi sp && sp.equals(subst.opp())) ?
+                        Stream.empty() :
+                        Stream.of(conj.stream().filter(ae -> !(ae instanceof SignedPi sp && sp.equals(subst))).collect(Collectors.toUnmodifiableSet()))
+        ).collect(Collectors.toUnmodifiableSet())).simplify();
+    }
 }

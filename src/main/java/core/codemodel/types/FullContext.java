@@ -3,6 +3,7 @@ package core.codemodel.types;
 import core.codemodel.elements.*;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
+import util.Pair;
 import util.Util;
 
 import java.util.Map;
@@ -14,22 +15,21 @@ public record FullContext(
         MutablesContext mutables,
         PcStack pcNecessary,
         IntraflowEvent pcExact,
-        Map<PhiOutput, Blame> resultBlames,
-        Map<Assertion, Blame> assertionBlames,
-        Map<CallInput, Blame> callArgBlames) {
+        Map<PhiOutput, Blame> resultBlames
+) {
 
     /*
     Generate an empty FullContext corresponding to the beginning of a program
      */
     public static FullContext empty() {
-        return new FullContext(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
+        return new FullContext(MutablesContext.empty(), new PcStack(), IntraflowEvent.one(), Map.of());
     }
 
     public static FullContext atEntry(Set<PhiInput> entrySet) {
         return new FullContext(
                 MutablesContext.atEntry(entrySet.stream().map(PhiInput::assertMutable)
                         .collect(Collectors.toUnmodifiableSet())),
-                new PcStack(), IntraflowEvent.one(), Map.of(), Map.of(), Map.of());
+                new PcStack(), IntraflowEvent.one(), Map.of());
     }
 
     public Blame lookupMutable(Mutable mutable) {
@@ -74,7 +74,7 @@ public record FullContext(
         //TODO: compress blames before assignment (merge lines with same event)
         Blame conditionedBlame = conditionBlame(blame);
         MutablesContext newMutables = mutables.disjunct(MutablesContext.assignment(mutable, conditionedBlame));
-        return new FullContext(newMutables, pcNecessary, pcExact, resultBlames, assertionBlames, callArgBlames);
+        return new FullContext(newMutables, pcNecessary, pcExact, resultBlames);
     }
 
     /*
@@ -92,32 +92,30 @@ public record FullContext(
     public FullContext observeReturn(Map<PhiOutput, Blame> blames) {
         Map<PhiOutput, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
         Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
-        return new FullContext(MutablesContext.empty(), pcNecessary, IntraflowEvent.zero(), newResultBlames, assertionBlames, callArgBlames);
+        return new FullContext(MutablesContext.empty(), pcNecessary, IntraflowEvent.zero(), newResultBlames);
     }
 
-    public FullContext observeAssertion(Assertion assertion, Blame blame) {
-        //TODO: condition this blame on all branches in pcNecessary being taken as they were
-        if (assertionBlames.containsKey(assertion)) {
-            throw new IllegalArgumentException("Provided assertion already in context");
+    public Blame conditionAssertionBlame(Blame blame) {
+        blame = conditionBlame(blame);
+
+        for (Pair<SignedPi, Blame> pcEntry : pcNecessary.stack()) {
+            //condition the blame on all branches in pcNecessary being taken as they are
+            blame = blame.substPi(pcEntry.left());
         }
-        Map<Assertion, Blame> newAssertionBlames = Util.addToImmutableMap(assertionBlames, assertion, blame);
-        return new FullContext(mutables, pcNecessary, pcExact, resultBlames, newAssertionBlames, callArgBlames);
+
+        return blame;
     }
 
-    public FullContext observeCallArg(CallInput callArg, Blame blame) {
-        //TODO: conjunct in event pcExact that flow reaches this call
-        if (callArgBlames.containsKey(callArg)) {
-            throw new IllegalArgumentException("Provided call arg is already in context");
-        }
-        Map<CallInput, Blame> newCallArgBlames = Util.addToImmutableMap(callArgBlames, callArg, blame);
-        return new FullContext(mutables, pcNecessary, pcExact, resultBlames, assertionBlames, newCallArgBlames);
+    public Blame conditionCallInput(Blame blame) {
+        //conjunct in the event that control flow reaches this point
+        return conditionBlame(blame).conjunctIntraflow(pcExact);
     }
 
     public FullContext takeBranch(Pi pi, Boolean sign, Blame blame) {
         MutablesContext newMutables = mutables.conjunctPi(pi, sign);
         PcStack newPcNecessary = pcNecessary.takeBranch(pi, sign, blame);
         IntraflowEvent newPcExact = pcExact.conjunctPi(pi, sign);
-        return new FullContext(newMutables, newPcNecessary, newPcExact, resultBlames, assertionBlames, callArgBlames);
+        return new FullContext(newMutables, newPcNecessary, newPcExact, resultBlames);
     }
 
     public FullContext mergeAcrossBranch(Pi pi, FullContext other) {
@@ -129,17 +127,20 @@ public record FullContext(
         ).orElseThrow(IllegalArgumentException::new);
         IntraflowEvent newPcExact = pcExact.disjunct(other.pcExact);
         Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(resultBlames, other.resultBlames, Blame::disjunct);
-        Map<Assertion, Blame> newAssertionBlames =
-                Util.mergeMaps(assertionBlames, other.assertionBlames, Blame::disjunct);
-        Map<CallInput, Blame> newCallArgBlames =
-                Util.mergeMaps(callArgBlames, other.callArgBlames, Blame::disjunct);
-        return new FullContext(newMutables, newPcNecessary, newPcExact,
-                newResultBlames, newAssertionBlames, newCallArgBlames);
+        return new FullContext(newMutables, newPcNecessary, newPcExact, newResultBlames);
     }
 
     public void assertReachable() {
         if (pcExact.isZero()) {
             throw new IllegalStateException("This point is unreachable and should not be");
         }
+    }
+
+    /*
+    remove blame for passed mutables - used at assertion sites
+     */
+    public FullContext zeroMutables(Set<Mutable> toZero) {
+        MutablesContext newMutables = mutables.zero(toZero);
+        return new FullContext(newMutables, pcNecessary, pcExact, resultBlames);
     }
 }

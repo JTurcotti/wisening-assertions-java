@@ -5,6 +5,7 @@ import core.codemodel.elements.PhiInput;
 import core.codemodel.events.Pi;
 import util.Util;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -48,5 +49,11 @@ public class MutablesContext {
 
     public MutablesContext disjunct(MutablesContext other) {
         return new MutablesContext(Util.mergeMaps(data, other.data, Blame::disjunct));
+    }
+
+    public MutablesContext zero(Set<Mutable> toZero) {
+        return new MutablesContext(data.keySet().stream()
+                .collect(Collectors.toUnmodifiableMap(Function.identity(), mutable ->
+                        toZero.contains(mutable)? Blame.zero(): data.get(mutable))));
     }
 }

@@ -1,6 +1,8 @@
 package analyzer;
 
 import core.codemodel.SourcePos;
+import core.codemodel.elements.PhiInput;
+import core.codemodel.types.Blame;
 import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.code.CtContinue;
 import spoon.reflect.code.CtLoop;
@@ -10,11 +12,14 @@ import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.CtElement;
 import spoon.support.sniper.internal.SourceFragment;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class CtVirtualCall implements SourcePositionHolder {
     public final CtElement underlying;
     public final boolean isVirtual;
+
+    public Optional<Map<PhiInput, Blame>> inputBlames = Optional.empty();
 
     @Override
     public SourcePosition getPosition() {
@@ -65,5 +70,11 @@ public class CtVirtualCall implements SourcePositionHolder {
     public CtVirtualCall(CtAbstractInvocation<?> call) {
         this.underlying = call;
         this.isVirtual = false;
+    }
+
+    public void setInputBlames(Map<PhiInput, Blame> inputBlames) {
+        this.inputBlames.ifPresent(ignored -> {throw new IllegalStateException("Already set");});
+
+        this.inputBlames = Optional.of(inputBlames);
     }
 }
