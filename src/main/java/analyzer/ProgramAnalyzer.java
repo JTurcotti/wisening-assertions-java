@@ -4,6 +4,8 @@ import core.codemodel.Indexer;
 import core.codemodel.elements.*;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
+import core.codemodel.types.Blame;
+import core.codemodel.types.FullContext;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtAssert;
@@ -26,6 +28,7 @@ public class ProgramAnalyzer {
     final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);
     final Indexer.BySourcePos<Assertion, CtWiseningAssert> assertionIndexer = new Indexer.BySourcePos<>(Assertion::new);
 
+    //wrapped map Procedure -> FullContext
     final Typechecker typechecker = new Typechecker(this);
     final ClosureMap closures = new ClosureMap(this);
 
@@ -57,6 +60,11 @@ public class ProgramAnalyzer {
         return procedureIndexer.outputs();
     }
 
+    public CtProcedure lookupProcedure(Procedure p) {
+        return procedureIndexer.lookupAux(p).orElseThrow(() ->
+                new IllegalArgumentException("Expected procedure to be present: " + p));
+    }
+
 
     /*
     Given an assertion, parse the list of mutables it targets
@@ -80,5 +88,12 @@ public class ProgramAnalyzer {
             }
         }
         return targets;
+    }
+
+    public Blame getOutputBlame(Procedure p, PhiOutput out) {
+        if (!typechecker.typecheckedProcedures.containsKey(p)) {
+            throw new IllegalArgumentException("Expected passed procedure to be present in typechecked table: " + p);
+        }
+        return typechecker.typecheckedProcedures.get(p).getResult(out);
     }
 }

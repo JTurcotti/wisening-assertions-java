@@ -6,6 +6,7 @@ import util.Util;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,7 +14,15 @@ import java.util.stream.Stream;
  * Class representing intraprocedural flows - none of these methods should mutate
  */
 public record IntraflowEvent(Set<Set<AtomicEvent>> dnf) {
-    public interface AtomicEvent {}
+    public interface AtomicEvent {
+        static <T> T process(AtomicEvent ae, Function<SignedPi, T> piProcess, Function<Phi, T> phiProcess) {
+            return switch (ae) {
+                case SignedPi sp -> piProcess.apply(sp);
+                case Phi phi -> phiProcess.apply(phi);
+                default -> throw new IllegalArgumentException("Unexpected atomic event: " + ae);
+            };
+        }
+    }
 
     private IntraflowEvent() {
         this(Set.of());

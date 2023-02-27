@@ -142,4 +142,15 @@ public record FullContext(
         MutablesContext newMutables = mutables.zero(toZero);
         return new FullContext(newMutables, pcNecessary, pcExact, resultBlames);
     }
+
+    public Blame getResult(PhiOutput out) {
+        if (!resultBlames.containsKey(out)) {
+            if (out instanceof Self) {
+                //TODO: if this gets thrown, handle it by aggregating field results
+                throw new IllegalStateException("Expected Self to be present");
+            }
+            throw new IllegalStateException("Expected result to be present: " + out);
+        }
+        return resultBlames.get(out);
+    }
 }

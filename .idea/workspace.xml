@@ -4,7 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add tracking for assertion and call input blames" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="minor tweaks">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AlphaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AssertionProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/BetaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/EtaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/LineUpdateProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/OmegaProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/TotalProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicConj.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicConstant.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicDisj.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicNot.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicParam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/SignedPi.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,7 +52,9 @@
     </option>
   </component>
   <component name="ProjectId" id="2LeEgsZ4EwPEtRL49EqF3Jtxq1w" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -92,7 +112,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="110788000" />
+      <workItem from="1676765368190" duration="116474000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -262,7 +282,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677360758301</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="minor tweaks">
+      <created>1677361769343</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1677361769343</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -303,7 +330,8 @@
     <MESSAGE value="fix bugs" />
     <MESSAGE value="add loop desugaring code - it's probably buggy" />
     <MESSAGE value="add tracking for assertion and call input blames" />
-    <option name="LAST_COMMIT_MESSAGE" value="add tracking for assertion and call input blames" />
+    <MESSAGE value="minor tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor tweaks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -346,17 +374,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>560</line>
+          <line>556</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>38</line>
+          <line>37</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>611</line>
+          <line>607</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -371,28 +399,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>591</line>
+          <line>587</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>134</line>
+          <line>133</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
-          <line>42</line>
+          <line>41</line>
           <option name="timeStamp" value="79" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>365</line>
+          <line>363</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <condition expression="procedure.num == 10" language="JAVA" />
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>96</line>
+          <line>94</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>

@@ -2,6 +2,7 @@ package analyzer;
 
 import core.codemodel.SourcePos;
 import core.codemodel.elements.Field;
+import core.codemodel.elements.Variable;
 import org.jetbrains.annotations.Nullable;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtBodyHolder;
@@ -112,6 +113,14 @@ public class CtProcedure implements SourcePositionHolder {
             throw new IllegalStateException("Field lookup should not have failed");
         }
         return declaringType.isSubtypeOf(fld.get().getDeclaringType().getReference());
+    }
+
+    public List<Variable> getParamVariables() {
+        return parameters.stream().map(parentAnalyzer.varIndexer::lookupOrCreate).toList();
+    }
+
+    public int getNumParams() {
+        return parameters.size();
     }
 }
 

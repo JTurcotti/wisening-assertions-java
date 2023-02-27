@@ -46,9 +46,7 @@ public class Typechecker {
 
         private FullContext typecheck() {
             if (closure.procedure.underlying instanceof CtExecutable<?>) {
-                Set<PhiInput> params = closure.procedure.parameters.stream()
-                        .map(parentAnalyzer.varIndexer::lookupOrCreate)
-                        .collect(Collectors.toUnmodifiableSet());
+                Set<PhiInput> params = Set.copyOf(closure.procedure.getParamVariables());
                 return typecheckStmtList(FullContext.atEntry(
                         Util.mergeSets(closure.getInputs(), params)
                 ), closure.procedure.body);

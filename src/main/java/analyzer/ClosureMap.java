@@ -104,8 +104,7 @@ public class ClosureMap {
 
         closure.processStmtList(procedure.body);
 
-        for (CtParameter<?> p : procedure.parameters) {
-            Variable v = parentAnalyzer.varIndexer.lookupOrCreate(p);
+        for (Variable v : procedure.getParamVariables()) {
             closure.reads.remove(v);
             closure.writes.remove(v);
         }

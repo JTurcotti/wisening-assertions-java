@@ -1,6 +1,9 @@
 package core.codemodel.types;
 
-import core.codemodel.elements.Mutable;
+import analyzer.CtProcedure;
+import analyzer.ProgramAnalyzer;
+import core.codemodel.elements.*;
+import core.codemodel.events.Event;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;
@@ -56,5 +59,27 @@ public class Blame {
 
     public Blame substPi(SignedPi subst) {
         return new Blame(Util.mapImmutableMap(data, flow -> flow.substPi(subst)));
+    }
+
+    public IntraflowEvent getAtSite(ProgramAnalyzer analyzer, PhiInput in) {
+        BlameSite site = switch (in) {
+            case Arg a -> {
+                CtProcedure proc = analyzer.lookupProcedure(a.procedure());
+                if (!proc.isMethod()) {
+                    throw new IllegalStateException("Cannot lookup arg of a non-method");
+                }
+                if (a.num() >= proc.getNumParams()) {
+                    throw new IllegalStateException("Method does not have an arg number " + a.num());
+                }
+                yield proc.getParamVariables().get(a.num());
+            }
+            case Field f -> f;
+            case Self s -> s;
+            case Variable v -> v;
+        };
+        if (!data.containsKey(site)) {
+            throw new IllegalStateException("Expected site to be present in blame: " + site);
+        }
+        return data.get(site);
     }
 }
