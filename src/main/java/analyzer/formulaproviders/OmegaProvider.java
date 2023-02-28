@@ -40,14 +40,16 @@ record OmegaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<AlphaO
         for (CallOutput c : assertionBlame.getBlamedOutputs()) {
             for (Map.Entry<PhiOutput, Blame> result :
                     analyzer.getResultBlamesForProcedure(lineProcedure).entrySet()) {
-                cases.add(new SymbolicConj<>(List.of(
-                        new SymbolicParam<>(
-                                new Beta(lineProcedure, omega.line(), BetaSite.ofPhiOutput(result.getKey()))),
-                        new SymbolicParam<>(
-                                new Eta(lineProcedure, result.getKey(), analyzer.procedureOfCall(c.call()).get(), c.output())),
-                        new SymbolicParam<>(
-                                new Beta(assertionProcedure, c, omega.assertion()))
-                )));
+                if (result.getValue().blamesSite(omega.line())) {
+                    cases.add(new SymbolicConj<>(List.of(
+                            new SymbolicParam<>(
+                                    new Beta(lineProcedure, omega.line(), BetaSite.ofPhiOutput(result.getKey()))),
+                            new SymbolicParam<>(
+                                    new Eta(lineProcedure, result.getKey(), analyzer.procedureOfCall(c.call()).get(), c.output())),
+                            new SymbolicParam<>(
+                                    new Beta(assertionProcedure, c, omega.assertion()))
+                    )));
+                }
             }
         }
 

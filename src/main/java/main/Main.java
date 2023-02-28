@@ -8,11 +8,16 @@ import supervisor.ComputationNetwork;
 
 public class Main {
     public static void main(String[] args) {
-        ProgramAnalyzer analyzer = new ProgramAnalyzer("src/test/java/simple/controlflow");
+        ProgramAnalyzer analyzer = new ProgramAnalyzer("src/test/java/a5");
         TotalProvider provider = new TotalProvider(analyzer);
         ComputationNetwork supervisor = new ComputationNetwork(provider);
-        supervisor.executeAssertion(new Assertion(0));
+        System.out.println(supervisor.get(new Assertion(0)));
+        supervisor.performCycle();
+        supervisor.performCycle();
+        supervisor.performCycle();
         while (true) {
+            System.out.println(supervisor.get(new Assertion(0)));
+            supervisor.notifyAssertionPass(new Assertion(0));
             supervisor.performCycle();
         }
         /*ComputationNetwork net = new ComputationNetwork(new ConstantAssertionFreqFormulaProvider(1f));

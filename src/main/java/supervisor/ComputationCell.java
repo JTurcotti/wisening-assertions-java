@@ -198,6 +198,7 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
 
     @Override
     public String toString() {
-        return store.size() + " rows";
+        long numActive = store.values().stream().filter(row -> row.dependeesUpdated.get() || !row.initialized || row.formulaUpdated.get()).count();
+        return store.size() + " rows (" + numActive + " active)";
     }
 }

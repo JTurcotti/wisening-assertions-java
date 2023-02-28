@@ -24,12 +24,15 @@ public class Main {
                 return 3;
             }
         }
-        //x
-        //n, a
-        assert n > 5;
         if (foo(0) > 5) {
             return bar(n-1);
         }
         return 0;
+    }
+
+    int baz(int y) {
+        int x = bar(y);
+        assert x > 0;
+        return x;
     }
 }
