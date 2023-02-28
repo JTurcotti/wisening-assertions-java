@@ -120,4 +120,13 @@ public class ProgramAnalyzer {
         }
         return typechecker.typecheckedProcedures.get(proc).resultBlames();
     }
+
+    public Collection<Line> getAllLines() {
+        return lineIndexer.outputs();
+    }
+
+    public Collection<Line> getAssertionDependentLines(Assertion assertion) {
+        //TODO: for now do nothing fancy here - but consider filtering for performance at some point
+        return getAllLines();
+    }
 }

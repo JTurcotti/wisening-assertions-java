@@ -18,22 +18,27 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
 
     private final ComputationNetwork parentNetwork;
     private final float defaultVal;
+    private final boolean rowsBeginInitialized;
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
     ComputationCell(ComputationNetwork parentNetwork,
                     float defaultVal,
+                    boolean rowsBeginInitialized,
                     FormulaProvider<Dep, Result> formulaProvider,
                     MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
         this.parentNetwork = parentNetwork;
         this.defaultVal = defaultVal;
+        this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
     }
 
     private class Row implements ComputationRow<Dep, Result, MsgT> {
-        boolean initialized = false;
-        private volatile Formula<Dep> formula;
+        boolean initialized = rowsBeginInitialized;
+
+        //TODO: concurrent updates to this formula would cause problems, ensure they don't occur
+        private Formula<Dep> formula;
         private volatile float val = defaultVal;
         private final Set<ComputationRow<? super Result, ?, ?>> dependers = new HashSet<>();
         private final Map<Dep, ComputationRow<?, ? extends Dep, ?>> dependees = new HashMap<>();
@@ -189,5 +194,10 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
 
             row.initialized = true;
         });
+    }
+
+    @Override
+    public String toString() {
+        return store.size() + " rows";
     }
 }

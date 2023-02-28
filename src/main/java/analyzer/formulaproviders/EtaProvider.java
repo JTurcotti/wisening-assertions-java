@@ -24,10 +24,10 @@ record EtaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<BetaOrEt
         return new SymbolicDisj<>(analyzer
                 .getOutputBlame(eta.tgt(), eta.tgtOutput())
                 .getBlamedOutputs().stream()
-                .map(call -> new SymbolicConj<>(List.of(
-                        new SymbolicParam<BetaOrEta>(
+                .map(call -> new SymbolicConj<BetaOrEta>(List.of(
+                        new SymbolicParam<>(
                                 new Beta(eta.tgt(), call, BetaSite.ofPhiOutput(eta.tgtOutput()))),
-                        new SymbolicParam<BetaOrEta>(
+                        new SymbolicParam<>(
                                 new Eta(eta.src(), eta.srcOutput(),
                                         analyzer.procedureOfCall(call.call()).get(), call.output())))))
                 .collect(Collectors.toList()));

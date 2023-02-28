@@ -1,7 +1,10 @@
 package analyzer.formulaproviders;
 
 import analyzer.ProgramAnalyzer;
-import analyzer.formulaproviders.arith.*;
+import analyzer.formulaproviders.arith.SymbolicConj;
+import analyzer.formulaproviders.arith.SymbolicDisj;
+import analyzer.formulaproviders.arith.SymbolicNot;
+import analyzer.formulaproviders.arith.SymbolicParam;
 import core.codemodel.events.Phi;
 import core.codemodel.types.IntraflowEvent;
 import core.dependencies.PiOrPhi;

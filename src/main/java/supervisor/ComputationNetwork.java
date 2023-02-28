@@ -56,30 +56,30 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
         piComputationCells =
                 new ComputationCellGroup<>(this, PI_COLD_VALUE,
-                        new ErrorFormulaProvider<>(), BranchMessageProcessor::new);
+                        true, new ErrorFormulaProvider<>("pi formula"), BranchMessageProcessor::new);
         phiComputationCells =
                 new ComputationCellGroup<>(this, PHI_COLD_VALUE,
-                        formulaProvider.phiFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.phiFormulaProvider(), NoopMessageProcessor::new);
         betaComputationCells =
                 new ComputationCellGroup<>(this, BETA_COLD_VALUE,
-                        formulaProvider.betaFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.betaFormulaProvider(), NoopMessageProcessor::new);
         etaComputationCells =
                 new ComputationCellGroup<>(this, ETA_COLD_VALUE,
-                        formulaProvider.etaFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.etaFormulaProvider(), NoopMessageProcessor::new);
         alphaComputationCells =
                 new ComputationCellGroup<>(this, ALPHA_COLD_VALUE,
-                        formulaProvider.alphaFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.alphaFormulaProvider(), NoopMessageProcessor::new);
         omegaComputationCells =
                 new ComputationCellGroup<>(this, OMEGA_COLD_VALUE,
-                        formulaProvider.omegaFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.omegaFormulaProvider(), NoopMessageProcessor::new);
         lineComputationCells =
                 new ComputationCellGroup<>(this, LINE_CORRECTNESS_COLD_VALUE,
-                        new ErrorFormulaProvider<>(),
+                        true, new ErrorFormulaProvider<>("line formula"),
                         line -> new AssertionPassMessageProcessor(
                                 formulaProvider.lineUpdateFormulaProvider(), this, line));
         assertionComputationCells =
                 new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
-                        formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
+                        false, formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
@@ -128,5 +128,10 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         forEach(Thread::start);
         while (!isInterrupted()) {}
         forEach(Thread::interrupt);
+    }
+
+    //mostly for debugging purposes
+    public void performCycle() {
+        forEach(ComputationCellGroup::performCycle);
     }
 }

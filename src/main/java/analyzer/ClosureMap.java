@@ -6,7 +6,6 @@ import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.visitor.filter.TypeFilter;
 import util.Util;
 

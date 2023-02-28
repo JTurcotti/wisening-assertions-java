@@ -13,15 +13,17 @@ import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {
     private final ComputationNetwork parentNetwork;
     private final float defaultVal;
+    private final boolean rowsBeginInitialized;
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
     ComputationCellGroup(ComputationNetwork parentNetwork,
                          float defaultVal,
-                         FormulaProvider<Dep, Result> formulaProvider,
+                         boolean rowsBeginInitialized, FormulaProvider<Dep, Result> formulaProvider,
                          MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
         this.parentNetwork = parentNetwork;
         this.defaultVal = defaultVal;
+        this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
     }
@@ -31,24 +33,30 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
     private final Map<Result, ComputationCell<Dep, Result, MsgT>> cellTable = new ConcurrentHashMap<>();
 
     private ComputationCell<Dep, Result, MsgT> getCellForEvent(Result event) {
-        return cellTable.computeIfAbsent(event, e -> {
-            //guaranteed to be performed atomically by the ConcurrentHashMap implementation
-            ComputationCell<Dep, Result, MsgT> smallest = Collections.min(cells, Comparator.comparingInt(ComputationCell::size));
-            ComputationCell<Dep, Result, MsgT> target;
-            if (smallest.size() < COMPUTATION_CELL_GROUP_MAX_CELL_SIZE) {
-                target = smallest;
-            } else {
-                ComputationCell<Dep, Result, MsgT> newCell =
-                        new ComputationCell<>(parentNetwork, defaultVal, formulaProvider, messageProcessorProducer);
-                cells.add(newCell);
-                if (isAlive()) {
-                    newCell.start();
-                }
-                target = newCell;
+        if (cellTable.containsKey(event)) {
+            return cellTable.get(event);
+        }
+
+        //guaranteed to be performed atomically by the ConcurrentHashMap implementation
+        Optional<ComputationCell<Dep, Result, MsgT>> smallest = cells.isEmpty()?
+                Optional.empty():
+                Optional.of(Collections.min(cells, Comparator.comparingInt(ComputationCell::size)));
+        ComputationCell<Dep, Result, MsgT> target;
+        if (smallest.isPresent() && smallest.get().size() < COMPUTATION_CELL_GROUP_MAX_CELL_SIZE) {
+            target = smallest.get();
+        } else {
+            ComputationCell<Dep, Result, MsgT> newCell =
+                    new ComputationCell<>(
+                            parentNetwork, defaultVal, rowsBeginInitialized,
+                            formulaProvider, messageProcessorProducer);
+            cells.add(newCell);
+            if (isAlive()) {
+                newCell.start();
             }
-            cellTable.put(e, target);
-            return target;
-        });
+            target = newCell;
+        }
+        cellTable.put(event, target);
+        return target;
     }
 
     @Override
@@ -76,5 +84,19 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
         cells.forEach(Thread::start);
         while (!isInterrupted()) {/*noop - intentional infinite loop */}
         cells.forEach(Thread::interrupt);
+    }
+
+    //mostly for debugging purposes
+    public void performCycle() {
+        cells.forEach(ComputationCell::performCycle);
+    }
+
+    @Override
+    public String toString() {
+        String repr = "ComputationCellGroup[";
+        for (ComputationCell<?, ?, ?> cell : cells) {
+            repr += cell.toString() + ", ";
+        }
+        return repr + "]";
     }
 }
