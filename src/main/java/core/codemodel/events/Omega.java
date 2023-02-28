@@ -2,5 +2,5 @@ package core.codemodel.events;
 
 import core.dependencies.OmegaOrLine;
 
-public class Omega implements Event, OmegaOrLine {
+public record Omega(Assertion assertion, Line line) implements Event, OmegaOrLine {
 }

@@ -3,9 +3,9 @@ package analyzer;
 import core.codemodel.Indexer;
 import core.codemodel.elements.*;
 import core.codemodel.events.Assertion;
+import core.codemodel.events.Line;
 import core.codemodel.events.Pi;
 import core.codemodel.types.Blame;
-import core.codemodel.types.FullContext;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtAssert;
@@ -95,5 +95,29 @@ public class ProgramAnalyzer {
             throw new IllegalArgumentException("Expected passed procedure to be present in typechecked table: " + p);
         }
         return typechecker.typecheckedProcedures.get(p).getResult(out);
+    }
+
+    public Blame getAssertionBlame(Assertion assertion) {
+        return assertionIndexer.lookupAux(assertion).orElseThrow(() ->
+                        new IllegalArgumentException("Expected assertion to be indexed by analyzer: " + assertion))
+                .blame();
+    }
+
+    public Procedure procedureOfLine(Line l) {
+        return lineIndexer.lookupAux(l).orElseThrow(() ->
+                new IllegalArgumentException("Exepected line to be indexed by analyzer: " + l)).left();
+    }
+
+    public Procedure procedureOfAssertion(Assertion assertion) {
+        return assertionIndexer.lookupAux(assertion).orElseThrow(() ->
+                        new IllegalArgumentException("Expected assertion to be indexed by analyzer: " + assertion))
+                .procedure();
+    }
+
+    public Map<PhiOutput, Blame> getResultBlamesForProcedure(Procedure proc) {
+        if (!typechecker.typecheckedProcedures.containsKey(proc)) {
+            throw new IllegalArgumentException("Expected procedure to be typechecked: " + proc);
+        }
+        return typechecker.typecheckedProcedures.get(proc).resultBlames();
     }
 }

@@ -1,9 +1,11 @@
 package core.codemodel;
 
+import core.codemodel.elements.Procedure;
 import core.codemodel.events.Line;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePositionHolder;
 import spoon.reflect.declaration.CtElement;
+import util.Pair;
 
 import java.util.*;
 import java.util.function.Function;
@@ -85,33 +87,37 @@ public class Indexer<OutputT, IndexingT, AuxT> {
     }
 
     //warning: values in aux not necessarily very informative - could be too big (see unop case)
-    public static class BySourceLine extends Indexer<Line, SourcePos, Set<CtElement>> {
-        public Line lookupOrCreateField(CtFieldAccess<?> fa) {
-            return super.lookupOrCreate(SourcePos.fromFieldAccess(fa), Set.of(fa.getVariable()));
+    public static class BySourceLine extends Indexer<Line, SourcePos, Pair<Procedure, Set<CtElement>>> {
+        private Line lookupOrCreateSingleton(SourcePos sp, Procedure procedure, CtElement elem) {
+            return super.lookupOrCreate(sp, new Pair<>(procedure, Set.of(elem)));
         }
 
-        public Line lookupOrCreateUnop(CtUnaryOperator<?> unop) {
-            return super.lookupOrCreate(SourcePos.fromUnop(unop), Set.of(unop));
+        public Line lookupOrCreateField(CtFieldAccess<?> fa, Procedure procedure) {
+            return lookupOrCreateSingleton(SourcePos.fromFieldAccess(fa), procedure, fa.getVariable());
         }
 
-        public Line lookupOrCreateBinop(CtBinaryOperator<?> binop) {
-            return super.lookupOrCreate(SourcePos.fromBinop(binop), Set.of(binop));
+        public Line lookupOrCreateUnop(CtUnaryOperator<?> unop, Procedure procedure) {
+            return lookupOrCreateSingleton(SourcePos.fromUnop(unop), procedure, unop);
         }
 
-        public Line lookupOrCreateConstr(CtConstructorCall<?> constr) {
-            return super.lookupOrCreate(SourcePos.fromConstr(constr), Set.of(constr));
+        public Line lookupOrCreateBinop(CtBinaryOperator<?> binop, Procedure procedure) {
+            return lookupOrCreateSingleton(SourcePos.fromBinop(binop), procedure, binop);
         }
 
-        public Line lookupOrCreateInv(CtInvocation<?> inv) {
-            return super.lookupOrCreate(SourcePos.fromInvocation(inv), Set.of(inv));
+        public Line lookupOrCreateConstr(CtConstructorCall<?> constr, Procedure procedure) {
+            return lookupOrCreateSingleton(SourcePos.fromConstr(constr), procedure, constr);
+        }
+
+        public Line lookupOrCreateInv(CtInvocation<?> inv, Procedure procedure) {
+            return lookupOrCreateSingleton(SourcePos.fromInvocation(inv), procedure, inv);
         }
 
         /*
         Get a new line whose source position is the entire source position of the passed element
          */
-        public Line lookupOrCreateEntire(CtElement elem) {
+        public Line lookupOrCreateEntire(CtElement elem, Procedure procedure) {
             if (elem.getPosition().isValidPosition()) {
-                return super.lookupOrCreate(SourcePos.fromSpoon(elem.getPosition()), Set.of(elem));
+                return lookupOrCreateSingleton(SourcePos.fromSpoon(elem.getPosition()), procedure, elem);
             }
             throw new IllegalArgumentException("Position not defined for passed CtElement: " + elem);
         }

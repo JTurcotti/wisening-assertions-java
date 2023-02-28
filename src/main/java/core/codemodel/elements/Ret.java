@@ -1,4 +1,4 @@
 package core.codemodel.elements;
 
-public record Ret(Procedure procedure) implements PhiOutput {
+public record Ret(Procedure procedure) implements PhiOutput, BetaSite {
 }

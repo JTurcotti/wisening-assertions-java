@@ -3,7 +3,6 @@ package core.codemodel.types;
 import analyzer.CtProcedure;
 import analyzer.ProgramAnalyzer;
 import core.codemodel.elements.*;
-import core.codemodel.events.Event;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;
@@ -11,7 +10,9 @@ import util.Util;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Blame {
     private final Map<BlameSite, IntraflowEvent> data;
@@ -61,7 +62,38 @@ public class Blame {
         return new Blame(Util.mapImmutableMap(data, flow -> flow.substPi(subst)));
     }
 
-    public IntraflowEvent getAtSite(ProgramAnalyzer analyzer, PhiInput in) {
+    public List<CallOutput> getBlamedOutputs() {
+        return data.keySet().stream().flatMap(site ->
+                        site instanceof CallOutput c? Stream.of(c): Stream.empty())
+                .collect(Collectors.toList());
+    }
+
+    public List<ClosedOver> getBlamedClosedOver() {
+        return data.keySet().stream().flatMap(site ->
+                switch (site) {
+                    case Field f -> Stream.of(f);
+                    case Self s -> Stream.of(s);
+                    case Variable v -> Stream.of(v);
+                    default -> Stream.empty();
+                }).collect(Collectors.toList());
+    }
+
+    public boolean blamesSelf() {
+        return data.containsKey(new Self());
+    }
+
+    public boolean blamesSite(BlameSite site) {
+        return data.containsKey(site);
+    }
+
+    public IntraflowEvent getAtSite(BlameSite site) {
+        if (!data.containsKey(site)) {
+            throw new IllegalStateException("Expected site to be present in blame: " + site);
+        }
+        return data.get(site);
+    }
+
+    public IntraflowEvent getAtInputSite(ProgramAnalyzer analyzer, PhiInput in) {
         BlameSite site = switch (in) {
             case Arg a -> {
                 CtProcedure proc = analyzer.lookupProcedure(a.procedure());
@@ -77,9 +109,6 @@ public class Blame {
             case Self s -> s;
             case Variable v -> v;
         };
-        if (!data.containsKey(site)) {
-            throw new IllegalStateException("Expected site to be present in blame: " + site);
-        }
-        return data.get(site);
+        return getAtSite(site);
     }
 }

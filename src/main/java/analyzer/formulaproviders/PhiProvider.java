@@ -11,7 +11,7 @@ import core.formula.FormulaProvider;
 import java.util.stream.Collectors;
 
 record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi, Phi> {
-    public Formula<PiOrPhi> fromEvent(IntraflowEvent event) {
+    public static Formula<PiOrPhi> formulaFromEvent(IntraflowEvent event) {
         return new SymbolicDisj<>(event.dnf().stream().map(conj ->
                 new SymbolicConj<>(conj.stream().map(ae ->
                         IntraflowEvent.AtomicEvent.<Formula<PiOrPhi>>process(ae,
@@ -21,7 +21,9 @@ record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi,
     }
 
     @Override
-    public Formula<PiOrPhi> get(Phi event) {
-        return fromEvent(analyzer.getOutputBlame(event.procedure(), event.out()).getAtSite(analyzer, event.in()));
+    public Formula<PiOrPhi> get(Phi phi) {
+        return formulaFromEvent(analyzer
+                .getOutputBlame(phi.procedure(), phi.out())
+                .getAtInputSite(analyzer, phi.in()));
     }
 }

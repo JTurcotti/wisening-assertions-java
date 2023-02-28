@@ -1,8 +1,7 @@
 package analyzer;
 
 import core.codemodel.SourcePos;
-import core.codemodel.elements.Field;
-import core.codemodel.elements.Variable;
+import core.codemodel.elements.*;
 import org.jetbrains.annotations.Nullable;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtBodyHolder;
@@ -121,6 +120,22 @@ public class CtProcedure implements SourcePositionHolder {
 
     public int getNumParams() {
         return parameters.size();
+    }
+
+    //ensure variables corresponding to arguments are marked thus
+    public PhiInput closedOverAsInput(ClosedOver c) {
+        return switch (c) {
+            case Field f -> f;
+            case Self s -> s;
+            case Variable v -> {
+                for (int i = 0; i < parameters.size(); i++) {
+                    if (parentAnalyzer.varIndexer.lookupOrCreate(parameters.get(i)).equals(v)) {
+                        yield new Arg(parentAnalyzer.procedureIndexer.lookupOrCreate(this), i);
+                    }
+                }
+                yield v;
+            }
+        };
     }
 }
 

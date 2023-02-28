@@ -239,7 +239,7 @@ public class Typechecker {
                             .reduce(Blame::disjunct);
 
                     targettedBlame.ifPresent(blame ->
-                            parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, blame)));
+                            parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, blame, procedure)));
 
                     Pair<FullContext, Blame> result = typecheckExpression(ctxt, a.getAssertExpression());
                     return result.left().zeroMutables(targetted);
@@ -409,7 +409,7 @@ public class Typechecker {
          */
         private Pair<FullContext, Blame> typecheckOpaque(FullContext ctxt, CtExpression<?> expr) {
             return new Pair<>(ctxt, expr.isImplicit()? Blame.zero():
-                    Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(expr)));
+                    Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(expr, procedure)));
         }
 
         private Pair<FullContext, Blame> typecheckExpression(FullContext ctxt, CtExpression<?> expr) {
@@ -424,7 +424,7 @@ public class Typechecker {
                                             .collect(Collectors.toList())));
                 }
                 case CtFieldAccess<?> fa -> {
-                    Blame faBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateField(fa));
+                    Blame faBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateField(fa, procedure));
                     if (fa.getTarget() instanceof CtThisAccess<?>) {
                         Field f = parentAnalyzer.fieldIndexer.lookupOrCreate(fa.getVariable().getDeclaration());
                         return new Pair<>(ctxt, ctxt.lookupMutable(f).disjunct(faBlame));
@@ -440,7 +440,7 @@ public class Typechecker {
                     return typecheckOpaque(ctxt, sa).mapRight(Blame.oneSite(new Self())::disjunct);
                 }
                 case CtVariableAccess<?> va -> {
-                    Blame vaBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(va));
+                    Blame vaBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateEntire(va, procedure));
                     Variable v = parentAnalyzer.varIndexer.lookupOrCreate(va.getVariable().getDeclaration());
                     return new Pair<>(ctxt, ctxt.lookupMutable(v).disjunct(vaBlame));
                 }
@@ -451,7 +451,7 @@ public class Typechecker {
                     //TODO: also consider possible overrides
 
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv));
-                    Blame callBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateInv(inv));
+                    Blame callBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateInv(inv, procedure));
 
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
                         //call to a library method - no Phi's introduced just treated like an arithmetic assignment
@@ -498,11 +498,11 @@ public class Typechecker {
                 }
                 case CtUnaryOperator<?> unop -> {
                     ///TODO: handle ++ as a write
-                    Blame unopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop));
+                    Blame unopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop, procedure));
                     return typecheckExpression(ctxt, unop.getOperand()).mapRight(unopBlame::disjunct);
                 }
                 case CtBinaryOperator<?> binop -> {
-                    Blame binopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateBinop(binop));
+                    Blame binopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateBinop(binop, procedure));
                     return typecheckTwoExprs(ctxt, binop.getLeftHandOperand(), binop.getRightHandOperand())
                             .mapRight(binopBlame::disjunct);
                 }
@@ -525,7 +525,7 @@ public class Typechecker {
                 }
                 case CtConstructorCall<?> constr -> {
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr));
-                    Blame constrBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr));
+                    Blame constrBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr, procedure));
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
                         return typecheckExprList(ctxt, constr.getArguments()).mapRight(constrBlame::disjunct);
                     }
@@ -579,7 +579,7 @@ public class Typechecker {
                     if (fa.getTarget() instanceof CtThisAccess<?>) {
                         return typecheckAssignmentToField(ctxt, fa.getVariable(), assignment);
                     }
-                    Blame faBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateField(fa));
+                    Blame faBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateField(fa, procedure));
                     return typecheckAssignmentToExpression(ctxt, fa.getTarget(), assignment.disjunct(faBlame));
                 }
                 case CtSuperAccess<?> sa -> {
