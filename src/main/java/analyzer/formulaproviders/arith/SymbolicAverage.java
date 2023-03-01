@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record SymbolicMax<Dep extends Dependency>(List<Formula<Dep>> operands) implements Formula<Dep> {
+public record SymbolicAverage<Dep extends Dependency>(List<Formula<Dep>> operands) implements Formula<Dep> {
     @Override
     public Set<Dep> getDeps() {
         return operands.stream().flatMap(c -> c.getDeps().stream()).collect(Collectors.toUnmodifiableSet());
@@ -16,8 +16,11 @@ public record SymbolicMax<Dep extends Dependency>(List<Formula<Dep>> operands) i
 
     @Override
     public float compute(Function<Dep, Float> resolveDependencies) {
+        if (operands.isEmpty()) {
+            throw new IllegalArgumentException("Don't create a symbolic average of 0 operands");
+        }
         return operands.stream()
                 .map(o -> o.compute(resolveDependencies))
-                .reduce(0.0f, Float::max);
+                .reduce(0.0f, Float::sum) / operands.size();
     }
 }

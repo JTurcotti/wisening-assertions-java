@@ -2,8 +2,6 @@ package analyzer.formulaproviders;
 
 import analyzer.ProgramAnalyzer;
 import analyzer.formulaproviders.arith.*;
-import core.codemodel.elements.PhiInput;
-import core.codemodel.elements.PhiOutput;
 import core.codemodel.elements.Procedure;
 import core.codemodel.elements.Self;
 import core.codemodel.events.Phi;
@@ -16,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi, Phi> {
-    public static Formula<PiOrPhi> formulaFromEvent(IntraflowEvent event) {
+    static Formula<PiOrPhi> formulaFromEvent(IntraflowEvent event) {
         return new SymbolicDisj<>(event.dnf().stream().map(conj ->
                 new SymbolicConj<>(conj.stream().map(ae ->
                         IntraflowEvent.AtomicEvent.<Formula<PiOrPhi>>process(ae,
@@ -25,7 +23,7 @@ record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi,
                         )).collect(Collectors.toList()))).collect(Collectors.toList()));
     }
 
-    public Formula<PiOrPhi> formulaFromPhi(Phi phi) {
+    Formula<PiOrPhi> formulaFromPhi(Phi phi) {
         if (!analyzer.hasImplementation(phi.procedure())) {
             //no flow here
             return SymbolicConstant.zero();
@@ -50,6 +48,6 @@ record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi,
         }
 
         //TODO: weight by dispatch frequency instead of just maxing, or alternatively consider a simple average
-        return new SymbolicMax<>(overrides.stream().map(p -> formulaFromPhi(Phi.mapToProc(phi, p))).toList());
+        return new SymbolicAverage<>(overrides.stream().map(p -> formulaFromPhi(Phi.mapToProc(phi, p))).toList());
     }
 }

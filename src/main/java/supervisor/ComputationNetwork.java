@@ -10,6 +10,7 @@ import core.formula.TotalFormulaProvider;
 import org.jetbrains.annotations.NotNull;
 import spoon.reflect.declaration.CtElement;
 import util.Pair;
+import util.Util;
 
 import java.nio.channels.FileLock;
 import java.util.Comparator;
@@ -102,6 +103,9 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         for (int i = 0; i < numAssertions; i++) {
             get(new Assertion(i));
         }
+        for (int i = 0; i < WARMUP_ROUNDS; i++) {
+            performCycle();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -169,21 +173,6 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .reduce(0f, Float::max);
     }
 
-    public List<Long> binLineStatistic(int numBins, Function<Line, Float> stat) {
-        return IntStream.range(0, numBins).mapToObj(i ->
-                analyzer.getAllLines().stream().filter(line ->
-                        stat.apply(line) >= (1f * i) / numBins && stat.apply(line) <= (1f * i + 1f) / numBins).count()).toList();
-    }
-
-    public String binLineStatString(int numBins, Function<Line, Float> stat) {
-        String repr = "[";
-        List<Long> stats = binLineStatistic(numBins, stat);
-        for (int i = 0; i < numBins; i++) {
-            repr += (1f * i) / numBins + ": " + stats.get(i) + " | ";
-        }
-        return repr + "]";
-    }
-
     @Override
     public String toString() {
         List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
@@ -192,9 +181,8 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         for (Float f: assertionCorrectness) {
             repr = repr + f + ", ";
         }
-        int numBins = 10;
         return repr + "}, line coverages: " +
-                binLineStatString(numBins, this::getCoverageForLine) + ", line correctnesses: " +
-                binLineStatString(numBins, this::get);
+                Util.binStatisticString(BINS_FOR_DISPLAY, this::getCoverageForLine, analyzer.getAllLines()) + ", line correctnesses: " +
+                Util.binStatisticString(BINS_FOR_DISPLAY, this::get, analyzer.getAllLines());
     }
 }

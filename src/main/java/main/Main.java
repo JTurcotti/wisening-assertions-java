@@ -15,9 +15,6 @@ public class Main {
 
         int i = 4;
 
-        supervisor.performCycle();
-        supervisor.performCycle();
-        supervisor.performCycle();
         while (true) {
             System.out.println(supervisor);
             supervisor.notifyAssertionPass(new Assertion(i));

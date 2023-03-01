@@ -3,11 +3,14 @@ package supervisor;
 import core.codemodel.events.Event;
 import core.dependencies.Dependency;
 import core.formula.FormulaProvider;
+import util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static supervisor.Config.BINS_FOR_DISPLAY;
 import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
@@ -102,12 +105,8 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     @Override
     public String toString() {
-        long numValues = streamValues().count();
-        float avgValue = streamValues().reduce(0f, Float::sum) / numValues;
-        float maxValue = streamValues().reduce(0f, Float::max);
-        float minValue = streamValues().reduce(0f, Float::min);
-
-        String repr = "ComputationCellGroup[" + numValues + " values: {" + minValue +", " + avgValue + ", " + maxValue + "} ";
+        String repr = "ComputationCellGroup[" + streamValues().count() + " values: {" +
+                Util.binStatisticString(BINS_FOR_DISPLAY, Function.identity(), streamValues().toList()) + "} ";
         for (ComputationCell<?, ?, ?> cell : cells) {
             repr += cell.toString() + ", ";
         }

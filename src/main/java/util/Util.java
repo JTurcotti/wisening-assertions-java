@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Util {
@@ -109,5 +110,20 @@ public class Util {
 
     public static <T> UnaryOperator<T> unaryAndThen(UnaryOperator<T> fst, UnaryOperator<T> snd) {
         return t -> snd.apply(fst.apply(t));
+    }
+
+    public static <Arg> List<Long> binStatistic(int numBins, Function<Arg, Float> stat, Collection<Arg> args) {
+        return IntStream.range(0, numBins).mapToObj(i ->
+                args.stream().filter(line ->
+                        stat.apply(line) >= (1f * i) / numBins && stat.apply(line) <= (1f * i + 1f) / numBins).count()).toList();
+    }
+
+    public static <Arg> String binStatisticString(int numBins, Function<Arg, Float> stat, Collection<Arg> args) {
+        String repr = "[";
+        List<Long> stats = binStatistic(numBins, stat, args);
+        for (int i = 0; i < numBins; i++) {
+            repr += (1f * i) / numBins + ": " + stats.get(i) + " | ";
+        }
+        return repr + "]";
     }
 }
