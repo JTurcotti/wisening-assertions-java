@@ -2,9 +2,7 @@ package core.codemodel.types;
 
 import analyzer.CtProcedure;
 import analyzer.ProgramAnalyzer;
-import core.codemodel.Indexer;
 import core.codemodel.elements.*;
-import core.codemodel.events.Event;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import static supervisor.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 
@@ -34,7 +35,7 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         this.messageProcessorProducer = messageProcessorProducer;
     }
 
-    private class Row implements ComputationRow<Dep, Result, MsgT> {
+    class Row implements ComputationRow<Dep, Result, MsgT> {
         boolean initialized = rowsBeginInitialized;
 
         //TODO: concurrent updates to this formula would cause problems, ensure they don't occur
@@ -129,6 +130,14 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         Row row = getOrCreateRow(event);
         row.dependers.add(requester);
         return row;
+    }
+
+    Stream<Float> streamValues() {
+        return store.values().stream().map(Row::getVal);
+    }
+
+    Stream<Map.Entry<Result, Row>> streamRows() {
+        return store.entrySet().stream();
     }
 
     @Override

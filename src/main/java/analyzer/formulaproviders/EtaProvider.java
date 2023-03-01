@@ -1,6 +1,5 @@
 package analyzer.formulaproviders;
 
-import analyzer.CtProcedure;
 import analyzer.ProgramAnalyzer;
 import analyzer.formulaproviders.arith.SymbolicConj;
 import analyzer.formulaproviders.arith.SymbolicConstant;

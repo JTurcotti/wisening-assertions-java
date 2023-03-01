@@ -6,6 +6,7 @@ import core.formula.FormulaProvider;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
@@ -91,9 +92,22 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
         new ArrayList<>(cells).forEach(ComputationCell::performCycle);
     }
 
+    private Stream<Float> streamValues() {
+        return cells.stream().flatMap(ComputationCell::streamValues);
+    }
+
+    private Stream<Map.Entry<Result, ComputationCell<Dep, Result, MsgT>.Row>> streamRows() {
+        return cells.stream().flatMap(ComputationCell::streamRows);
+    }
+
     @Override
     public String toString() {
-        String repr = "ComputationCellGroup[";
+        long numValues = streamValues().count();
+        float avgValue = streamValues().reduce(0f, Float::sum) / numValues;
+        float maxValue = streamValues().reduce(0f, Float::max);
+        float minValue = streamValues().reduce(0f, Float::min);
+
+        String repr = "ComputationCellGroup[" + numValues + " values: {" + minValue +", " + avgValue + ", " + maxValue + "} ";
         for (ComputationCell<?, ?, ?> cell : cells) {
             repr += cell.toString() + ", ";
         }

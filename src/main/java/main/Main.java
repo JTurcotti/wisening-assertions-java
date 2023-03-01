@@ -11,13 +11,16 @@ public class Main {
         ProgramAnalyzer analyzer = new ProgramAnalyzer("src/test/java/a5");
         TotalProvider provider = new TotalProvider(analyzer);
         ComputationNetwork supervisor = new ComputationNetwork(provider);
-        System.out.println(supervisor.get(new Assertion(0)));
+        supervisor.initializeAssertions(analyzer.getAllAssertions().size());
+
+        int i = 4;
+
         supervisor.performCycle();
         supervisor.performCycle();
         supervisor.performCycle();
         while (true) {
-            System.out.println(supervisor.get(new Assertion(0)));
-            supervisor.notifyAssertionPass(new Assertion(0));
+            System.out.println(supervisor.get(new Assertion(i)));
+            supervisor.notifyAssertionPass(new Assertion(i));
             supervisor.performCycle();
         }
         /*ComputationNetwork net = new ComputationNetwork(new ConstantAssertionFreqFormulaProvider(1f));

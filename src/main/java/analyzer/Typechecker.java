@@ -237,6 +237,7 @@ public class Typechecker {
         private FullContext typecheckStmt(FullContext ctxt, CtStatement stmt) {
             switch (stmt) {
                 case CtAssert<?> a -> {
+                    /*
                     Set<Mutable> targetted = parentAnalyzer.parseWiseningAssertionTargets(a);
                     Optional<Blame> targettedBlame = targetted.stream()
                             .map(ctxt::lookupMutable)
@@ -246,8 +247,15 @@ public class Typechecker {
                     targettedBlame.ifPresent(blame ->
                             parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, blame, procedure)));
 
-                    Pair<FullContext, Blame> result = typecheckExpression(ctxt, a.getAssertExpression());
+
                     return result.left().zeroMutables(targetted);
+                            */
+
+                    Pair<FullContext, Blame> result = typecheckExpression(ctxt, a.getAssertExpression());
+                    parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, result.right(), procedure));
+
+                    //TODO: zero out blame on targetted mutables
+                    return result.left();
                 }
                 case CtOperatorAssignment<?, ?> op -> {
                     Pair<FullContext, Blame> lhs = typecheckExpression(ctxt, op.getAssigned());
