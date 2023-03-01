@@ -53,4 +53,14 @@ public class MutablesContext {
                 .collect(Collectors.toUnmodifiableMap(Function.identity(), mutable ->
                         toZero.contains(mutable)? Blame.zero(): data.get(mutable))));
     }
+
+    /*
+    For any mutables that are definitely blamed by the passed blame, zero them out
+     */
+    public MutablesContext observeAssertion(Blame assertionBlame) {
+        return new MutablesContext(data.keySet().stream()
+                .collect(Collectors.toUnmodifiableMap(Function.identity(), mutable ->
+                        assertionBlame.getAtSiteOrZero(Mutable.asBlameSite(mutable)).isOne()
+                                ? Blame.zero(): data.get(mutable))));
+    }
 }

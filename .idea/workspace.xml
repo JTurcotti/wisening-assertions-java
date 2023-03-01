@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fix failing lookup bugs">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
-    </list>
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="get to a pretty good state, I can watch it working!" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -100,7 +94,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="152225000" />
+      <workItem from="1676765368190" duration="153085000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -312,7 +306,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677691809878</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="get to a pretty good state, I can watch it working!">
+      <created>1677697046835</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1677697046835</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -330,7 +331,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="make computationcell row data volatile" />
     <MESSAGE value="comment" />
     <MESSAGE value="refactoring into package structure" />
     <MESSAGE value="lots of work" />
@@ -355,7 +355,8 @@
     <MESSAGE value="fix bugs and get system (buggily) running" />
     <MESSAGE value="system seems to be working for simple code!" />
     <MESSAGE value="fix failing lookup bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix failing lookup bugs" />
+    <MESSAGE value="get to a pretty good state, I can watch it working!" />
+    <option name="LAST_COMMIT_MESSAGE" value="get to a pretty good state, I can watch it working!" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -406,17 +407,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>572</line>
+          <line>573</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>38</line>
+          <line>37</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>623</line>
+          <line>624</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -431,17 +432,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>603</line>
+          <line>604</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>151</line>
+          <line>150</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>373</line>
+          <line>374</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -469,6 +470,11 @@
           <line>240</line>
           <option name="timeStamp" value="121" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
+          <line>257</line>
+          <option name="timeStamp" value="122" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
@@ -479,7 +485,7 @@
         <watch expression="supervisor.piComputationCells" />
         <watch expression="supervisor.lineComputationCells.streamRows().map(entry -&gt; supervisor.get(new Omega(new Assertion(0), entry.getKey()))).reduce(Float::max)" language="JAVA" custom="java.util.Map,core.codemodel.events.Omega" />
         <watch expression="analyzer.assertionIndexer.outputs().stream().map(analyzer.assertionIndexer::lookupAux).map(Optional::get).collect(Collectors.toList())" language="JAVA" custom="java.util.Optional,java.util.stream.Collectors" />
-        <watch expression="supervisor.assertionComputationCells.streamValues().toList()" language="JAVA" />
+        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.get(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
         <watch expression="analyzer.assertionIndexer.auxMap" language="JAVA" />
       </configuration>
     </watches-manager>

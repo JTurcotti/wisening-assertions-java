@@ -254,8 +254,9 @@ public class Typechecker {
                     Pair<FullContext, Blame> result = typecheckExpression(ctxt, a.getAssertExpression());
                     parentAnalyzer.assertionIndexer.lookupOrCreate(new CtWiseningAssert(a, result.right(), procedure));
 
-                    //TODO: zero out blame on targetted mutables
-                    return result.left();
+                    //TODO: think about better ways to zero out blame - e.g. if assertion's blame depends only on
+                    // phi events they can be negated, and we could add the ability to negate phi's too
+                    return result.left().observeAssertion(result.right());
                 }
                 case CtOperatorAssignment<?, ?> op -> {
                     Pair<FullContext, Blame> lhs = typecheckExpression(ctxt, op.getAssigned());

@@ -173,4 +173,12 @@ public record FullContext(
         }
         return resultBlames.get(out);
     }
+
+    /*
+    For any mutables that are definitely blamed by the passed blame, zero them out
+    */
+    public FullContext observeAssertion(Blame assertionBlame) {
+        MutablesContext newMutables = mutables.observeAssertion(assertionBlame);
+        return new FullContext(newMutables, pcNecessary, pcExact, resultBlames);
+    }
 }
