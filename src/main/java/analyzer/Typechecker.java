@@ -489,18 +489,20 @@ public class Typechecker {
                     Set<PhiOutput> retSet = Set.of(new Ret(p));
 
                     if (!inv.getExecutable().isStatic()) {
-                        ClosureMap.ClosureType closure = parentAnalyzer.closures.lookupByCall(c);
+                        ClosureMap.ClosureType closureOfCall = parentAnalyzer.closures.lookupByCall(c);
 
-                        if (inv.getTarget() instanceof CtThisAccess<?> || inv.getTarget() instanceof CtSuperAccess<?>) {
-                            argSet = Stream.concat(argSet.stream(), closure.getInputs().stream())
+                        if (inv.getTarget() instanceof CtThisAccess<?>
+                                || inv.getTarget() instanceof CtSuperAccess<?>
+                                || inv.getTarget() == null) {
+                            argSet = Stream.concat(argSet.stream(), closureOfCall.getInputs().stream())
                                     .collect(Collectors.toUnmodifiableSet());
-                            retSet = Stream.concat(retSet.stream(), closure.getOutputs().stream()
-                            ).collect(Collectors.toUnmodifiableSet());
+                            retSet = Stream.concat(retSet.stream(), closureOfCall.getOutputs().stream())
+                                    .collect(Collectors.toUnmodifiableSet());
                         } else {
-                            if (closure.readsSelf()) {
-                                argSet = Util.addToStream(argSet.stream(), new Self()).collect(Collectors.toUnmodifiableSet());
-                            }
-                            if (closure.writesSelf()) {
+                            //always assume self is read - for example isPresent of options
+                            argSet = Util.addToStream(argSet.stream(), new Self()).collect(Collectors.toUnmodifiableSet());
+
+                            if (closureOfCall.writesSelf()) {
                                 retSet = Util.addToStream(retSet.stream(), new Self()).collect(Collectors.toUnmodifiableSet());
                             }
                         }

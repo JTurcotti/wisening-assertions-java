@@ -4,11 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="improve assertions blame zeroing">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="improve printing">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicMax.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/IntraflowEvent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,8 +25,8 @@
       <list>
         <option value="Enum" />
         <option value="Record" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -100,7 +104,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="156419000" />
+      <workItem from="1676765368190" duration="162324000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -326,7 +330,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677698156672</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="improve printing">
+      <created>1677701430016</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1677701430016</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -344,7 +355,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactoring into package structure" />
     <MESSAGE value="lots of work" />
     <MESSAGE value="start working on closure analysis" />
     <MESSAGE value="loop handling" />
@@ -369,7 +379,8 @@
     <MESSAGE value="fix failing lookup bugs" />
     <MESSAGE value="get to a pretty good state, I can watch it working!" />
     <MESSAGE value="improve assertions blame zeroing" />
-    <option name="LAST_COMMIT_MESSAGE" value="improve assertions blame zeroing" />
+    <MESSAGE value="improve printing" />
+    <option name="LAST_COMMIT_MESSAGE" value="improve printing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -400,7 +411,7 @@
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>602</line>
+          <line>603</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -410,7 +421,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
-          <line>547</line>
+          <line>548</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -420,7 +431,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>575</line>
+          <line>577</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -430,7 +441,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>626</line>
+          <line>628</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -445,7 +456,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>606</line>
+          <line>608</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -462,31 +473,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
           <line>23</line>
           <option name="timeStamp" value="107" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>17</line>
-          <option name="timeStamp" value="115" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>18</line>
-          <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>19</line>
-          <option name="timeStamp" value="117" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>240</line>
-          <option name="timeStamp" value="121" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>258</line>
-          <option name="timeStamp" value="122" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -18,7 +18,7 @@ import java.util.*;
 public class ProgramAnalyzer {
     final CtModel model;
     final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
-    final Indexer.BySourceLine lineIndexer = new Indexer.BySourceLine();
+    public final Indexer.BySourceLine lineIndexer = new Indexer.BySourceLine();
     final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer = new Indexer.BySourcePos<>(Call::new);
     final Indexer.BySourcePos<Pi, CtVirtualBranch> branchIndexer = new Indexer.BySourcePos<>(Pi::new);
     final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
@@ -137,5 +137,10 @@ public class ProgramAnalyzer {
     public boolean hasImplementation(Procedure p) {
         CtProcedure proc = lookupProcedure(p);
         return !proc.isAbstract() && !proc.isInterfaceMethod();
+    }
+
+    public List<Procedure> getOverrides(Procedure p) {
+        assert closures.data.get(p).getOverrides().contains(p); //TODO: delete this
+        return closures.data.get(p).getOverrides();
     }
 }

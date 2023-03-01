@@ -181,7 +181,7 @@ public class ClosureMap {
 
         //the set of closuretypes that extend/override/implement this closuretype
         //(including self)
-        private final Set<ClosureType> overrides = new HashSet<>(Set.of(this));
+        final Set<ClosureType> overrides = new HashSet<>(Set.of(this));
 
         //the following fields are populated by fixpoint propagation
         //after all closure types are generated
@@ -479,7 +479,8 @@ public class ClosureMap {
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(i));
                     calls.add(c);
                     if ((i.getTarget() instanceof CtThisAccess<?> ||
-                            i.getTarget() instanceof CtSuperAccess<?>) &&
+                            i.getTarget() instanceof CtSuperAccess<?> ||
+                            i.getTarget() == null) &&
                             parentAnalyzer.isIntrasourceCall(c)) {
                         selfCalls.add(c);
                     }
@@ -603,6 +604,10 @@ public class ClosureMap {
                     throw new IllegalStateException("Unexpected write to expression: " + expr);
             }
             return this;
+        }
+
+        List<Procedure> getOverrides() {
+            return overrides.stream().map(ct -> parentAnalyzer.procedureIndexer.lookupOrCreate(ct.procedure)).toList();
         }
     }
 }

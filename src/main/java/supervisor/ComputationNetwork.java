@@ -1,17 +1,21 @@
 package supervisor;
 
 import analyzer.ProgramAnalyzer;
+import core.codemodel.elements.Procedure;
 import core.codemodel.events.*;
 import core.dependencies.*;
 import core.formula.ErrorFormulaProvider;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
 import org.jetbrains.annotations.NotNull;
+import spoon.reflect.declaration.CtElement;
+import util.Pair;
 
 import java.nio.channels.FileLock;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -151,10 +155,12 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         forEach(ComputationCellGroup::performCycle);
     }
 
-    public List<Line> topBlamedLines(Assertion a, int n) {
+    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> topBlamedLines(Assertion a, int n) {
         return analyzer.getAllLines().stream()
                 .sorted(Comparator.comparingDouble(line -> -get(new Omega(a, line))))
-                .limit(n).toList();
+                .limit(n)
+                .map(line -> new Pair<>(analyzer.lineIndexer.lookupAux(line).get(), get(new Omega(a, line))))
+                .toList();
     }
 
     public float getCoverageForLine(Line l) {
