@@ -1,10 +1,7 @@
 package analyzer.formulaproviders;
 
 import analyzer.ProgramAnalyzer;
-import analyzer.formulaproviders.arith.SymbolicConj;
-import analyzer.formulaproviders.arith.SymbolicDisj;
-import analyzer.formulaproviders.arith.SymbolicNot;
-import analyzer.formulaproviders.arith.SymbolicParam;
+import analyzer.formulaproviders.arith.*;
 import core.codemodel.events.Phi;
 import core.codemodel.types.IntraflowEvent;
 import core.dependencies.PiOrPhi;
@@ -25,6 +22,11 @@ record PhiProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi,
 
     @Override
     public Formula<PiOrPhi> get(Phi phi) {
+        if (!analyzer.hasImplementation(phi.procedure())) {
+            //assume no interference directly through interface methods and abtract methods
+            return SymbolicConstant.zero();
+        }
+        //TODO: add disjunction with phi for overriding methods
         return formulaFromEvent(analyzer
                 .getOutputBlame(phi.procedure(), phi.out())
                 .getAtInputSite(analyzer, phi.in()));

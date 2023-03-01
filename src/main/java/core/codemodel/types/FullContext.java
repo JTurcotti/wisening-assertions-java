@@ -1,6 +1,7 @@
 package core.codemodel.types;
 
 import core.codemodel.elements.*;
+import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Pair;
 import util.Util;
@@ -88,10 +89,27 @@ public record FullContext(
                 .mapToObj(i -> blames1.get(i).disjunct(blames2.get(i))).toList();
     }*/
 
-    public FullContext observeReturn(Map<PhiOutput, Blame> blames) {
-        Map<PhiOutput, Blame> conditionedBlames = Util.mapImmutableMap(blames, this::conditionBlame);
-        Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(conditionedBlames, resultBlames, Blame::disjunct);
+    /*
+    Observe a return in the current context, zeroing out the possiblity of control flow passing
+    this point and adding results to the resutls blame. Explicitly returned results can be passed
+    in the `blames` parameter, and the `closedOver` parameter should list all variables and fields
+    that the typechecking procedure is a closure over so that they can be added as results as well
+     */
+    public FullContext observeReturn(Map<PhiOutput, Blame> blames, Set<PhiOutput> closedOver) {
+        assertReachable();
+
+        blames = Util.mergeDisjointMaps(blames, lookupPhiOutputs(closedOver));
+        blames = Util.mapImmutableMap(blames, this::conditionBlame);
+        Map<PhiOutput, Blame> newResultBlames = Util.mergeMaps(blames, resultBlames, Blame::disjunct);
         return new FullContext(MutablesContext.empty(), pcNecessary, IntraflowEvent.zero(), newResultBlames);
+    }
+
+    //observe return if the current context is reachable
+    public FullContext observeReturnIfReachable(Set<PhiOutput> closedOver) {
+        if (!pcExact.isZero()) {
+            return observeReturn(Map.of(), closedOver);
+        }
+        return this;
     }
 
     public Blame conditionAssertionBlame(Blame blame) {
@@ -146,8 +164,11 @@ public record FullContext(
     public Blame getResult(PhiOutput out) {
         if (!resultBlames.containsKey(out)) {
             if (out instanceof Self) {
-                //TODO: if this gets thrown, handle it by aggregating field results
-                throw new IllegalStateException("Expected Self to be present");
+                //if an output of self is requested but not present, disjunct the blame for all fields
+                return resultBlames.keySet().stream()
+                        .filter(Field.class::isInstance)
+                        .map(resultBlames::get)
+                        .reduce(Blame.zero(), Blame::disjunct);
             }
             throw new IllegalStateException("Expected result to be present: " + out);
         }

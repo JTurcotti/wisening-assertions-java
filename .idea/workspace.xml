@@ -4,21 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fill in all providers except alpha provider">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="system seems to be working for simple code!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AssertionProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AssertionProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/EtaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/EtaProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/BlameSite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/BlameSite.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ConstantAssertionFreqFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ConstantAssertionFreqFormulaProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/ErrorFormulaProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
     </list>
@@ -111,7 +106,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="133676000" />
+      <workItem from="1676765368190" duration="147163000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -302,7 +297,21 @@
       <option name="project" value="LOCAL" />
       <updated>1677600363475</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="fix bugs and get system (buggily) running">
+      <created>1677604018160</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1677604018160</updated>
+    </task>
+    <task id="LOCAL-00029" summary="system seems to be working for simple code!">
+      <created>1677609655454</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1677609655454</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -320,8 +329,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add message passing to branches and lines to handle more events, and other improvements like configging" />
-    <MESSAGE value="add top-level ExecutionSupervisor contract" />
     <MESSAGE value="add thread running structure" />
     <MESSAGE value="make computationcell row data volatile" />
     <MESSAGE value="comment" />
@@ -345,7 +352,9 @@
     <MESSAGE value="minor tweaks" />
     <MESSAGE value="start working on formula providers - phi done" />
     <MESSAGE value="fill in all providers except alpha provider" />
-    <option name="LAST_COMMIT_MESSAGE" value="fill in all providers except alpha provider" />
+    <MESSAGE value="fix bugs and get system (buggily) running" />
+    <MESSAGE value="system seems to be working for simple code!" />
+    <option name="LAST_COMMIT_MESSAGE" value="system seems to be working for simple code!" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -365,6 +374,14 @@
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.IllegalStateException" package="java.lang" />
           <option name="timeStamp" value="25" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.util.NoSuchElementException" package="java.util" />
+          <option name="timeStamp" value="111" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.util.ConcurrentModificationException" package="java.util" />
+          <option name="timeStamp" value="112" />
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java</url>
@@ -388,17 +405,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>554</line>
+          <line>565</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>37</line>
+          <line>38</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>605</line>
+          <line>616</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -413,32 +430,33 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>585</line>
+          <line>596</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/types/FullContext.java</url>
-          <line>133</line>
+          <line>151</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>361</line>
+          <line>366</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <condition expression="procedure.num == 10" language="JAVA" />
-          <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>92</line>
-          <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>15</line>
+          <line>20</line>
           <option name="timeStamp" value="107" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="procedureIndexer.lookupAux(p).get()" language="JAVA" />
+        <watch expression="typechecker.typecheckedProcedures.get(p)" language="JAVA" />
+        <watch expression="analyzer.procedureIndexer.lookupAux(phi.procedure).get()" language="JAVA" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

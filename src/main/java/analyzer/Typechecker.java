@@ -49,7 +49,9 @@ public class Typechecker {
                 Set<PhiInput> params = Set.copyOf(closure.procedure.getParamVariables());
                 return typecheckStmtList(FullContext.atEntry(
                         Util.mergeSets(closure.getInputs(), params)
-                ), closure.procedure.body);
+                ), closure.procedure.body)
+                        //add a symbolic empty return at the end if pc could reach it (e.g. void procedure)
+                        .observeReturnIfReachable(closure.getOutputs());
             }
             if (closure.procedure.underlying instanceof CtLoop l) {
                 Call recurCall = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(l, l.getBody()));
@@ -65,7 +67,7 @@ public class Typechecker {
                                 new CtVirtualBranch(w),
                                 Util.unaryAndThen(typecheckStmt(w.getBody()), recur),
                                 UnaryOperator.identity())
-                                .observeReturn(Map.of());
+                                .observeReturn(Map.of(), closure.getOutputs());
                     }
                     case CtDo d -> {
                         //TODO: technically this desugaring doesn't work because `continue` will bypass the check
@@ -73,7 +75,7 @@ public class Typechecker {
                                 d.getLoopingExpression(), Blame.zero(),
                                 new CtVirtualBranch(d),
                                 recur, UnaryOperator.identity())
-                                .observeReturn(Map.of());
+                                .observeReturn(Map.of(), closure.getOutputs());
                     }
                     case CtFor f -> {
                         return typecheckCond(entry,
@@ -86,7 +88,7 @@ public class Typechecker {
                                     }
                                     return recur.apply(c);
                                 }, UnaryOperator.identity())
-                                .observeReturn(Map.of());
+                                .observeReturn(Map.of(), closure.getOutputs());
                     }
                     case CtForEach fe -> {
                         Variable v = parentAnalyzer.varIndexer.lookupOrCreate(fe.getVariable());
@@ -97,7 +99,7 @@ public class Typechecker {
                                 UnaryOperator.identity())
                                 //this "assignment" ensures that the blame for the looping variable is reset
                                 .performAssignment(v, Blame.oneSite(v))
-                                .observeReturn(Map.of());
+                                .observeReturn(Map.of(), closure.getOutputs());
                     }
                     default -> throw new IllegalArgumentException("Unrecognized procedure type: " + closure.procedure.underlying);
                 }
@@ -149,7 +151,7 @@ public class Typechecker {
                 Call call, Procedure proc,
                 List<CtExpression<?>> args,
                 Set<PhiInput> inputs, Set<PhiOutput> outputs) {
-            return ctxt -> typecheckInvocation(ctxt, receiver, callBlame, call, proc, args, inputs, outputs).left();
+            return ctxt -> typecheckInvocation(ctxt, receiver, callBlame, call, proc, args, inputs, outputs, false).left();
         }
 
         private Pair<FullContext, Blame> typecheckInvocation(
@@ -159,12 +161,11 @@ public class Typechecker {
                 Blame callBlame, //the syntactic blame for the call itself
                 Call call, Procedure proc,
                 List<CtExpression<?>> args,
-                Set<PhiInput> inputs, Set<PhiOutput> outputs) {
+                Set<PhiInput> inputs, Set<PhiOutput> outputs,
+                boolean isConstructorCall) {
             if (ctxt.pcExact().isZero()) {
                 return new Pair<>(ctxt, Blame.zero());
             }
-
-            //TODO: don't pull argument to for each loop from context, but refresh to original
 
             boolean touchesMutables =
                     inputs.stream().anyMatch(Mutable.class::isInstance) ||
@@ -173,7 +174,8 @@ public class Typechecker {
                     inputs.stream().anyMatch(Self.class::isInstance) ||
                     outputs.stream().anyMatch(Self.class::isInstance);
             if (touchesSelf && touchesMutables) {
-                throw new IllegalArgumentException("Invocations that touch self should not be closed over fields or vars");
+                throw new IllegalArgumentException(
+                        "Invocations that touch self should not be closed over fields or vars");
             }
 
             Optional<Blame> receiverBlame = Optional.empty();
@@ -209,17 +211,20 @@ public class Typechecker {
                             new Phi(proc, inputList.get(i), output))
                             .disjunct(Blame.oneSite(new CallOutput(call, output)))
                             .disjunct(callBlame);
+            if (isConstructorCall) {
+                return new Pair<>(ctxt, blameGenerator.apply(new Self()));
+            }
             Blame retBlame = Blame.zero();
             for (PhiOutput output : outputs) {
                switch (output) {
                    case Field f ->
                            ctxt = ctxt.performAssignment(f, blameGenerator.apply(f));
                    case Ret r ->
-                       retBlame = blameGenerator.apply(r);
+                           retBlame = blameGenerator.apply(r);
                    case Self s ->
-                       ctxt = typecheckAssignmentToExpression(ctxt, receiver, blameGenerator.apply(s));
+                           ctxt = typecheckAssignmentToExpression(ctxt, receiver, blameGenerator.apply(s));
                    case Variable v ->
-                       ctxt = ctxt.performAssignment(v, blameGenerator.apply(v));
+                           ctxt = ctxt.performAssignment(v, blameGenerator.apply(v));
                }
             }
             return new Pair<>(ctxt, retBlame);
@@ -313,7 +318,7 @@ public class Typechecker {
                             new IllegalStateException("Expected procedure lookup to succeed"));
                     ClosureMap.ClosureType loopClosure = parentAnalyzer.closures.lookupByElement(loop);
                     return typecheckInvocation(ctxt, null, Blame.zero(), c, p, List.of(),
-                            loopClosure.getInputs(), loopClosure.getOutputs()).left();
+                            loopClosure.getInputs(), loopClosure.getOutputs(), false).left();
                 }
                 case CtTry t -> {
                     //TODO: deal with exception handling - or at least some minimal switch-like processing
@@ -326,11 +331,11 @@ public class Typechecker {
                         ctxt = retBlame.left();
                         results = Map.of(new Ret(procedure), retBlame.right());
                     }
-                    return ctxt.observeReturn(Util.mergeDisjointMaps(results, ctxt.lookupPhiOutputs(closure.getOutputs())));
+                    return ctxt.observeReturn(results, closure.getOutputs());
                 }
                 case CtBreak b -> {
                     if (b.getParent(parent -> parent instanceof CtLoop || parent instanceof CtSwitch<?>) instanceof CtLoop) {
-                        return ctxt.observeReturn(ctxt.lookupPhiOutputs(closure.getOutputs()));
+                        return ctxt.observeReturn(Map.of(), closure.getOutputs());
                     }
                     //ignore breaks in switch statements
                     //TODO: make switch statement handling break-sensitive
@@ -342,9 +347,9 @@ public class Typechecker {
                             parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(c)),
                             procedure,
                             List.of(),
-                            closure.getInputs(), closure.getOutputs()
-                    );
-                    return checkContinue.left().observeReturn(ctxt.lookupPhiOutputs(closure.getOutputs()));
+                            closure.getInputs(), closure.getOutputs(),
+                            false);
+                    return checkContinue.left().observeReturn(Map.of(), closure.getOutputs());
                 }
                 case CtUnaryOperator<?> u -> {
                     return typecheckExpression(ctxt, u).left();
@@ -491,18 +496,20 @@ public class Typechecker {
                         }
                     }
 
-                    return typecheckInvocation(ctxt, inv.getTarget(), callBlame, c, p, inv.getArguments(), argSet, retSet);
+                    return typecheckInvocation(ctxt, inv.getTarget(), callBlame, c, p, inv.getArguments(), argSet, retSet, false);
                 }
                 case CtLiteral<?> lit -> {
                     return typecheckOpaque(ctxt, lit);
                 }
                 case CtUnaryOperator<?> unop -> {
                     ///TODO: handle ++ as a write
-                    Blame unopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop, procedure));
+                    Blame unopBlame = Blame.oneSite(
+                            parentAnalyzer.lineIndexer.lookupOrCreateUnop(unop, procedure));
                     return typecheckExpression(ctxt, unop.getOperand()).mapRight(unopBlame::disjunct);
                 }
                 case CtBinaryOperator<?> binop -> {
-                    Blame binopBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateBinop(binop, procedure));
+                    Blame binopBlame = Blame.oneSite(
+                            parentAnalyzer.lineIndexer.lookupOrCreateBinop(binop, procedure));
                     return typecheckTwoExprs(ctxt, binop.getLeftHandOperand(), binop.getRightHandOperand())
                             .mapRight(binopBlame::disjunct);
                 }
@@ -514,9 +521,11 @@ public class Typechecker {
                     ctxt = guard.left();
                     Blame guardBlame = guard.right();
                     Pi pi = parentAnalyzer.branchIndexer.lookupOrCreate(new CtVirtualBranch(c));
-                    Pair<FullContext, Blame> thenExpr = typecheckExpression(ctxt.takeBranch(pi, true, guardBlame),
+                    Pair<FullContext, Blame> thenExpr =
+                            typecheckExpression(ctxt.takeBranch(pi, true, guardBlame),
                             c.getThenExpression());
-                    Pair<FullContext, Blame> elseExpr = typecheckExpression(ctxt.takeBranch(pi, false, guardBlame),
+                    Pair<FullContext, Blame> elseExpr =
+                            typecheckExpression(ctxt.takeBranch(pi, false, guardBlame),
                             c.getElseExpression());
                     return new Pair<>(
                             thenExpr.left().mergeAcrossBranch(pi, elseExpr.left()),
@@ -525,7 +534,8 @@ public class Typechecker {
                 }
                 case CtConstructorCall<?> constr -> {
                     Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr));
-                    Blame constrBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr, procedure));
+                    Blame constrBlame = Blame.oneSite(
+                            parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr, procedure));
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
                         return typecheckExprList(ctxt, constr.getArguments()).mapRight(constrBlame::disjunct);
                     }
@@ -535,9 +545,10 @@ public class Typechecker {
                     Set<PhiInput> argSet = IntStream.range(0, constr.getArguments().size())
                             .mapToObj(i -> new Arg(p, i))
                             .collect(Collectors.toUnmodifiableSet());
-                    Set<PhiOutput> retSet = Set.of(new Ret(p));
 
-                    return typecheckInvocation(ctxt, null, constrBlame, c, p, constr.getArguments(), argSet, retSet);
+                    return typecheckInvocation(
+                            ctxt, null, constrBlame, c, p,
+                            constr.getArguments(), argSet, Set.of(), true);
                 }
                 case CtLambda<?> l -> {
                     return typecheckOpaque(ctxt, l);

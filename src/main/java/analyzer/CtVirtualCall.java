@@ -31,10 +31,16 @@ public class CtVirtualCall implements SourcePositionHolder {
         return underlying.getOriginalSourceFragment();
     }
 
+    /*
+    return the source position of this call
+     */
     public SourcePos getSourcePos() {
         return SourcePos.fromSpoon(underlying.getPosition());
     }
 
+    /*
+    return the source position of the procedure called by this call
+     */
     public Optional<SourcePos> getProcedureSourcePos() {
         switch (underlying) {
             case CtLoop ignored -> {
@@ -47,8 +53,11 @@ public class CtVirtualCall implements SourcePositionHolder {
                 }
                 return Optional.empty();
             }
-            default ->
-                    throw new IllegalStateException("Unrecognized vitual call: " + this);
+            default -> {
+                //continue statements and the implicit recursive call at the end of a loop yield
+                //values of underlying that correspond to elements of the loop. Lookup the original loop here
+                return Optional.of(SourcePos.fromSpoon(underlying.getParent(CtLoop.class).getPosition()));
+            }
         }
     }
 

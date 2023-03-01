@@ -2,13 +2,16 @@ package core.codemodel.types;
 
 import analyzer.CtProcedure;
 import analyzer.ProgramAnalyzer;
+import core.codemodel.Indexer;
 import core.codemodel.elements.*;
+import core.codemodel.events.Event;
 import core.codemodel.events.Phi;
 import core.codemodel.events.Pi;
 import util.Util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -86,18 +89,35 @@ public class Blame {
         return data.containsKey(site);
     }
 
-    public IntraflowEvent getAtSite(BlameSite site) {
+    public Optional<IntraflowEvent> getAtSiteOpt(BlameSite site) {
         if (!data.containsKey(site)) {
-            throw new IllegalStateException("Expected site to be present in blame: " + site);
+            if (site instanceof Self) {
+                //if an input of Self is requested but not present, aggregate field blames
+                return Optional.of(data.keySet().stream()
+                        .filter(Field.class::isInstance)
+                        .map(data::get)
+                        .reduce(IntraflowEvent.zero(), IntraflowEvent::disjunct));
+            }
+            return Optional.empty();
         }
-        return data.get(site);
+        return Optional.of(data.get(site));
+    }
+
+    public IntraflowEvent getAtSite(BlameSite site) {
+        return getAtSiteOpt(site).orElseThrow(() ->
+                new IllegalStateException("Expected site to be present in blame: " + site));
+    }
+
+    //same as getAtSite - but returns zero event if not present, useful in some cases
+    public IntraflowEvent getAtSiteOrZero(BlameSite site) {
+        return getAtSiteOpt(site).orElse(IntraflowEvent.zero());
     }
 
     public IntraflowEvent getAtInputSite(ProgramAnalyzer analyzer, PhiInput in) {
         BlameSite site = switch (in) {
             case Arg a -> {
                 CtProcedure proc = analyzer.lookupProcedure(a.procedure());
-                if (!proc.isMethod()) {
+                if (!proc.isMethod() && !proc.isConstructor()) {
                     throw new IllegalStateException("Cannot lookup arg of a non-method");
                 }
                 if (a.num() >= proc.getNumParams()) {
@@ -109,6 +129,6 @@ public class Blame {
             case Self s -> s;
             case Variable v -> v;
         };
-        return getAtSite(site);
+        return getAtSiteOrZero(site);
     }
 }

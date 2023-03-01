@@ -83,6 +83,11 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
+    public void initializeAssertions(int numAssertions) {
+        for (int i = 0; i < numAssertions; i++) {
+            get(new Assertion(i));
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private <Result extends Event> RowProvider<?, Result, ?> getCellGroup(Result event) {

@@ -1,5 +1,6 @@
 package analyzer.formulaproviders;
 
+import analyzer.CtProcedure;
 import analyzer.ProgramAnalyzer;
 import analyzer.formulaproviders.arith.SymbolicConj;
 import analyzer.formulaproviders.arith.SymbolicConstant;
@@ -21,6 +22,11 @@ record EtaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<BetaOrEt
         if (eta.src().equals(eta.tgt())) {
             return SymbolicConstant.one();
         }
+        if (!analyzer.hasImplementation(eta.tgt())) {
+            //abstract methods and interface methods don't make calls
+            return SymbolicConstant.zero();
+        }
+        //TODO: add disjunction with eta for overriding methods
         return new SymbolicDisj<>(analyzer
                 .getOutputBlame(eta.tgt(), eta.tgtOutput())
                 .getBlamedOutputs().stream()

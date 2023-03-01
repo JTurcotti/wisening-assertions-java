@@ -88,7 +88,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     //mostly for debugging purposes
     public void performCycle() {
-        cells.forEach(ComputationCell::performCycle);
+        new ArrayList<>(cells).forEach(ComputationCell::performCycle);
     }
 
     @Override

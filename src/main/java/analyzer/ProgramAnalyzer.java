@@ -8,10 +8,7 @@ import core.codemodel.events.Pi;
 import core.codemodel.types.Blame;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
-import spoon.reflect.code.CtAssert;
-import spoon.reflect.code.CtComment;
-import spoon.reflect.code.CtFieldAccess;
-import spoon.reflect.code.CtVariableAccess;
+import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.visitor.Filter;
@@ -82,7 +79,10 @@ public class ProgramAnalyzer {
         Set<Mutable> targets = new HashSet<>();
         for (CtVariableAccess<?> v : a.getElements(filter)) {
             if (v instanceof CtFieldAccess<?> f) {
-                targets.add(fieldIndexer.lookupOrCreate(f.getVariable().getDeclaration()));
+                if (!f.getVariable().isStatic() && f.getTarget() instanceof CtThisAccess<?>) {
+                    //don't target static fields
+                    targets.add(fieldIndexer.lookupOrCreate(f.getVariable().getDeclaration()));
+                }
             } else {
                 targets.add(varIndexer.lookupOrCreate(v.getVariable().getDeclaration()));
             }
@@ -128,5 +128,14 @@ public class ProgramAnalyzer {
     public Collection<Line> getAssertionDependentLines(Assertion assertion) {
         //TODO: for now do nothing fancy here - but consider filtering for performance at some point
         return getAllLines();
+    }
+
+    public Collection<Assertion> getAllAssertions() {
+        return assertionIndexer.outputs();
+    }
+
+    public boolean hasImplementation(Procedure p) {
+        CtProcedure proc = lookupProcedure(p);
+        return !proc.isAbstract() && !proc.isInterfaceMethod();
     }
 }
