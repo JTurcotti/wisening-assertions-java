@@ -92,11 +92,11 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
         new ArrayList<>(cells).forEach(ComputationCell::performCycle);
     }
 
-    private Stream<Float> streamValues() {
+    Stream<Float> streamValues() {
         return cells.stream().flatMap(ComputationCell::streamValues);
     }
 
-    private Stream<Map.Entry<Result, ComputationCell<Dep, Result, MsgT>.Row>> streamRows() {
+    Stream<Map.Entry<Result, ComputationCell<Dep, Result, MsgT>.Row>> streamRows() {
         return cells.stream().flatMap(ComputationCell::streamRows);
     }
 

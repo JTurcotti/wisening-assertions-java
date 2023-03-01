@@ -427,6 +427,7 @@ public class Typechecker {
         }
 
         private Pair<FullContext, Blame> typecheckExpression(FullContext ctxt, CtExpression<?> expr) {
+            //TODO: merge together blamed sites while typechecking
             switch (expr) {
                 case CtArrayAccess<?, ?> a -> {
                     return typecheckTwoExprs(ctxt, a.getTarget(), a.getIndexExpression());

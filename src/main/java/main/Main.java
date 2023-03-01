@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         ProgramAnalyzer analyzer = new ProgramAnalyzer("src/test/java/a5");
         TotalProvider provider = new TotalProvider(analyzer);
-        ComputationNetwork supervisor = new ComputationNetwork(provider);
+        ComputationNetwork supervisor = new ComputationNetwork(provider, analyzer);
         supervisor.initializeAssertions(analyzer.getAllAssertions().size());
 
         int i = 4;
@@ -19,7 +19,7 @@ public class Main {
         supervisor.performCycle();
         supervisor.performCycle();
         while (true) {
-            System.out.println(supervisor.get(new Assertion(i)));
+            System.out.println(supervisor);
             supervisor.notifyAssertionPass(new Assertion(i));
             supervisor.performCycle();
         }

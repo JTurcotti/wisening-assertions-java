@@ -1,5 +1,6 @@
 package supervisor;
 
+import analyzer.ProgramAnalyzer;
 import core.codemodel.events.*;
 import core.dependencies.*;
 import core.formula.ErrorFormulaProvider;
@@ -7,8 +8,14 @@ import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.channels.FileLock;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static supervisor.Config.*;
 
@@ -37,6 +44,8 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
     private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
 
+    private final ProgramAnalyzer analyzer;
+
     private void forEach(Consumer<ComputationCellGroup<?, ?, ?>> action) {
         action.accept(piComputationCells);
         action.accept(phiComputationCells);
@@ -53,7 +62,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final Random randomness = new Random();
 
 
-    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
+    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider, ProgramAnalyzer analyzer) {
         piComputationCells =
                 new ComputationCellGroup<>(this, PI_COLD_VALUE,
                         true, new ErrorFormulaProvider<>("pi formula"), BranchMessageProcessor::new);
@@ -81,6 +90,8 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
                         false, formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
+
+        this.analyzer = analyzer;
     }
 
     public void initializeAssertions(int numAssertions) {
@@ -138,5 +149,46 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     //mostly for debugging purposes
     public void performCycle() {
         forEach(ComputationCellGroup::performCycle);
+    }
+
+    public List<Line> topBlamedLines(Assertion a, int n) {
+        return analyzer.getAllLines().stream()
+                .sorted(Comparator.comparingDouble(line -> -get(new Omega(a, line))))
+                .limit(n).toList();
+    }
+
+    public float getCoverageForLine(Line l) {
+        return assertionComputationCells.streamRows()
+                .map(entry -> get(new Omega(entry.getKey(), l)))
+                .reduce(0f, Float::max);
+    }
+
+    public List<Long> binLineStatistic(int numBins, Function<Line, Float> stat) {
+        return IntStream.range(0, numBins).mapToObj(i ->
+                analyzer.getAllLines().stream().filter(line ->
+                        stat.apply(line) >= (1f * i) / numBins && stat.apply(line) <= (1f * i + 1f) / numBins).count()).toList();
+    }
+
+    public String binLineStatString(int numBins, Function<Line, Float> stat) {
+        String repr = "[";
+        List<Long> stats = binLineStatistic(numBins, stat);
+        for (int i = 0; i < numBins; i++) {
+            repr += (1f * i) / numBins + ": " + stats.get(i) + " | ";
+        }
+        return repr + "]";
+    }
+
+    @Override
+    public String toString() {
+        List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
+                .mapToObj(i -> get(new Assertion(i))).toList();
+        String repr = "Supervisor[" + assertionCorrectness.size() + " assertions: {";
+        for (Float f: assertionCorrectness) {
+            repr = repr + f + ", ";
+        }
+        int numBins = 10;
+        return repr + "}, line coverages: " +
+                binLineStatString(numBins, this::getCoverageForLine) + ", line correctnesses: " +
+                binLineStatString(numBins, this::get);
     }
 }
