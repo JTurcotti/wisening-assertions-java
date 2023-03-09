@@ -22,6 +22,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static supervisor.Config.*;
 
@@ -52,15 +53,16 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     public final ProgramAnalyzer analyzer;
 
-    private void forEach(Consumer<ComputationCellGroup<?, ?, ?>> action) {
-        action.accept(piComputationCells);
-        action.accept(phiComputationCells);
-        action.accept(betaComputationCells);
-        action.accept(etaComputationCells);
-        action.accept(alphaComputationCells);
-        action.accept(omegaComputationCells);
-        action.accept(lineComputationCells);
-        action.accept(assertionComputationCells);
+    private Stream<ComputationCellGroup<?, ?, ?>> streamCellGroups() {
+        return Stream.of(
+                piComputationCells,
+                phiComputationCells,
+                betaComputationCells,
+                etaComputationCells,
+                alphaComputationCells,
+                omegaComputationCells,
+                lineComputationCells,
+                assertionComputationCells);
     }
 
     private final FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider;
@@ -162,15 +164,15 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     @Override
     public void run() {
-        forEach(Thread::start);
+        streamCellGroups().forEach(Thread::start);
         while (!isInterrupted()) {}
-        forEach(Thread::interrupt);
+        streamCellGroups().forEach(Thread::interrupt);
     }
 
     //mostly for debugging purposes
     public void performCycle() {
         long start = System.currentTimeMillis();
-        forEach(ComputationCellGroup::performCycle);
+        streamCellGroups().forEach(ComputationCellGroup::performCycle);
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Elapsed: " + elapsed);
     }
@@ -203,11 +205,20 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .reduce(0f, Float::max);
     }
 
+    public long numActive() {
+        return streamCellGroups().mapToLong(ComputationCellGroup::numActive).sum();
+    }
+
+    public boolean isStable() {
+        //could be made more performant by early termination
+        return numActive() == 0;
+    }
+
     @Override
     public String toString() {
         List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
                 .mapToObj(i -> get(new Assertion(i))).toList();
-        String repr = "Supervisor[" + assertionCorrectness.size() + " assertions: {";
+        String repr = "Supervisor[" + numActive() + " active, " + assertionCorrectness.size() + " assertions: {";
         for (Float f: assertionCorrectness) {
             repr = repr + f + ", ";
         }

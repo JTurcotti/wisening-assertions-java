@@ -15,24 +15,35 @@ public class Main {
     static String simplePath = "src/test/java/simple";
     static String andrewPath = "src/test/java/andrew";
     static String srcPath = andrewPath;
-    public static void testSupervisorCycling() {
+    public static void testSupervisorCycling() throws InterruptedException {
         ComputationNetwork supervisor = ComputationNetwork.generateFromSourcePath(srcPath);
         supervisor.start();
 
-        int i = 4;
+        Assertion assertion = new Assertion(4);
         Random rand = new Random();
 
-        while (true) {
-            supervisor.notifyAssertionPass(new Assertion(i));
-            System.out.println(supervisor);
+        Thread.sleep(2000);
 
-            if (rand.nextFloat() > 0.7) {
-                int b = rand.nextInt(supervisor.analyzer.numBranches());
-                supervisor.notifyBranchTaken(new Pi(b), true);
-                System.out.println("Branch " + b + " taken");
-                System.out.println(supervisor);
+        new Thread(() -> {
+            try {
+                long start_t = System.currentTimeMillis();
+                long t = start_t;
+                int i1 = 0;
+                while (true) {
+                    if (supervisor.isStable()) {
+                        long elapsed = System.currentTimeMillis() - t;
+                        System.out.println("Thread round " + i1++ + ": " + elapsed + " elapsed. Total: " + (t - start_t));
+
+                        Thread.sleep(500);
+
+                        t = System.currentTimeMillis();
+                        supervisor.notifyAssertionPass(assertion);
+                    }
+                }
+            } catch (InterruptedException e) {
+                throw new IllegalStateException("interrupted");
             }
-        }
+        }).start();
         /*ComputationNetwork net = new ComputationNetwork(new ConstantAssertionFreqFormulaProvider(1f));
         net.start();
         while (true) {
@@ -51,9 +62,9 @@ public class Main {
         launcher.setArgs(args);
         launcher.run();
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         testSupervisorCycling();
-        testProcessor();
+        //testProcessor();
     }
 }
 

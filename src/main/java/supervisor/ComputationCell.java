@@ -41,7 +41,7 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         //TODO: concurrent updates to this formula would cause problems, ensure they don't occur
         private Formula<Dep> formula;
         private volatile float val = defaultVal;
-        private final Set<ComputationRow<? super Result, ?, ?>> dependers = new HashSet<>();
+        private final Set<ComputationRow<? super Result, ?, ?>> dependers = ConcurrentHashMap.newKeySet();
         private final Map<Dep, ComputationRow<?, ? extends Dep, ?>> dependees = new HashMap<>();
         private final AtomicBoolean dependeesUpdated = new AtomicBoolean(false);
         private boolean dependeesUpdatedSnapshot;
@@ -205,9 +205,12 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         });
     }
 
+    public long numActive() {
+        return store.values().stream().filter(row -> row.dependeesUpdated.get() || !row.initialized || row.formulaUpdated.get()).count();
+    }
+
     @Override
     public String toString() {
-        long numActive = store.values().stream().filter(row -> row.dependeesUpdated.get() || !row.initialized || row.formulaUpdated.get()).count();
-        return store.size() + " rows (" + numActive + " active)";
+        return store.size() + " rows (" + numActive() + " active)";
     }
 }

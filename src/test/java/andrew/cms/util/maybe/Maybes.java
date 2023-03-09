@@ -60,7 +60,7 @@ class Maybes {
 
         @Override
         public Iterator<T> iterator() {
-            return new Iterator<>() {
+            return new Iterator<T>() {
                 public T next() { throw new NoSuchElementException(); }
                 public boolean hasNext() { return false; }
             };

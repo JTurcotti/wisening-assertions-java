@@ -38,6 +38,16 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     private final List<ComputationCell<Dep, Result, MsgT>> cells = new LinkedList<>();
 
+    private List<ComputationCell<Dep, Result, MsgT>> readCells() {
+        cellsLock.readLock().lock();
+        try {
+            return new ArrayList<>(cells);
+        } finally {
+            cellsLock.readLock().unlock();
+        }
+
+    }
+
     private final Map<Result, ComputationCell<Dep, Result, MsgT>> cellTable = new ConcurrentHashMap<>();
 
     private final ReadWriteLock cellsLock = new ReentrantReadWriteLock();
@@ -95,36 +105,35 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     @Override
     public void passMessageToAll(MsgT msg) {
-        cells.forEach(cell -> cell.passMessageToAll(msg));
+        readCells().forEach(cell -> cell.passMessageToAll(msg));
     }
 
     @Override
     public void run() {
-        new LinkedList<>(cells).forEach(Thread::start);
+        readCells().forEach(Thread::start);
         while (!isInterrupted()) {/*noop - intentional infinite loop */}
-        cells.forEach(Thread::interrupt);
+        readCells().forEach(Thread::interrupt);
     }
 
     //mostly for debugging purposes
     public void performCycle() {
-        new ArrayList<>(cells).forEach(ComputationCell::performCycle);
+        readCells().forEach(ComputationCell::performCycle);
     }
 
     Stream<Float> streamValues() {
-        return cells.stream().flatMap(ComputationCell::streamValues);
+        return readCells().stream().flatMap(ComputationCell::streamValues);
     }
 
     Stream<Map.Entry<Result, ComputationCell<Dep, Result, MsgT>.Row>> streamRows() {
-        return cells.stream().flatMap(ComputationCell::streamRows);
+        return readCells().stream().flatMap(ComputationCell::streamRows);
+    }
+
+    public long numActive() {
+        return readCells().stream().mapToLong(ComputationCell::numActive).sum();
     }
 
     @Override
     public String toString() {
-        String repr = "ComputationCellGroup[" + streamValues().count() + " values: {" +
-                Util.binStatisticString(BINS_FOR_DISPLAY, Function.identity(), streamValues().toList()) + "} ";
-        for (ComputationCell<?, ?, ?> cell : cells) {
-            repr += cell.toString() + ", ";
-        }
-        return repr + "]";
+        return "ComputationCellGroup[" + streamValues().count() + " values; " + numActive() + " active]";
     }
 }
