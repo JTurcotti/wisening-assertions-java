@@ -7,6 +7,10 @@ import util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -32,35 +36,46 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
         this.messageProcessorProducer = messageProcessorProducer;
     }
 
-    private final List<ComputationCell<Dep, Result, MsgT>> cells = new ArrayList<>();
+    private final List<ComputationCell<Dep, Result, MsgT>> cells = new LinkedList<>();
 
     private final Map<Result, ComputationCell<Dep, Result, MsgT>> cellTable = new ConcurrentHashMap<>();
 
+    private final ReadWriteLock cellsLock = new ReentrantReadWriteLock();
+
     private ComputationCell<Dep, Result, MsgT> getCellForEvent(Result event) {
-        if (cellTable.containsKey(event)) {
-            return cellTable.get(event);
+        cellsLock.readLock().lock();
+        try {
+            if (cellTable.containsKey(event)) {
+                return cellTable.get(event);
+            }
+        } finally {
+            cellsLock.readLock().unlock();
         }
 
-        //guaranteed to be performed atomically by the ConcurrentHashMap implementation
-        Optional<ComputationCell<Dep, Result, MsgT>> smallest = cells.isEmpty()?
-                Optional.empty():
-                Optional.of(Collections.min(cells, Comparator.comparingInt(ComputationCell::size)));
-        ComputationCell<Dep, Result, MsgT> target;
-        if (smallest.isPresent() && smallest.get().size() < COMPUTATION_CELL_GROUP_MAX_CELL_SIZE) {
-            target = smallest.get();
-        } else {
-            ComputationCell<Dep, Result, MsgT> newCell =
-                    new ComputationCell<>(
-                            parentNetwork, defaultVal, rowsBeginInitialized,
-                            formulaProvider, messageProcessorProducer);
-            cells.add(newCell);
-            if (isAlive()) {
-                newCell.start();
+        cellsLock.writeLock().lock();
+        try {
+            Optional<ComputationCell<Dep, Result, MsgT>> smallest = cells.isEmpty() ?
+                    Optional.empty() :
+                    Optional.of(Collections.min(cells, Comparator.comparingInt(ComputationCell::size)));
+            ComputationCell<Dep, Result, MsgT> target;
+            if (smallest.isPresent() && smallest.get().size() < COMPUTATION_CELL_GROUP_MAX_CELL_SIZE) {
+                target = smallest.get();
+            } else {
+                ComputationCell<Dep, Result, MsgT> newCell =
+                        new ComputationCell<>(
+                                parentNetwork, defaultVal, rowsBeginInitialized,
+                                formulaProvider, messageProcessorProducer);
+                cells.add(newCell);
+                if (isAlive()) {
+                    newCell.start();
+                }
+                target = newCell;
             }
-            target = newCell;
+            cellTable.put(event, target);
+            return target;
+        } finally {
+            cellsLock.writeLock().unlock();
         }
-        cellTable.put(event, target);
-        return target;
     }
 
     @Override
@@ -85,7 +100,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     @Override
     public void run() {
-        cells.forEach(Thread::start);
+        new LinkedList<>(cells).forEach(Thread::start);
         while (!isInterrupted()) {/*noop - intentional infinite loop */}
         cells.forEach(Thread::interrupt);
     }

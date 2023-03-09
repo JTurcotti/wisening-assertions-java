@@ -239,4 +239,12 @@ public class ProgramAnalyzer {
                 .filter(v -> sameParam(v, lookupParamVar(a)))
                 .findFirst();
     }
+
+    public int numBranches() {
+        return branchIndexer.inputs().size();
+    }
+
+    public int numAssertions() {
+        return assertionIndexer.inputs().size();
+    }
 }

@@ -139,5 +139,9 @@ public class Indexer<OutputT, IndexingT, AuxT> {
     public Collection<AuxT> auxOutputs() {
         return auxMap.values();
     }
+
+    public Collection<IndexingT> inputs() {
+        return index.keySet();
+    }
 }
 

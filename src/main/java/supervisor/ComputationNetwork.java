@@ -1,6 +1,7 @@
 package supervisor;
 
 import analyzer.ProgramAnalyzer;
+import analyzer.formulaproviders.TotalProvider;
 import core.codemodel.elements.Procedure;
 import core.codemodel.events.*;
 import core.dependencies.*;
@@ -49,7 +50,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
     private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
 
-    private final ProgramAnalyzer analyzer;
+    public final ProgramAnalyzer analyzer;
 
     private void forEach(Consumer<ComputationCellGroup<?, ?, ?>> action) {
         action.accept(piComputationCells);
@@ -108,6 +109,18 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         }
     }
 
+    public void initializeAllAssertions() {
+        initializeAssertions(analyzer.numAssertions());
+    }
+
+    public static ComputationNetwork generateFromSourcePath(String sourcePath) {
+        ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath);
+        TotalProvider provider = new TotalProvider(analyzer);
+        ComputationNetwork network = new ComputationNetwork(provider, analyzer);
+        network.initializeAssertions(analyzer.getAllAssertions().size());
+        return network;
+    }
+
     @SuppressWarnings("unchecked")
     private <Result extends Event> RowProvider<?, Result, ?> getCellGroup(Result event) {
         return switch (event) {
@@ -156,7 +169,10 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     //mostly for debugging purposes
     public void performCycle() {
+        long start = System.currentTimeMillis();
         forEach(ComputationCellGroup::performCycle);
+        long elapsed = System.currentTimeMillis() - start;
+        System.out.println("Elapsed: " + elapsed);
     }
 
     public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> topBlamedLines(Assertion a, int n) {
