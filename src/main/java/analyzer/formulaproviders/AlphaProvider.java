@@ -1,5 +1,6 @@
 package analyzer.formulaproviders;
 
+import analyzer.Config;
 import analyzer.CtVirtualCall;
 import analyzer.ProgramAnalyzer;
 import analyzer.formulaproviders.arith.*;
@@ -21,6 +22,10 @@ import java.util.stream.Collectors;
 record AlphaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<AlphaOrBeta, Alpha> {
     @Override
     public Formula<AlphaOrBeta> get(Alpha alpha) {
+        if (!Config.ENABLE_ALPHA) {
+            //alpha is really expensive now, need to find a way to cheapen it
+            return SymbolicConstant.zero();
+        }
         //average over all calls that could occur to this procedure
         //TODO: weighted average by profiled call frequency
         return new SymbolicAverage<>(analyzer.callsToProcedure(alpha.procedure()).stream().map(c -> {
