@@ -16,6 +16,10 @@ public class Simple {
             a++;
         }
     }
+
+    public static void main(String[] args) {
+        System.out.println("hello world");
+    }
 }
 
 class Simple2 extends Simple {
