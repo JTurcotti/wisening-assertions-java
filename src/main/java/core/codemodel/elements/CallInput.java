@@ -1,4 +1,4 @@
 package core.codemodel.elements;
 
-public record CallInput(Call call, PhiInput input) {
+public record CallInput(Call call, PhiInput input) implements BetaSite {
 }

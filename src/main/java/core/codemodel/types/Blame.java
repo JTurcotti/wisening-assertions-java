@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntFunction;
+import java.util.prefs.PreferenceChangeEvent;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -79,6 +80,23 @@ public class Blame {
                 }).collect(Collectors.toList());
     }
 
+    public List<PhiInput> getBlamedInputs(ProgramAnalyzer analyzer, Procedure p) {
+        return data.keySet().stream().flatMap(site ->
+                switch (site) {
+                    case Field f -> Stream.of(f);
+                    case Self s -> Stream.of(s);
+                    case Variable v -> {
+                        CtProcedure procedure = analyzer.lookupProcedure(p);
+                        if (procedure.getParamVariables().contains(v)) {
+                            yield Stream.of(new Arg(p, procedure.getParamVariables().indexOf(v)));
+                        }
+                        yield Stream.of(v);
+                    }
+                    default -> Stream.empty();
+                })
+                .collect(Collectors.toList());
+    }
+
     public boolean blamesSelf() {
         return data.containsKey(new Self());
     }
@@ -112,21 +130,6 @@ public class Blame {
     }
 
     public IntraflowEvent getAtInputSite(ProgramAnalyzer analyzer, PhiInput in) {
-        BlameSite site = switch (in) {
-            case Arg a -> {
-                CtProcedure proc = analyzer.lookupProcedure(a.procedure());
-                if (!proc.isMethod() && !proc.isConstructor()) {
-                    throw new IllegalStateException("Cannot lookup arg of a non-method");
-                }
-                if (a.num() >= proc.getNumParams()) {
-                    throw new IllegalStateException("Method does not have an arg number " + a.num());
-                }
-                yield proc.getParamVariables().get(a.num());
-            }
-            case Field f -> f;
-            case Self s -> s;
-            case Variable v -> v;
-        };
-        return getAtSiteOrZero(site);
+        return getAtSiteOrZero(BlameSite.ofPhiInput(in, analyzer));
     }
 }

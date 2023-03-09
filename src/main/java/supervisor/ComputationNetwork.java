@@ -167,6 +167,20 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .toList();
     }
 
+    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> getBlamedLines(Assertion a) {
+        return analyzer.getAllLines().stream()
+                .sorted(Comparator.comparingDouble(line -> -get(new Omega(a, line))))
+                .filter(line -> get(new Omega(a, line)) > COMPUTATION_CELL_FRESH_VAL_TRESHOLD)
+                .map(line -> new Pair<>(analyzer.lineIndexer.lookupAux(line).get(), get(new Omega(a, line))))
+                .toList();
+    }
+
+    public long countBlamedLines(Assertion a) {
+        return analyzer.getAllLines().stream()
+                .filter(line -> get(new Omega(a, line)) > COMPUTATION_CELL_FRESH_VAL_TRESHOLD)
+                .count();
+    }
+
     public float getCoverageForLine(Line l) {
         return assertionComputationCells.streamRows()
                 .map(entry -> get(new Omega(entry.getKey(), l)))

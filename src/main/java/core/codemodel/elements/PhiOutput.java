@@ -10,4 +10,9 @@ public sealed interface PhiOutput permits Field, Ret, Self, Variable {
             default -> Optional.empty();
         };
     }
+
+    //sometimes we want to consider an equivalent
+    static PhiOutput mapToProc(PhiOutput out, Procedure p) {
+        return out instanceof Ret? new Ret(p): out;
+    }
 }

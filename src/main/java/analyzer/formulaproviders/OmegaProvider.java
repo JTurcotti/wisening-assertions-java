@@ -45,7 +45,7 @@ record OmegaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<AlphaO
                             new SymbolicParam<>(
                                     new Beta(lineProcedure, omega.line(), BetaSite.ofPhiOutput(result.getKey()))),
                             new SymbolicParam<>(
-                                    new Eta(lineProcedure, result.getKey(), analyzer.procedureOfCall(c.call()).get(), c.output())),
+                                    new Eta(lineProcedure, result.getKey(), analyzer.procedureCalledBy(c.call()).get(), c.output())),
                             new SymbolicParam<>(
                                     new Beta(assertionProcedure, c, omega.assertion()))
                     )));
@@ -54,11 +54,12 @@ record OmegaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<AlphaO
         }
 
         for (ClosedOver closedOver : assertionBlame.getBlamedClosedOver()) {
+            PhiInput input = assertionCtProcedure.closedOverAsInput(closedOver);
             cases.add(new SymbolicConj<>(List.of(
                     new SymbolicParam<>(
                             new Alpha(omega.line(),
                                     assertionProcedure,
-                                    assertionCtProcedure.closedOverAsInput(closedOver))),
+                                    input)),
                     new SymbolicParam<>(
                             new Beta(assertionProcedure,
                                     BlameSite.ofClosedOver(closedOver),

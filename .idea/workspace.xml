@@ -4,17 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add phi polymorphism awareness">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add eta polymorphism awareness">
+      <change afterPath="$PROJECT_DIR$/src/main/java/analyzer/CallMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ClosureMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtProcedure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AlphaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/AlphaProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/BetaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/BetaProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/EtaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/EtaProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/PhiProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicMax.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/arith/SymbolicAverage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/OmegaProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/OmegaProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiInput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiOutput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/Blame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/types/BlameSite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/types/BlameSite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +46,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -105,7 +119,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="163716000" />
+      <workItem from="1676765368190" duration="195019000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -345,7 +359,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677713655966</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="add eta polymorphism awareness">
+      <created>1677715109591</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1677715109591</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -363,7 +384,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="start working on closure analysis" />
     <MESSAGE value="loop handling" />
     <MESSAGE value="code smells" />
     <MESSAGE value="add transitive closure operation to closure map" />
@@ -388,7 +408,8 @@
     <MESSAGE value="improve assertions blame zeroing" />
     <MESSAGE value="improve printing" />
     <MESSAGE value="add phi polymorphism awareness" />
-    <option name="LAST_COMMIT_MESSAGE" value="add phi polymorphism awareness" />
+    <MESSAGE value="add eta polymorphism awareness" />
+    <option name="LAST_COMMIT_MESSAGE" value="add eta polymorphism awareness" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -459,7 +480,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java</url>
-          <line>121</line>
+          <line>126</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -482,18 +503,55 @@
           <line>20</line>
           <option name="timeStamp" value="107" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java</url>
+          <line>125</line>
+          <option name="timeStamp" value="133" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java</url>
+          <line>15</line>
+          <option name="timeStamp" value="141" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java</url>
+          <line>135</line>
+          <option name="timeStamp" value="142" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/elements/PhiInput.java</url>
+          <line>88</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java</url>
+          <line>219</line>
+          <option name="timeStamp" value="149" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
+        <watch expression="this" language="JAVA" />
         <watch expression="procedureIndexer.lookupAux(p).get()" language="JAVA" />
         <watch expression="typechecker.typecheckedProcedures.get(p)" language="JAVA" />
         <watch expression="analyzer.procedureIndexer.lookupAux(phi.procedure).get()" language="JAVA" />
         <watch expression="supervisor.piComputationCells" />
         <watch expression="supervisor.lineComputationCells.streamRows().map(entry -&gt; supervisor.get(new Omega(new Assertion(0), entry.getKey()))).reduce(Float::max)" language="JAVA" custom="java.util.Map,core.codemodel.events.Omega" />
-        <watch expression="analyzer.assertionIndexer.outputs().stream().map(analyzer.assertionIndexer::lookupAux).map(Optional::get).collect(Collectors.toList())" language="JAVA" custom="java.util.Optional,java.util.stream.Collectors" />
-        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.get(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
+        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; analyzer.assertionIndexer.lookupAux(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
+        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.getBlamedLines(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
+        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.countBlamedLines(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
         <watch expression="analyzer.assertionIndexer.auxMap" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(new Procedure(14))" language="JAVA" />
+        <watch expression="analyzer.procedureIndexer.auxMap" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(15)" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(14)" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(p).declaringType" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(35)" language="JAVA" />
+        <watch expression="analyzer.lookupVar(81)" language="JAVA" />
+        <watch expression="analyzer.lookupVar(91)" language="JAVA" />
+        <watch expression="analyzer.lookupProcedure(2)" language="JAVA" />
+        <watch expression="analyzer.lookupParamVars(procedureCalled(analyzer)).get(0)" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

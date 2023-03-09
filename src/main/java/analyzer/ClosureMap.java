@@ -24,10 +24,10 @@ public class ClosureMap {
     final ProgramAnalyzer parentAnalyzer;
 
     ClosureType lookupByCall(Call c) {
-        if (parentAnalyzer.procedureOfCall(c).isEmpty()) {
+        if (parentAnalyzer.procedureCalledBy(c).isEmpty()) {
             throw new IllegalStateException("The parent analyzer does not have a procedure for the call: " + c);
         }
-        Procedure callProc = parentAnalyzer.procedureOfCall(c).get();
+        Procedure callProc = parentAnalyzer.procedureCalledBy(c).get();
         if (!data.containsKey(callProc)) {
             throw new IllegalStateException("Closure map incomplete - no entry for procedure: " + callProc);
         }
@@ -396,7 +396,7 @@ public class ClosureMap {
 
                     data.put(proc, processing.apply(new ClosureType(fixpoint)));
 
-                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(w, procedure));
                     calls.add(call);
                     selfCalls.add(call);
                 }
@@ -411,7 +411,7 @@ public class ClosureMap {
 
                     data.put(proc, processing.apply(new ClosureType(fixpoint)));
 
-                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(d, procedure));
                     calls.add(call);
                     selfCalls.add(call);
                 }
@@ -431,7 +431,7 @@ public class ClosureMap {
 
                     Util.forEachRev(f.getForInit(), this::processStmt);
 
-                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f, procedure));
                     calls.add(call);
                     selfCalls.add(call);
                 }
@@ -443,7 +443,7 @@ public class ClosureMap {
 
                     merge(copy().processStmt(f.getBody()).processStmt(f.getVariable()).processRead(f.getExpression()));
 
-                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f));
+                    Call call = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(f, procedure));
                     calls.add(call);
                     selfCalls.add(call);
                 }
@@ -476,7 +476,7 @@ public class ClosureMap {
             }
             switch (expr) {
                 case CtInvocation<?> i -> {
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(i));
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(i, procedure));
                     calls.add(c);
                     if ((i.getTarget() instanceof CtThisAccess<?> ||
                             i.getTarget() instanceof CtSuperAccess<?> ||
@@ -489,7 +489,7 @@ public class ClosureMap {
                     i.getArguments().forEach(this::processRead);
                 }
                 case CtConstructorCall<?> cc -> {
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(cc));
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(cc, procedure));
                     calls.add(c);
                     cc.getArguments().forEach(this::processRead);
                 }
@@ -608,6 +608,10 @@ public class ClosureMap {
 
         List<Procedure> getOverrides() {
             return overrides.stream().map(ct -> parentAnalyzer.procedureIndexer.lookupOrCreate(ct.procedure)).toList();
+        }
+
+        Collection<Call> getCalls() {
+            return calls;
         }
     }
 }

@@ -81,6 +81,11 @@ public class Indexer<OutputT, IndexingT, AuxT> {
             return super.lookupOrCreate(SourcePos.fromSpoon(aux.getPosition()), aux);
         }
 
+        public OutputT lookupExisting(AuxT aux) {
+            return super.lookup(SourcePos.fromSpoon(aux.getPosition())).orElseThrow(() ->
+                    new IllegalStateException("Expected auxiliary input to already be indexed: " + aux));
+        }
+
         public BySourcePos(Function<Integer, OutputT> constructor) {
             super(constructor);
         }
@@ -129,6 +134,10 @@ public class Indexer<OutputT, IndexingT, AuxT> {
 
     public Collection<OutputT> outputs() {
         return index.values();
+    }
+
+    public Collection<AuxT> auxOutputs() {
+        return auxMap.values();
     }
 }
 

@@ -1,6 +1,7 @@
 package analyzer.formulaproviders;
 
 import analyzer.ProgramAnalyzer;
+import core.codemodel.elements.CallInput;
 import core.codemodel.elements.PhiOutput;
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Beta;
@@ -17,6 +18,8 @@ record BetaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<PiOrPhi
                     analyzer.getOutputBlame(beta.procedure(), out);
             case Assertion assertion ->
                     analyzer.getAssertionBlame(assertion);
+            case CallInput in ->
+                    analyzer.lookupCall(in.call()).getInputBlame(in.input(), analyzer);
             default ->
                 throw new IllegalStateException("Unexpected beta output: " + beta.out());
         };

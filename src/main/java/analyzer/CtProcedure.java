@@ -21,7 +21,7 @@ public class CtProcedure implements SourcePositionHolder {
     public final CtBlock<?> body;
     public final CtElement underlying;
 
-    private final ProgramAnalyzer parentAnalyzer;
+    final ProgramAnalyzer parentAnalyzer;
 
     public final List<CtParameter<?>> parameters;
 
@@ -115,6 +115,8 @@ public class CtProcedure implements SourcePositionHolder {
     }
 
     public List<Variable> getParamVariables() {
+        //we use lookupOrCreate because this is called directly by ComputeClosureForProcedure - at which
+        //point auxiliary objects are not yet created
         return parameters.stream().map(parentAnalyzer.varIndexer::lookupOrCreate).toList();
     }
 
@@ -129,13 +131,17 @@ public class CtProcedure implements SourcePositionHolder {
             case Self s -> s;
             case Variable v -> {
                 for (int i = 0; i < parameters.size(); i++) {
-                    if (parentAnalyzer.varIndexer.lookupOrCreate(parameters.get(i)).equals(v)) {
-                        yield new Arg(parentAnalyzer.procedureIndexer.lookupOrCreate(this), i);
+                    if (parentAnalyzer.varIndexer.lookupExisting(parameters.get(i)).equals(v)) {
+                        yield new Arg(parentAnalyzer.procedureIndexer.lookupExisting(this), i);
                     }
                 }
                 yield v;
             }
         };
+    }
+
+    public CtType<?> getDeclaringType() {
+        return declaringType;
     }
 }
 

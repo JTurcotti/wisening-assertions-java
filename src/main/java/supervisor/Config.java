@@ -27,5 +27,5 @@ public class Config {
     static final int BINS_FOR_DISPLAY = 10;
 
     //to get the computation network primed, perform a fixed number of warmup rounds. This is that number.
-    static final int WARMUP_ROUNDS = 7;
+    static final int WARMUP_ROUNDS = 5;
 }

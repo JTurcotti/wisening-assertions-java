@@ -30,7 +30,7 @@ record EtaProvider(ProgramAnalyzer analyzer) implements FormulaProvider<BetaOrEt
                                 new Beta(eta.tgt(), call, BetaSite.ofPhiOutput(eta.tgtOutput()))),
                         new SymbolicParam<>(
                                 new Eta(eta.src(), eta.srcOutput(),
-                                        analyzer.procedureOfCall(call.call()).get(), call.output())))))
+                                        analyzer.procedureCalledBy(call.call()).get(), call.output())))))
                 .collect(Collectors.toList()));
     }
 

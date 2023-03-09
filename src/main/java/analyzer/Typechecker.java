@@ -54,7 +54,7 @@ public class Typechecker {
                         .observeReturnIfReachable(closure.getOutputs());
             }
             if (closure.procedure.underlying instanceof CtLoop l) {
-                Call recurCall = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(l, l.getBody()));
+                Call recurCall = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(l, l.getBody(), procedure));
                 UnaryOperator<FullContext> recur = typecheckInvocation(
                         null, Blame.zero(), recurCall, procedure, List.of(),
                         closure.getInputs(), closure.getOutputs());
@@ -322,8 +322,8 @@ public class Typechecker {
                         }
                     }
 
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(loop));
-                    Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(() ->
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(loop, procedure));
+                    Procedure p = parentAnalyzer.procedureCalledBy(c).orElseThrow(() ->
                             new IllegalStateException("Expected procedure lookup to succeed"));
                     ClosureMap.ClosureType loopClosure = parentAnalyzer.closures.lookupByElement(loop);
                     return typecheckInvocation(ctxt, null, Blame.zero(), c, p, List.of(),
@@ -353,7 +353,7 @@ public class Typechecker {
                 case CtContinue c -> {
                     Pair<FullContext, Blame> checkContinue = typecheckInvocation(
                             ctxt, null, Blame.zero(),
-                            parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(c)),
+                            parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(c, procedure)),
                             procedure,
                             List.of(),
                             closure.getInputs(), closure.getOutputs(),
@@ -465,7 +465,7 @@ public class Typechecker {
                     }
                     //TODO: also consider possible overrides
 
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv));
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(inv, procedure));
                     Blame callBlame = Blame.oneSite(parentAnalyzer.lineIndexer.lookupOrCreateInv(inv, procedure));
 
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
@@ -480,7 +480,7 @@ public class Typechecker {
                                 invResult.right());
                     }
 
-                    Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(
+                    Procedure p = parentAnalyzer.procedureCalledBy(c).orElseThrow(
                             () -> new IllegalStateException("Call made that could not be tied to a procedure"));
 
                     Set<PhiInput> argSet = IntStream.range(0, inv.getArguments().size())
@@ -545,13 +545,13 @@ public class Typechecker {
                     );
                 }
                 case CtConstructorCall<?> constr -> {
-                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr));
+                    Call c = parentAnalyzer.callIndexer.lookupOrCreate(new CtVirtualCall(constr, procedure));
                     Blame constrBlame = Blame.oneSite(
                             parentAnalyzer.lineIndexer.lookupOrCreateConstr(constr, procedure));
                     if (!parentAnalyzer.isIntrasourceCall(c)) {
                         return typecheckExprList(ctxt, constr.getArguments()).mapRight(constrBlame::disjunct);
                     }
-                    Procedure p = parentAnalyzer.procedureOfCall(c).orElseThrow(() ->
+                    Procedure p = parentAnalyzer.procedureCalledBy(c).orElseThrow(() ->
                             new IllegalStateException("Expected procedure lookup to succeed"));
 
                     Set<PhiInput> argSet = IntStream.range(0, constr.getArguments().size())
