@@ -15,6 +15,7 @@ import util.Pair;
 import util.Util;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -65,34 +66,53 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     private final Random randomness = new Random();
 
+    private <Result extends Event> Function<Result, Float> precedentOrDefault(Optional<SerialResults> precedentResults, Float defaultVal) {
+        return precedentResults.<Function<Result, Float>>map(serialResults -> ev -> serialResults.data().get(ev))
+                .orElse(ev -> defaultVal);
+    }
 
-    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
+    public ComputationNetwork(TotalFormulaProvider formulaProvider, Optional<SerialResults> precedentResults) {
         piComputationCells =
-                new ComputationCellGroup<>(this, PI_COLD_VALUE,
-                        true, new ErrorFormulaProvider<>("pi formula"), BranchMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, PI_COLD_VALUE),
+                        true, new ErrorFormulaProvider<>("there is no pi formula"),
+                        BranchMessageProcessor::new);
         phiComputationCells =
-                new ComputationCellGroup<>(this, PHI_COLD_VALUE,
-                        false, formulaProvider.phiFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, PHI_COLD_VALUE),
+                        false, formulaProvider.phiFormulaProvider(),
+                        NoopMessageProcessor::new);
         betaComputationCells =
-                new ComputationCellGroup<>(this, BETA_COLD_VALUE,
-                        false, formulaProvider.betaFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, BETA_COLD_VALUE),
+                        false, formulaProvider.betaFormulaProvider(),
+                        NoopMessageProcessor::new);
         etaComputationCells =
-                new ComputationCellGroup<>(this, ETA_COLD_VALUE,
-                        false, formulaProvider.etaFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, ETA_COLD_VALUE),
+                        false, formulaProvider.etaFormulaProvider(),
+                        NoopMessageProcessor::new);
         alphaComputationCells =
-                new ComputationCellGroup<>(this, ALPHA_COLD_VALUE,
-                        false, formulaProvider.alphaFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, ALPHA_COLD_VALUE),
+                        false, formulaProvider.alphaFormulaProvider(),
+                        NoopMessageProcessor::new);
         omegaComputationCells =
-                new ComputationCellGroup<>(this, OMEGA_COLD_VALUE,
-                        false, formulaProvider.omegaFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, OMEGA_COLD_VALUE),
+                        false, formulaProvider.omegaFormulaProvider(),
+                        NoopMessageProcessor::new);
         lineComputationCells =
-                new ComputationCellGroup<>(this, LINE_CORRECTNESS_COLD_VALUE,
-                        true, new ErrorFormulaProvider<>("line formula"),
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, LINE_CORRECTNESS_COLD_VALUE),
+                        true, new ErrorFormulaProvider<>("there is no line formula"),
                         line -> new AssertionPassMessageProcessor(
                                 formulaProvider.lineUpdateFormulaProvider(), this, line));
         assertionComputationCells =
-                new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
-                        false, formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
+                new ComputationCellGroup<>(this,
+                        precedentOrDefault(precedentResults, ASSERTION_CORRECTNESS_COLD_VALUE),
+                        false, formulaProvider.assertionFormulaProvider(),
+                        NoopMessageProcessor::new);
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
@@ -110,9 +130,9 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     }
 
     public static ComputationNetwork generateFromSourcePath(String sourcePath) {
-        ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath);
+        ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath, Optional.empty());
         TotalProvider provider = new TotalProvider(analyzer);
-        ComputationNetwork network = new ComputationNetwork(provider);
+        ComputationNetwork network = new ComputationNetwork(provider, Optional.empty());
         network.analyzer = analyzer;
         network.initializeAssertions(analyzer.getAllAssertions().size());
         return network;

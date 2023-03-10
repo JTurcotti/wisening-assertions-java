@@ -1,7 +1,10 @@
 package analyzer;
 
 import core.codemodel.SourcePos;
-import core.codemodel.elements.*;
+import core.codemodel.elements.Field;
+import core.codemodel.elements.PhiInput;
+import core.codemodel.elements.Procedure;
+import core.codemodel.elements.Self;
 import core.codemodel.types.Blame;
 import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.code.CtContinue;

@@ -3,34 +3,30 @@ package supervisor;
 import core.codemodel.events.Event;
 import core.dependencies.Dependency;
 import core.formula.FormulaProvider;
-import util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static supervisor.Config.BINS_FOR_DISPLAY;
 import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
 class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {
     private final ComputationNetwork parentNetwork;
-    private final float defaultVal;
+    private final Function<Result, Float> defaultValProducer;
     private final boolean rowsBeginInitialized;
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
     ComputationCellGroup(ComputationNetwork parentNetwork,
-                         float defaultVal,
+                         Function<Result, Float> defaultValProducer,
                          boolean rowsBeginInitialized, FormulaProvider<Dep, Result> formulaProvider,
                          MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
         this.parentNetwork = parentNetwork;
-        this.defaultVal = defaultVal;
+        this.defaultValProducer = defaultValProducer;
         this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
@@ -73,7 +69,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
             } else {
                 ComputationCell<Dep, Result, MsgT> newCell =
                         new ComputationCell<>(
-                                parentNetwork, defaultVal, rowsBeginInitialized,
+                                parentNetwork, defaultValProducer, rowsBeginInitialized,
                                 formulaProvider, messageProcessorProducer);
                 cells.add(newCell);
                 if (isAlive()) {

@@ -2,7 +2,6 @@ package core.codemodel.events;
 
 import core.codemodel.elements.PhiOutput;
 import core.codemodel.elements.Procedure;
-import core.codemodel.elements.Ret;
 import core.dependencies.AlphaOrBetaOrEta;
 import core.dependencies.BetaOrEta;
 

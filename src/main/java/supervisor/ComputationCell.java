@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static supervisor.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
@@ -18,18 +19,18 @@ import static supervisor.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT> {
 
     private final ComputationNetwork parentNetwork;
-    private final float defaultVal;
+    private final Function<Result, Float> defaultValProducer;
     private final boolean rowsBeginInitialized;
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
     ComputationCell(ComputationNetwork parentNetwork,
-                    float defaultVal,
+                    Function<Result, Float> defaultValProducer,
                     boolean rowsBeginInitialized,
                     FormulaProvider<Dep, Result> formulaProvider,
                     MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
         this.parentNetwork = parentNetwork;
-        this.defaultVal = defaultVal;
+        this.defaultValProducer = defaultValProducer;
         this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
@@ -39,8 +40,9 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         boolean initialized = rowsBeginInitialized;
 
         //TODO: concurrent updates to this formula would cause problems, ensure they don't occur
+        //not a problem cause we're not gonna be updating formulas
         private Formula<Dep> formula;
-        private volatile float val = defaultVal;
+        private volatile float val;
         private final Set<ComputationRow<? super Result, ?, ?>> dependers = ConcurrentHashMap.newKeySet();
         private final Map<Dep, ComputationRow<?, ? extends Dep, ?>> dependees = new HashMap<>();
         private final AtomicBoolean dependeesUpdated = new AtomicBoolean(false);
@@ -48,6 +50,7 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         private final MessageProcessor<MsgT> messageProcessor;
 
         private Row(Result event) {
+            val = defaultValProducer.apply(event);
             messageProcessor = messageProcessorProducer.produce(event);
         }
 

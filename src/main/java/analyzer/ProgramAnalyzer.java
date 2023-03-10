@@ -7,7 +7,6 @@ import core.codemodel.events.*;
 import core.codemodel.types.Blame;
 import core.dependencies.Dependency;
 import core.formula.Formula;
-import core.formula.TotalFormulaProvider;
 import serializable.SerialFormulas;
 import serializable.SerialLabels;
 import spoon.Launcher;
@@ -19,20 +18,19 @@ import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.visitor.Filter;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ProgramAnalyzer {
     final CtModel model;
-    final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
-    public final Indexer.BySourceLine lineIndexer = new Indexer.BySourceLine();
-    final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer = new Indexer.BySourcePos<>(Call::new);
-    final Indexer.BySourcePos<Pi, CtVirtualBranch> branchIndexer = new Indexer.BySourcePos<>(Pi::new);
-    final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer = new Indexer.BySourcePos<>(Field::new);
-    final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer = new Indexer.BySourcePos<>(Variable::new);
-    final Indexer.BySourcePos<Assertion, CtWiseningAssert> assertionIndexer = new Indexer.BySourcePos<>(Assertion::new);
+    final Indexer.BySourcePos<Procedure, CtProcedure> procedureIndexer;
+    public final Indexer.BySourceLine lineIndexer;
+    final Indexer.BySourcePos<Call, CtVirtualCall> callIndexer;
+    final Indexer.BySourcePos<Pi, CtVirtualBranch> branchIndexer;
+    final Indexer.BySourcePos<Field, CtField<?>> fieldIndexer;
+    final Indexer.BySourcePos<Variable, CtVariable<?>> varIndexer;
+    final Indexer.BySourcePos<Assertion, CtWiseningAssert> assertionIndexer;
 
     //wrapped map Procedure -> FullContext
     final Typechecker typechecker = new Typechecker(this);
@@ -45,12 +43,39 @@ public class ProgramAnalyzer {
     //i.e. if it's not present certain checks will not be performed but that's it
     public static Optional<ProgramAnalyzer> availableInstance = Optional.empty();
 
-    public ProgramAnalyzer(String sourcePath) {
+    public ProgramAnalyzer(String sourcePath, Optional<SerialLabels> serializedLabels) {
         availableInstance = Optional.of(this); // I know this is bad practice... see above
+
         Launcher launcher = new Launcher();
         launcher.addInputResource(sourcePath);
         launcher.getEnvironment().setComplianceLevel(18);
         launcher.buildModel();
+
+        if (serializedLabels.isPresent()) {
+            procedureIndexer = new Indexer.BySourcePos<>(Procedure::new,
+                    serializedLabels.get().procedureLabels(), serializedLabels.get().nextProcedure());
+            lineIndexer = new Indexer.BySourceLine(
+                    serializedLabels.get().lineLabels(), serializedLabels.get().nextLine());
+            callIndexer = new Indexer.BySourcePos<>(Call::new,
+                    serializedLabels.get().callLabels(), serializedLabels.get().nextCall());
+            branchIndexer = new Indexer.BySourcePos<>(Pi::new,
+                    serializedLabels.get().branchLabels(), serializedLabels.get().nextBranch());
+            fieldIndexer = new Indexer.BySourcePos<>(Field::new,
+                    serializedLabels.get().fieldLabels(), serializedLabels.get().nextField());
+            varIndexer = new Indexer.BySourcePos<>(Variable::new,
+                    serializedLabels.get().varLabels(), serializedLabels.get().nextVar());
+            assertionIndexer = new Indexer.BySourcePos<>(Assertion::new,
+                    serializedLabels.get().assertionLabels(), serializedLabels.get().nextAssertion());
+        } else {
+            procedureIndexer = new Indexer.BySourcePos<>(Procedure::new);
+            lineIndexer = new Indexer.BySourceLine();
+            callIndexer = new Indexer.BySourcePos<>(Call::new);
+            branchIndexer = new Indexer.BySourcePos<>(Pi::new);
+            fieldIndexer = new Indexer.BySourcePos<>(Field::new);
+            varIndexer = new Indexer.BySourcePos<>(Variable::new);
+            assertionIndexer = new Indexer.BySourcePos<>(Assertion::new);
+        }
+
         model = launcher.getModel();
         closures.computeClosures();
         closures.determineOverrides();
@@ -275,7 +300,12 @@ public class ProgramAnalyzer {
 
     public SerialLabels serializeLabels() {
         return new SerialLabels(
-                assertionIndexer.copyIndex(), assertionIndexer.nextIndex(),
-                branchIndexer.copyIndex(), branchIndexer.nextIndex());
+                procedureIndexer.getIndex(), procedureIndexer.nextIndex(),
+                lineIndexer.getIndex(), lineIndexer.nextIndex(),
+                callIndexer.getIndex(), callIndexer.nextIndex(),
+                branchIndexer.getIndex(), branchIndexer.nextIndex(),
+                fieldIndexer.getIndex(), fieldIndexer.nextIndex(),
+                varIndexer.getIndex(), varIndexer.nextIndex(),
+                assertionIndexer.getIndex(), assertionIndexer.nextIndex());
     }
 }

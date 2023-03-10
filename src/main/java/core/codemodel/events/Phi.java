@@ -1,7 +1,8 @@
 package core.codemodel.events;
 
-import analyzer.ProgramAnalyzer;
-import core.codemodel.elements.*;
+import core.codemodel.elements.PhiInput;
+import core.codemodel.elements.PhiOutput;
+import core.codemodel.elements.Procedure;
 import core.codemodel.types.IntraflowEvent;
 import core.dependencies.PiOrPhi;
 

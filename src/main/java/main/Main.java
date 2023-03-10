@@ -1,13 +1,9 @@
 package main;
 
 
-import analyzer.ProgramAnalyzer;
-import analyzer.formulaproviders.TotalProvider;
 import core.codemodel.events.Assertion;
-import core.codemodel.events.Pi;
 import spoon.Launcher;
 import supervisor.ComputationNetwork;
-import supervisor.ExecutionSupervisor;
 
 import java.util.Random;
 
