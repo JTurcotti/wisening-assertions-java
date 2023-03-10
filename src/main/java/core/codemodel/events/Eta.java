@@ -7,7 +7,7 @@ import core.dependencies.AlphaOrBetaOrEta;
 import core.dependencies.BetaOrEta;
 
 public record Eta(Procedure src, PhiOutput srcOutput, Procedure tgt, PhiOutput tgtOutput)
-        implements Event, BetaOrEta, AlphaOrBetaOrEta {
+        implements Event, BetaOrEta, AlphaOrBetaOrEta, ComputedEvent {
 
     public static Eta mapTgtToProc(Eta eta, Procedure newTgt) {
         return new Eta(eta.src, eta.srcOutput, newTgt, PhiOutput.mapToProc(eta.tgtOutput, newTgt));

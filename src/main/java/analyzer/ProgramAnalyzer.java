@@ -1,11 +1,15 @@
 package analyzer;
 
+import analyzer.formulaproviders.TotalProvider;
 import core.codemodel.Indexer;
 import core.codemodel.elements.*;
-import core.codemodel.events.Assertion;
-import core.codemodel.events.Line;
-import core.codemodel.events.Pi;
+import core.codemodel.events.*;
 import core.codemodel.types.Blame;
+import core.dependencies.Dependency;
+import core.formula.Formula;
+import core.formula.TotalFormulaProvider;
+import serializable.SerialFormulas;
+import serializable.SerialLabels;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
@@ -17,6 +21,7 @@ import spoon.reflect.visitor.Filter;
 
 import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ProgramAnalyzer {
@@ -246,5 +251,31 @@ public class ProgramAnalyzer {
 
     public int numAssertions() {
         return assertionIndexer.inputs().size();
+    }
+
+    public SerialFormulas serializeFormulas() {
+        Set<ComputedEvent> keys = new HashSet<>(getAllAssertions());
+        TotalProvider concreteProvider = new TotalProvider(this);
+        //close keys over dependencies according to the formula provider
+        while (true) {
+            Set<ComputedEvent> keyDeps = keys.stream()
+                    .flatMap(event -> concreteProvider.genericFormulaProvider().get(event).getDeps().stream())
+                    //restrict to computed event dependencies - e.g. ignore Pi deps
+                    .flatMap(dep -> ComputedEvent.ofDependencyOpt(dep).stream())
+                    .collect(Collectors.toUnmodifiableSet());
+            if (keys.containsAll(keyDeps)) {
+                break;
+            }
+            keys.addAll(keyDeps);
+        }
+        final HashMap<Event, Formula<? extends Dependency>> data = new HashMap<>();
+        keys.forEach(event -> data.put(event, concreteProvider.genericFormulaProvider().get(ComputedEvent.ofEvent(event))));
+        return new SerialFormulas(data);
+    }
+
+    public SerialLabels serializeLabels() {
+        return new SerialLabels(
+                assertionIndexer.copyIndex(), assertionIndexer.nextIndex(),
+                branchIndexer.copyIndex(), branchIndexer.nextIndex());
     }
 }

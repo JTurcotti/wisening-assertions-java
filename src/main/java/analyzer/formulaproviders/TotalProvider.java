@@ -3,6 +3,7 @@ package analyzer.formulaproviders;
 import analyzer.ProgramAnalyzer;
 import core.codemodel.events.*;
 import core.dependencies.*;
+import core.formula.Formula;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
 
@@ -13,9 +14,9 @@ public class TotalProvider implements TotalFormulaProvider {
         this.etaProvider = new EtaProvider(analyzer);
         this.alphaProvider = new AlphaProvider(analyzer);
         this.omegaProvider = new OmegaProvider(analyzer);
-        this.lineUpdateProvider = new LineUpdateProvider(analyzer);
+        this.lineUpdateProvider = new LineUpdateProvider();
         this.assertionProvider = new AssertionProvider(analyzer);
-        this.assertionCorrectnessToFrequencyProvider = new FrequencyProvider(analyzer);
+        this.assertionCorrectnessToFrequencyProvider = new FrequencyProvider();
     }
     private final FormulaProvider<PiOrPhi, Phi> phiProvider;
     private final FormulaProvider<PiOrPhi, Beta> betaProvider;
@@ -66,5 +67,24 @@ public class TotalProvider implements TotalFormulaProvider {
     @Override
     public FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider() {
         return assertionCorrectnessToFrequencyProvider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <Dep extends Dependency, Result extends ComputedEvent> FormulaProvider<Dep, Result> unsafeFormulaProvider() {
+        return event -> switch (event) {
+                    case Alpha a -> (Formula<Dep>) alphaProvider.get(a);
+                    case Assertion a -> (Formula<Dep>) assertionProvider.get(a);
+                    case Beta b -> (Formula<Dep>) betaProvider.get(b);
+                    case Eta e -> (Formula<Dep>) etaProvider.get(e);
+                    case Omega o -> (Formula<Dep>) omegaProvider.get(o);
+                    case Phi p -> (Formula<Dep>) phiProvider.get(p);
+            };
+    }
+
+    /*
+    I don't know why this is necessary to declare in two methods - it's annoying, perhaps investigate?
+     */
+    public FormulaProvider<? extends Dependency, ComputedEvent> genericFormulaProvider() {
+        return event -> unsafeFormulaProvider().get(event);
     }
 }

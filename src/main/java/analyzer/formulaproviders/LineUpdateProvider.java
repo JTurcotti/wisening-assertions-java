@@ -1,6 +1,5 @@
 package analyzer.formulaproviders;
 
-import analyzer.ProgramAnalyzer;
 import analyzer.formulaproviders.arith.SymbolicDisj;
 import analyzer.formulaproviders.arith.SymbolicParam;
 import core.codemodel.events.LineAssertionPair;
@@ -11,7 +10,12 @@ import core.formula.FormulaProvider;
 
 import java.util.List;
 
-record LineUpdateProvider(ProgramAnalyzer analyzer) implements FormulaProvider<OmegaOrLine, LineAssertionPair> {
+
+/*
+Given a line and an assertion that passed, compute the new correctness of that line, using the appropriate omega
+and the old correctness of the line
+ */
+public record LineUpdateProvider() implements FormulaProvider<OmegaOrLine, LineAssertionPair> {
     @Override
     public Formula<OmegaOrLine> get(LineAssertionPair pair) {
         return new SymbolicDisj<>(List.of(

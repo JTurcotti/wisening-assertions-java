@@ -35,7 +35,7 @@ public class Indexer<OutputT, IndexingT, AuxT> {
     public OutputT next(IndexingT ind, AuxT aux) {
         OutputT n = next(ind);
         if (auxMap.values().stream().anyMatch((v -> v == aux))) {
-            //TODO: delete
+            //TODO: delete once its been passing for a while
             throw new IllegalStateException("aux value duplicated: " + aux);
         }
         auxMap.put(n, aux);
@@ -142,6 +142,14 @@ public class Indexer<OutputT, IndexingT, AuxT> {
 
     public Collection<IndexingT> inputs() {
         return index.keySet();
+    }
+
+    public HashMap<IndexingT, OutputT> copyIndex() {
+        return new HashMap<>(index);
+    }
+
+    public int nextIndex() {
+        return next;
     }
 }
 

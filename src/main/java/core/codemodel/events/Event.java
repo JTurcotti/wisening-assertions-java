@@ -1,4 +1,6 @@
 package core.codemodel.events;
 
-public interface Event {}
+import java.io.Serializable;
+
+public interface Event extends Serializable {}
 

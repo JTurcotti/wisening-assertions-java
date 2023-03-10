@@ -9,18 +9,13 @@ import core.formula.ErrorFormulaProvider;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
 import org.jetbrains.annotations.NotNull;
+import serializable.SerialResults;
 import spoon.reflect.declaration.CtElement;
 import util.Pair;
 import util.Util;
 
-import java.nio.channels.FileLock;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -51,9 +46,10 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
     private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
 
-    public final ProgramAnalyzer analyzer;
+    //only used for pretty printing
+    public ProgramAnalyzer analyzer;
 
-    private Stream<ComputationCellGroup<?, ?, ?>> streamCellGroups() {
+    private Stream<ComputationCellGroup<? extends Dependency, ? extends Event, ?>> streamCellGroups() {
         return Stream.of(
                 piComputationCells,
                 phiComputationCells,
@@ -70,7 +66,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final Random randomness = new Random();
 
 
-    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider, ProgramAnalyzer analyzer) {
+    public ComputationNetwork(@NotNull TotalFormulaProvider formulaProvider) {
         piComputationCells =
                 new ComputationCellGroup<>(this, PI_COLD_VALUE,
                         true, new ErrorFormulaProvider<>("pi formula"), BranchMessageProcessor::new);
@@ -98,8 +94,6 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 new ComputationCellGroup<>(this, ASSERTION_CORRECTNESS_COLD_VALUE,
                         false, formulaProvider.assertionFormulaProvider(), NoopMessageProcessor::new);
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
-
-        this.analyzer = analyzer;
     }
 
     public void initializeAssertions(int numAssertions) {
@@ -111,14 +105,15 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         }
     }
 
-    public void initializeAllAssertions() {
+    public void initializeAllAssertions(ProgramAnalyzer analyzer) {
         initializeAssertions(analyzer.numAssertions());
     }
 
     public static ComputationNetwork generateFromSourcePath(String sourcePath) {
         ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath);
         TotalProvider provider = new TotalProvider(analyzer);
-        ComputationNetwork network = new ComputationNetwork(provider, analyzer);
+        ComputationNetwork network = new ComputationNetwork(provider);
+        network.analyzer = analyzer;
         network.initializeAssertions(analyzer.getAllAssertions().size());
         return network;
     }
@@ -177,7 +172,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         System.out.println("Elapsed: " + elapsed);
     }
 
-    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> topBlamedLines(Assertion a, int n) {
+    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> topBlamedLines(Assertion a, int n, ProgramAnalyzer analyzer) {
         return analyzer.getAllLines().stream()
                 .sorted(Comparator.comparingDouble(line -> -get(new Omega(a, line))))
                 .limit(n)
@@ -185,7 +180,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .toList();
     }
 
-    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> getBlamedLines(Assertion a) {
+    public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> getBlamedLines(Assertion a, ProgramAnalyzer analyzer) {
         return analyzer.getAllLines().stream()
                 .sorted(Comparator.comparingDouble(line -> -get(new Omega(a, line))))
                 .filter(line -> get(new Omega(a, line)) > COMPUTATION_CELL_FRESH_VAL_TRESHOLD)
@@ -193,7 +188,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .toList();
     }
 
-    public long countBlamedLines(Assertion a) {
+    public long countBlamedLines(Assertion a, ProgramAnalyzer analyzer) {
         return analyzer.getAllLines().stream()
                 .filter(line -> get(new Omega(a, line)) > COMPUTATION_CELL_FRESH_VAL_TRESHOLD)
                 .count();
@@ -214,16 +209,28 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         return numActive() == 0;
     }
 
+    public SerialResults serializeResults() {
+        //we cast to hashmap because the underlying implementation of Collectors.toMap uses it and I want to ensure
+        //serialization goes right so SerialResults only accepts HashMaps
+        HashMap<Event, Float> data = (HashMap<Event, Float>) streamCellGroups()
+                .flatMap(ComputationCellGroup::streamRows)
+                .collect(Collectors.toMap(entry -> (Event) entry.getKey(), entry -> entry.getValue().getVal()));
+        return new SerialResults(data);
+    }
+
     @Override
     public String toString() {
-        List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
-                .mapToObj(i -> get(new Assertion(i))).toList();
-        String repr = "Supervisor[" + numActive() + " active, " + assertionCorrectness.size() + " assertions: {";
-        for (Float f: assertionCorrectness) {
-            repr = repr + f + ", ";
+        if (analyzer != null) {
+            List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
+                    .mapToObj(i -> get(new Assertion(i))).toList();
+            String repr = "Supervisor[" + numActive() + " active, " + assertionCorrectness.size() + " assertions: {";
+            for (Float f : assertionCorrectness) {
+                repr = repr + f + ", ";
+            }
+            return repr + "}, line coverages: " +
+                    Util.binStatisticString(BINS_FOR_DISPLAY, this::getCoverageForLine, analyzer.getAllLines()) + ", line correctnesses: " +
+                    Util.binStatisticString(BINS_FOR_DISPLAY, this::get, analyzer.getAllLines());
         }
-        return repr + "}, line coverages: " +
-                Util.binStatisticString(BINS_FOR_DISPLAY, this::getCoverageForLine, analyzer.getAllLines()) + ", line correctnesses: " +
-                Util.binStatisticString(BINS_FOR_DISPLAY, this::get, analyzer.getAllLines());
+        return "Supervisor";
     }
 }

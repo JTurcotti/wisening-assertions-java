@@ -5,7 +5,8 @@ import core.codemodel.elements.*;
 import core.codemodel.types.IntraflowEvent;
 import core.dependencies.PiOrPhi;
 
-public record Phi(Procedure procedure, PhiInput in, PhiOutput out) implements Event, PiOrPhi, IntraflowEvent.AtomicEvent {
+public record Phi(Procedure procedure, PhiInput in, PhiOutput out)
+        implements Event, PiOrPhi, IntraflowEvent.AtomicEvent, ComputedEvent {
     public Phi(Procedure procedure, PhiInput in, PhiOutput out) {
         //ProgramAnalyzer.availableInstance.ifPresent(analyzer -> PhiInput.validateInProc(in, procedure, analyzer));
         this.procedure = procedure;

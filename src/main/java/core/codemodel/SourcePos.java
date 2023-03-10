@@ -4,9 +4,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public record SourcePos(String file, int[] position) {
+public record SourcePos(String file, int[] position) implements Serializable {
     public static SourcePos fromSpoon(SourcePosition pos) {
         if (!pos.isValidPosition()) {
             throw new IllegalArgumentException("NoSourcePosition passed where not expected");

@@ -4,13 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add locks around the creation of new cells and start to work on transformers">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fix some bugs and keep playing with evaluation in main">
+      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/ComputedEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/LineUpdateProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/LineUpdateProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/TotalProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/TotalProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Assertion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Assertion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Line.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Line.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Omega.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Omega.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,8 +36,8 @@
       <list>
         <option value="Enum" />
         <option value="Record" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -63,7 +77,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "advanced.settings",
+    "settings.editor.selected.configurable": "preferences.editor",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -158,7 +172,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="210272000" />
+      <workItem from="1676765368190" duration="220975000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -433,7 +447,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678381747654</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="fix some bugs and keep playing with evaluation in main">
+      <created>1678389688551</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1678389688551</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -451,7 +472,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add full context for typechecking" />
     <MESSAGE value="refactoring and add typechecking skeleton" />
     <MESSAGE value="fill in some typechecking" />
     <MESSAGE value="more typechecking, focussing on invocations" />
@@ -476,7 +496,8 @@
     <MESSAGE value="disable alpha - too expensive" />
     <MESSAGE value="add test directory to git - including andrew's files" />
     <MESSAGE value="add locks around the creation of new cells and start to work on transformers" />
-    <option name="LAST_COMMIT_MESSAGE" value="add locks around the creation of new cells and start to work on transformers" />
+    <MESSAGE value="fix some bugs and keep playing with evaluation in main" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix some bugs and keep playing with evaluation in main" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -542,7 +563,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java</url>
-          <line>11</line>
+          <line>12</line>
           <option name="timeStamp" value="67" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

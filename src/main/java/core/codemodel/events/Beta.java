@@ -7,6 +7,7 @@ import core.dependencies.AlphaOrBeta;
 import core.dependencies.AlphaOrBetaOrEta;
 import core.dependencies.BetaOrEta;
 
-public record Beta(Procedure procedure, BlameSite in, BetaSite out) implements Event, AlphaOrBeta, BetaOrEta, AlphaOrBetaOrEta {
+public record Beta(Procedure procedure, BlameSite in, BetaSite out)
+        implements Event, AlphaOrBeta, BetaOrEta, AlphaOrBetaOrEta, ComputedEvent {
 
 }

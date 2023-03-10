@@ -1,7 +1,6 @@
 package analyzer.formulaproviders;
 
 import analyzer.Config;
-import analyzer.ProgramAnalyzer;
 import core.codemodel.events.Assertion;
 import core.formula.Formula;
 import core.formula.FormulaProvider;
@@ -9,7 +8,11 @@ import core.formula.FormulaProvider;
 import java.util.Set;
 import java.util.function.Function;
 
-record FrequencyProvider(ProgramAnalyzer analyzer) implements FormulaProvider<Assertion, Assertion> {
+/*
+This one is a little confusing: a FrequencyProvider takens an assertion, queries that assertion
+for its probability of correctness, and returns the frequency with which it should execute.
+ */
+public record FrequencyProvider() implements FormulaProvider<Assertion, Assertion> {
     @Override
     public Formula<Assertion> get(Assertion assertion) {
         return new Formula<>() {
