@@ -144,7 +144,7 @@ class Maybes {
 
         @Override
         public Iterator<T> iterator() {
-            return new Iterator<>() {
+            return new Iterator<T>() {
                 boolean yielded = false;
                 public T next() {
                     if (yielded) throw new NoSuchElementException();

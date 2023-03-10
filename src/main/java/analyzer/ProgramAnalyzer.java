@@ -2,6 +2,7 @@ package analyzer;
 
 import analyzer.formulaproviders.TotalProvider;
 import core.codemodel.Indexer;
+import core.codemodel.SourcePos;
 import core.codemodel.elements.*;
 import core.codemodel.events.*;
 import core.codemodel.types.Blame;
@@ -123,6 +124,12 @@ public class ProgramAnalyzer {
 
     public List<Variable> lookupParamVars(Procedure p) {
         return lookupProcedure(p).getParamVariables();
+    }
+
+    public Assertion indexOfAssertion(CtAssert<?> ctAssert) {
+        return assertionIndexer.lookup(SourcePos.fromSpoon(ctAssert.getPosition())).orElseThrow(
+                () -> new IllegalStateException("Expected Assertion to be indexed")
+        );
     }
 
     public CtVirtualCall lookupCall(Call c) {

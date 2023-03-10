@@ -9,6 +9,7 @@ import core.codemodel.events.Assertion;
 import core.codemodel.events.Line;
 import core.codemodel.events.Pi;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 public record SerialLabels(
@@ -25,5 +26,5 @@ public record SerialLabels(
         HashMap<SourcePos, Variable> varLabels,
         int nextVar,
         HashMap<SourcePos, Assertion> assertionLabels,
-        int nextAssertion) {
+        int nextAssertion) implements Serializable {
 }

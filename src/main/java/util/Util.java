@@ -1,5 +1,10 @@
 package util;
 
+import spoon.processing.AbstractProcessor;
+import spoon.reflect.code.CtTypeAccess;
+import spoon.reflect.reference.CtTypeReference;
+
+import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
@@ -125,5 +130,36 @@ public class Util {
             repr += (1f * i) / numBins + ": " + stats.get(i) + " | ";
         }
         return repr + "]";
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T deserializeObject(String path) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(path))) {
+            return (T) in.readObject();
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("provided path is bad: " + e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("IO failed for reason: " + e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("file deserialized badly: " + e);
+        }
+    }
+
+    public static <T> void serializeObject(String path, T t) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path))) {
+            out.writeObject(t);
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("provided path is bad: " + e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("IO failed for reason: " + e);
+        }
+    }
+
+    public static CtTypeReference<?> getTypeReference(AbstractProcessor<?> processor, Class<?> c) {
+        return processor.getFactory().Class().get(c).getReference();
+    }
+
+    public static CtTypeAccess<?> getTypeAccess(AbstractProcessor<?> processor, Class<?> c) {
+        return processor.getFactory().createTypeAccess(getTypeReference(processor, c));
     }
 }

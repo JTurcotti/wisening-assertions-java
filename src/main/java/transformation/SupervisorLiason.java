@@ -8,7 +8,7 @@ import spoon.reflect.declaration.CtClass;
 public class SupervisorLiason {
     public SupervisorLiason() {
 
-    }
+    }/*
     CtClass<?> getWrapperClass() {
 
     }
@@ -19,5 +19,5 @@ public class SupervisorLiason {
 
     CtStatement wrapAssertion(CtAssert assertion) {
 
-    }
+    }*/
 }

@@ -2,15 +2,19 @@ package main;
 
 
 import core.codemodel.events.Assertion;
+import driver.AnalysisDriver;
 import spoon.Launcher;
 import supervisor.ComputationNetwork;
+import transformation.ClassProcessor;
+import transformation.PackageProcessor;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class Main {
     static String simplePath = "src/test/java/simple";
     static String andrewPath = "src/test/java/andrew";
-    static String srcPath = andrewPath;
+    static String srcPath = simplePath;
     public static void testSupervisorCycling() throws InterruptedException {
         ComputationNetwork supervisor = ComputationNetwork.generateFromSourcePath(srcPath);
         supervisor.start();
@@ -48,18 +52,10 @@ public class Main {
     }
 
     public static void testProcessor() {
-        Launcher launcher = new Launcher();
-        String[] args = {
-                "-i", srcPath,
-                "-o", "target/spooned",
-                "-p", "transformation.ClassProcessor",
-                "--compile"
-        };
-        launcher.setArgs(args);
-        launcher.run();
+        AnalysisDriver.run(simplePath, Optional.empty(), Optional.empty(), "target/spooned", "target/aux/formulas", "target/aux/labels");
     }
     public static void main(String[] args) throws InterruptedException {
-        testSupervisorCycling();
+        //testSupervisorCycling();
         //testProcessor();
     }
 }

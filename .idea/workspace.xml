@@ -4,27 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="fix some bugs and keep playing with evaluation in main">
-      <change afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/ComputedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/FrequencyProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/LineUpdateProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/LineUpdateProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/TotalProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/formulaproviders/TotalProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/SourcePos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Alpha.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Assertion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Assertion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Beta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Eta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Event.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Line.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Line.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Omega.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Omega.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/events/Phi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add input of serialized values - next, actually perform serialization and deserialization">
+      <change afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,8 +26,8 @@
       <list>
         <option value="Enum" />
         <option value="Record" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -77,7 +67,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.editor",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -172,7 +162,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="220975000" />
+      <workItem from="1676765368190" duration="233027000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -454,7 +444,21 @@
       <option name="project" value="LOCAL" />
       <updated>1678389688551</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="add serialization of version-intermediate results, deserialization next">
+      <created>1678466334239</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1678466334239</updated>
+    </task>
+    <task id="LOCAL-00042" summary="add input of serialized values - next, actually perform serialization and deserialization">
+      <created>1678469843572</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1678469843572</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -472,8 +476,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactoring and add typechecking skeleton" />
-    <MESSAGE value="fill in some typechecking" />
     <MESSAGE value="more typechecking, focussing on invocations" />
     <MESSAGE value="more typechecking, focussing on branches" />
     <MESSAGE value="more typechecking, focussing on branches like switch" />
@@ -497,7 +499,9 @@
     <MESSAGE value="add test directory to git - including andrew's files" />
     <MESSAGE value="add locks around the creation of new cells and start to work on transformers" />
     <MESSAGE value="fix some bugs and keep playing with evaluation in main" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix some bugs and keep playing with evaluation in main" />
+    <MESSAGE value="add serialization of version-intermediate results, deserialization next" />
+    <MESSAGE value="add input of serialized values - next, actually perform serialization and deserialization" />
+    <option name="LAST_COMMIT_MESSAGE" value="add input of serialized values - next, actually perform serialization and deserialization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -505,14 +509,6 @@
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.UnsupportedOperationException" package="java.lang" />
           <option name="timeStamp" value="5" />
-        </breakpoint>
-        <breakpoint enabled="true" type="java-exception">
-          <properties class="java.lang.IndexOutOfBoundsException" package="java.lang" />
-          <option name="timeStamp" value="14" />
-        </breakpoint>
-        <breakpoint enabled="true" type="java-exception">
-          <properties class="java.lang.NullPointerException" package="java.lang" />
-          <option name="timeStamp" value="20" />
         </breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.IllegalStateException" package="java.lang" />
@@ -543,7 +539,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java</url>
-          <line>38</line>
+          <line>49</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -568,7 +564,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/core/codemodel/Indexer.java</url>
-          <line>126</line>
+          <line>146</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -588,7 +584,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java</url>
-          <line>125</line>
+          <line>128</line>
           <option name="timeStamp" value="133" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -598,7 +594,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/CtVirtualCall.java</url>
-          <line>135</line>
+          <line>138</line>
           <option name="timeStamp" value="142" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -608,8 +604,19 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>34</line>
+          <line>32</line>
           <option name="timeStamp" value="157" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/fr/inria/gforge/spoon/spoon-core/10.2.0/spoon-core-10.2.0-sources.jar!/spoon/support/compiler/jdt/ContextBuilder.java</url>
+          <line>121</line>
+          <option name="timeStamp" value="162" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="String.valueOf(this.selector).equals(&quot;processWrite&quot;)" language="JAVA" />
+          <url>jar://$MAVEN_REPOSITORY$/org/eclipse/jdt/org.eclipse.jdt.core/3.31.0/org.eclipse.jdt.core-3.31.0.jar!/org/eclipse/jdt/internal/compiler/ast/MethodDeclaration.class</url>
+          <line>212</line>
+          <option name="timeStamp" value="163" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
