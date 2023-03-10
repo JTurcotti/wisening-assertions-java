@@ -35,6 +35,8 @@ public class RuntimeDriverProcessor extends AbstractAnnotationProcessor<RuntimeD
                 field.setAssignment(getFactory().createLiteral(this.precedentResultsPresent));
             case "outputPath"->
                 field.setAssignment(getFactory().createLiteral(this.outputPath));
+            case "active"->
+                field.setAssignment(getFactory().createLiteral(true));
         }
     }
 }

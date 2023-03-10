@@ -24,6 +24,7 @@ public class RuntimeDriver {
     static final boolean precedentResultsPresent = false;
     @ReplaceDuringProcessing
     static final String outputPath = "to be replaced by spoon Transformer";
+    @ReplaceDuringProcessing
     static final boolean active = false;
 
     static {
@@ -52,7 +53,9 @@ public class RuntimeDriver {
 
     static void serializeResults() {
         assertSupervisorInit();
-        Util.serializeObject(outputPath, supervisor.serializeResults());
+        SerialResults results = supervisor.serializeResults();
+        System.out.println(results);
+        Util.serializeObject(outputPath, results);
     }
 
     public static void notifyAssertionFailure(Assertion assertion) {
