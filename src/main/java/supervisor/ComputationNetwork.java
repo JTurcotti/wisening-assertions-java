@@ -115,13 +115,17 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
+    private void warmup() {
+        for (int i = 0; i < WARMUP_ROUNDS; i++) {
+            performCycle();
+        }
+    }
+
     public void initializeAssertions(int numAssertions) {
         for (int i = 0; i < numAssertions; i++) {
             get(new Assertion(i));
         }
-        for (int i = 0; i < WARMUP_ROUNDS; i++) {
-            performCycle();
-        }
+        warmup();
     }
 
     public void initializeAllAssertions(ProgramAnalyzer analyzer) {
@@ -130,6 +134,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     public void initializeAllAssertions(Collection<Assertion> assertions) {
         assertions.forEach(this::get);
+        warmup();
     }
 
     public static ComputationNetwork generateFromSourcePath(String sourcePath) {
