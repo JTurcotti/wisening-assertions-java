@@ -48,6 +48,7 @@ public class RuntimeDriver {
                 supervisor = new ComputationNetwork(Util.deserializeObject(serialFormulasPath), precedentResults);
 
                 Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
+                supervisor.start();
             } else {
                 supervisor = null;
             }
