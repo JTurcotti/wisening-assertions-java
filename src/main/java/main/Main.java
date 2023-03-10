@@ -49,10 +49,11 @@ public class Main {
     }
 
     public static void testProcessor() {
-        AnalysisDriver.run(simplePath,
+        AnalysisDriver.run("src/test/java/simpleassertions",
                 Optional.empty(),
                 Optional.empty(),
-                "target/spooned",
+                "src/main/java/main",
+                "target/aux/results",
                 "target/aux/formulas",
                 "target/aux/labels");
     }

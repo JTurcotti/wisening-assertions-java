@@ -5,54 +5,63 @@ import core.codemodel.events.Pi;
 import serializable.SerialResults;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtTypeAccess;
+import spoon.reflect.declaration.CtClass;
+import spoon.reflect.reference.CtTypeReference;
 import supervisor.ComputationNetwork;
 import util.Util;
 
 import java.util.Optional;
 
 
+@RuntimeDriver.IsRuntimeDriver
 public class RuntimeDriver {
-    private static final ComputationNetwork supervisor;
+    public @interface IsRuntimeDriver {}
 
-    public @interface ReplaceDuringProcessing {}
-    @ReplaceDuringProcessing
+    private static ComputationNetwork supervisor;
+
+    public @interface ReplaceFieldDuringProcessing {}
+    @ReplaceFieldDuringProcessing
     static final String serialFormulasPath = "to be replaced by spoon Transformer";
 
-    @ReplaceDuringProcessing
+    @ReplaceFieldDuringProcessing
     static final String precedentResultsPath = "to be replaced by spoon Transformer";
-    @ReplaceDuringProcessing
+    @ReplaceFieldDuringProcessing
     static final boolean precedentResultsPresent = false;
-    @ReplaceDuringProcessing
+    @ReplaceFieldDuringProcessing
     static final String outputPath = "to be replaced by spoon Transformer";
-    @ReplaceDuringProcessing
+    @ReplaceFieldDuringProcessing
     static final boolean active = false;
 
-    static {
-        if (active) {
-            Optional<SerialResults> precedentResults = precedentResultsPresent?
-                    Optional.of(Util.deserializeObject(precedentResultsPath)):
-                    Optional.empty();
-            supervisor = new ComputationNetwork(Util.deserializeObject(serialFormulasPath), precedentResults);
+    static boolean initialized = false;
 
-            Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
-        } else {
-            supervisor = null;
-        }
+    static {
+        initializeSupervisor();
     }
 
-    private static void assertSupervisorInit() {
-        if (supervisor == null) {
-            throw new IllegalStateException("Error: supervisor not statically initialized early enough");
+    private static void initializeSupervisor() {
+        if (!initialized) {
+            if (active) {
+                Optional<SerialResults> precedentResults = precedentResultsPresent?
+                        Optional.of(Util.deserializeObject(precedentResultsPath)):
+                        Optional.empty();
+                supervisor = new ComputationNetwork(Util.deserializeObject(serialFormulasPath), precedentResults);
+
+                Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
+            } else {
+                supervisor = null;
+            }
+            initialized = true;
         }
     }
 
     public static ComputationNetwork getSupervisor() {
-        assertSupervisorInit();
+        initializeSupervisor();
         return supervisor;
     }
 
     static void serializeResults() {
-        assertSupervisorInit();
+        initializeSupervisor();
         SerialResults results = supervisor.serializeResults();
         System.out.println(results);
         Util.serializeObject(outputPath, results);
@@ -76,13 +85,25 @@ public class RuntimeDriver {
         getSupervisor().notifyBranchTaken(new Pi(i), dir);
     }
 
+    public static CtClass<?> getCtClass(AbstractProcessor<?> processor) {
+        return processor.getFactory().Class().get(RuntimeDriver.class);
+    }
+
+    public static CtTypeReference<?> getCtTypeRef(AbstractProcessor<?> processor) {
+        return getCtClass(processor).getReference();
+    }
+
+    public static CtTypeAccess<?> getCtTypeAccess(AbstractProcessor<?> processor) {
+        return processor.getFactory().createTypeAccess(getCtTypeRef(processor));
+    }
+
 
     public static CtInvocation<Boolean> getExecuteAssertionInvocation(AbstractProcessor<?> processor, int i) {
         return processor.getFactory().createInvocation(
-                Util.getTypeAccess(processor, RuntimeDriver.class),
+                getCtTypeAccess(processor),
 
                 processor.getFactory().Executable().createReference(
-                        Util.getTypeReference(processor, RuntimeDriver.class),
+                        getCtTypeRef(processor),
                         true,
                         processor.getFactory().Type().BOOLEAN_PRIMITIVE, "executeAssertion",
                         processor.getFactory().Type().INTEGER_PRIMITIVE),
@@ -95,7 +116,7 @@ public class RuntimeDriver {
                 Util.getTypeAccess(processor, RuntimeDriver.class),
 
                 processor.getFactory().Executable().createReference(
-                        Util.getTypeReference(processor, RuntimeDriver.class),
+                        getCtTypeRef(processor),
                         true,
                         processor.getFactory().Type().VOID_PRIMITIVE, "notifyAssertionPass",
                         processor.getFactory().Type().INTEGER_PRIMITIVE),

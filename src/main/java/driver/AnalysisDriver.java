@@ -3,7 +3,8 @@ package driver;
 import analyzer.ProgramAnalyzer;
 import spoon.Launcher;
 import transformation.AssertionProcessor;
-import transformation.RuntimeDriverProcessor;
+import transformation.RuntimeDriverFieldProcessor;
+import transformation.RuntimeDriverRepackageProcessor;
 import util.Util;
 
 import java.util.Optional;
@@ -12,6 +13,7 @@ public class AnalysisDriver {
     public static void run(String srcPath, Optional<String> precedentLabelsPath,
                     Optional<String> precedentResultsPath,
                     String tgtPath,
+                    String resultsPath,
                     String formulasPath,
                     String labelsPath) {
 
@@ -24,7 +26,7 @@ public class AnalysisDriver {
         launcher.addInputResource(srcPath);
         launcher.addInputResource("src/main/java/driver/RuntimeDriver.java");
 
-        launcher.addProcessor(new RuntimeDriverProcessor(precedentResultsPath, tgtPath, formulasPath));
+        launcher.addProcessor(new RuntimeDriverFieldProcessor(precedentResultsPath, resultsPath, formulasPath));
         launcher.addProcessor(new AssertionProcessor(analyzer));
 
         launcher.setSourceOutputDirectory(tgtPath);

@@ -6,13 +6,13 @@ import spoon.reflect.declaration.CtField;
 
 import java.util.Optional;
 
-public class RuntimeDriverProcessor extends AbstractAnnotationProcessor<RuntimeDriver.ReplaceDuringProcessing, CtField<?>> {
+public class RuntimeDriverFieldProcessor extends AbstractAnnotationProcessor<RuntimeDriver.ReplaceFieldDuringProcessing, CtField<?>> {
     private final String serialFormulasPath;
     private final String precedentResultsPath;
     private final boolean precedentResultsPresent;
     private final String outputPath;
 
-    public RuntimeDriverProcessor(
+    public RuntimeDriverFieldProcessor(
             Optional<String> precedentResultsPath, String outputPath, String serialFormulasPath) {
         this.serialFormulasPath = serialFormulasPath;
         if (precedentResultsPath.isPresent()) {
@@ -25,7 +25,7 @@ public class RuntimeDriverProcessor extends AbstractAnnotationProcessor<RuntimeD
         this.outputPath = outputPath;
     }
     @Override
-    public void process(RuntimeDriver.ReplaceDuringProcessing annotation, CtField field) {
+    public void process(RuntimeDriver.ReplaceFieldDuringProcessing annotation, CtField field) {
         switch (field.getSimpleName()) {
             case "serialFormulasPath" ->
                 field.setAssignment(getFactory().createLiteral(this.serialFormulasPath));
