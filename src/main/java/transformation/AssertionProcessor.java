@@ -1,17 +1,12 @@
 package transformation;
 
 import analyzer.ProgramAnalyzer;
-import core.codemodel.Indexer;
 import core.codemodel.events.Assertion;
-import core.dependencies.None;
 import driver.RuntimeDriver;
-import serializable.SerialLabels;
 import spoon.processing.AbstractProcessor;
-import spoon.processing.Processor;
 import spoon.reflect.code.CtAssert;
+import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtIf;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtStatement;
 
 public class AssertionProcessor extends AbstractProcessor<CtAssert<?>> {
     private final ProgramAnalyzer parentAnalyzer;
@@ -25,6 +20,9 @@ public class AssertionProcessor extends AbstractProcessor<CtAssert<?>> {
         CtIf replacement = getFactory().createIf();
         ctAssert.replace(replacement);
         replacement.setCondition(RuntimeDriver.getExecuteAssertionInvocation(this, assertion.num()));
-        replacement.setThenStatement(ctAssert);
+        CtBlock<?> thenBlock = getFactory().createBlock();
+        thenBlock.addStatement(ctAssert);
+        thenBlock.addStatement(RuntimeDriver.getNotifyAssertionPassInvocation(this, assertion.num()));
+        replacement.setThenStatement(thenBlock);
     }
 }

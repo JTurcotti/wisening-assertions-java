@@ -5,13 +5,10 @@ import core.codemodel.events.Pi;
 import serializable.SerialResults;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtTypeAccess;
-import spoon.reflect.reference.CtTypeReference;
 import supervisor.ComputationNetwork;
 import util.Util;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 
 public class RuntimeDriver {
@@ -80,11 +77,26 @@ public class RuntimeDriver {
     public static CtInvocation<Boolean> getExecuteAssertionInvocation(AbstractProcessor<?> processor, int i) {
         return processor.getFactory().createInvocation(
                 Util.getTypeAccess(processor, RuntimeDriver.class),
+
                 processor.getFactory().Executable().createReference(
                         Util.getTypeReference(processor, RuntimeDriver.class),
                         true,
                         processor.getFactory().Type().BOOLEAN_PRIMITIVE, "executeAssertion",
                         processor.getFactory().Type().INTEGER_PRIMITIVE),
+
+                processor.getFactory().createLiteral(i));
+    }
+
+    public static CtInvocation<?> getNotifyAssertionPassInvocation(AbstractProcessor<?> processor, int i) {
+        return processor.getFactory().createInvocation(
+                Util.getTypeAccess(processor, RuntimeDriver.class),
+
+                processor.getFactory().Executable().createReference(
+                        Util.getTypeReference(processor, RuntimeDriver.class),
+                        true,
+                        processor.getFactory().Type().VOID_PRIMITIVE, "notifyAssertionPass",
+                        processor.getFactory().Type().INTEGER_PRIMITIVE),
+
                 processor.getFactory().createLiteral(i));
     }
 }

@@ -2,5 +2,7 @@ package core.codemodel.elements;
 
 import core.codemodel.types.BlameSite;
 
-public record Field(int num) implements BlameSite, Mutable, ClosedOver, PhiInput, PhiOutput, BetaSite {
+import java.io.Serializable;
+
+public record Field(int num) implements BlameSite, Mutable, ClosedOver, PhiInput, PhiOutput, BetaSite, Serializable {
 }

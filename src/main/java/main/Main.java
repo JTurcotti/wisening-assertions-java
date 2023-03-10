@@ -3,10 +3,7 @@ package main;
 
 import core.codemodel.events.Assertion;
 import driver.AnalysisDriver;
-import spoon.Launcher;
 import supervisor.ComputationNetwork;
-import transformation.ClassProcessor;
-import transformation.PackageProcessor;
 
 import java.util.Optional;
 import java.util.Random;
@@ -52,11 +49,16 @@ public class Main {
     }
 
     public static void testProcessor() {
-        AnalysisDriver.run(simplePath, Optional.empty(), Optional.empty(), "target/spooned", "target/aux/formulas", "target/aux/labels");
+        AnalysisDriver.run(simplePath,
+                Optional.empty(),
+                Optional.empty(),
+                "target/spooned",
+                "target/aux/formulas",
+                "target/aux/labels");
     }
     public static void main(String[] args) throws InterruptedException {
         //testSupervisorCycling();
-        //testProcessor();
+        testProcessor();
     }
 }
 

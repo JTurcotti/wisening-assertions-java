@@ -1,15 +1,11 @@
 package driver;
 
 import analyzer.ProgramAnalyzer;
-import serializable.SerialLabels;
 import spoon.Launcher;
 import transformation.AssertionProcessor;
-import transformation.ClassProcessor;
-import transformation.PackageProcessor;
 import transformation.RuntimeDriverProcessor;
 import util.Util;
 
-import java.io.*;
 import java.util.Optional;
 
 public class AnalysisDriver {

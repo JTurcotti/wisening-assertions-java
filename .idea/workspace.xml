@@ -4,17 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="add input of serialized values - next, actually perform serialization and deserialization">
-      <change afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="work on driver infrastructure - ready to test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Call.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Call.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Procedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Procedure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Ret.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Ret.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/Formula.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/Formula.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialLabels.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialResults.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/andrew/cms/util/maybe/Maybes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/ClassProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +168,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="233027000" />
+      <workItem from="1676765368190" duration="238392000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
       <created>1676302757956</created>
@@ -458,7 +464,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678469843572</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="work on driver infrastructure - ready to test">
+      <created>1678481246485</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1678481246485</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -476,7 +489,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="more typechecking, focussing on invocations" />
     <MESSAGE value="more typechecking, focussing on branches" />
     <MESSAGE value="more typechecking, focussing on branches like switch" />
     <MESSAGE value="make invocation more abstract" />
@@ -501,7 +513,8 @@
     <MESSAGE value="fix some bugs and keep playing with evaluation in main" />
     <MESSAGE value="add serialization of version-intermediate results, deserialization next" />
     <MESSAGE value="add input of serialized values - next, actually perform serialization and deserialization" />
-    <option name="LAST_COMMIT_MESSAGE" value="add input of serialized values - next, actually perform serialization and deserialization" />
+    <MESSAGE value="work on driver infrastructure - ready to test" />
+    <option name="LAST_COMMIT_MESSAGE" value="work on driver infrastructure - ready to test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -604,7 +617,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>32</line>
+          <line>34</line>
           <option name="timeStamp" value="157" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

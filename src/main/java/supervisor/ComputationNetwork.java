@@ -8,7 +8,6 @@ import core.dependencies.*;
 import core.formula.ErrorFormulaProvider;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
-import org.jetbrains.annotations.NotNull;
 import serializable.SerialResults;
 import spoon.reflect.declaration.CtElement;
 import util.Pair;

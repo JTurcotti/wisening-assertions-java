@@ -1,4 +1,6 @@
 package core.codemodel.elements;
 
-public record Call(int num) {
+import java.io.Serializable;
+
+public record Call(int num) implements Serializable {
 }
