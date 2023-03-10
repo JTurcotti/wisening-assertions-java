@@ -194,10 +194,7 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     //mostly for debugging purposes
     public void performCycle() {
-        long start = System.currentTimeMillis();
         streamCellGroups().forEach(ComputationCellGroup::performCycle);
-        long elapsed = System.currentTimeMillis() - start;
-        System.out.println("Elapsed: " + elapsed);
     }
 
     public List<Pair<Pair<Procedure, Set<CtElement>>, Float>> topBlamedLines(Assertion a, int n, ProgramAnalyzer analyzer) {
