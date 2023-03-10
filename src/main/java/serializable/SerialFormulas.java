@@ -7,9 +7,13 @@ import core.dependencies.*;
 import core.formula.Formula;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
+import transformation.AssertionProcessor;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record SerialFormulas(HashMap<Event, Formula<? extends Dependency>> data) implements Serializable, TotalFormulaProvider {
 
@@ -61,5 +65,11 @@ public record SerialFormulas(HashMap<Event, Formula<? extends Dependency>> data)
     @Override
     public FormulaProvider<Assertion, Assertion> assertionCorrectnessToFrequencyProvider() {
         return new FrequencyProvider();
+    }
+
+    public Collection<Assertion> getAllAssertions() {
+        return data.keySet().stream().flatMap(
+                e -> e instanceof Assertion a? Stream.of(a): Stream.empty()
+        ).collect(Collectors.toUnmodifiableSet());
     }
 }

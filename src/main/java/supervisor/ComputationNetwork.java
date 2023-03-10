@@ -128,6 +128,10 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         initializeAssertions(analyzer.numAssertions());
     }
 
+    public void initializeAllAssertions(Collection<Assertion> assertions) {
+        assertions.forEach(this::get);
+    }
+
     public static ComputationNetwork generateFromSourcePath(String sourcePath) {
         ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath, Optional.empty());
         TotalProvider provider = new TotalProvider(analyzer);

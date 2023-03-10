@@ -52,7 +52,7 @@ public class Main {
         AnalysisDriver.run("src/test/java/simpleassertions",
                 Optional.empty(),
                 Optional.empty(),
-                "src/main/java/main",
+                "src/main/java",
                 "target/aux/results",
                 "target/aux/formulas",
                 "target/aux/labels");

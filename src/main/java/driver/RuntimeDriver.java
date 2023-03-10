@@ -2,6 +2,7 @@ package driver;
 
 import core.codemodel.events.Assertion;
 import core.codemodel.events.Pi;
+import serializable.SerialFormulas;
 import serializable.SerialResults;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtInvocation;
@@ -45,9 +46,11 @@ public class RuntimeDriver {
                 Optional<SerialResults> precedentResults = precedentResultsPresent?
                         Optional.of(Util.deserializeObject(precedentResultsPath)):
                         Optional.empty();
-                supervisor = new ComputationNetwork(Util.deserializeObject(serialFormulasPath), precedentResults);
+                SerialFormulas formulas = Util.deserializeObject(serialFormulasPath);
+                supervisor = new ComputationNetwork(formulas, precedentResults);
 
                 Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
+                supervisor.initializeAllAssertions(formulas.getAllAssertions());
                 supervisor.start();
             } else {
                 supervisor = null;
