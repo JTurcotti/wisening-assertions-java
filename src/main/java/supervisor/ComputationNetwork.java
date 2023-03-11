@@ -8,13 +8,16 @@ import core.dependencies.*;
 import core.formula.ErrorFormulaProvider;
 import core.formula.FormulaProvider;
 import core.formula.TotalFormulaProvider;
+import serializable.SerialFormulas;
 import serializable.SerialResults;
 import spoon.reflect.declaration.CtElement;
 import util.Pair;
 import util.Util;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -46,8 +49,12 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     private final ComputationCellGroup<None, Line, AssertionPass> lineComputationCells;
     private final ComputationCellGroup<OmegaOrLine, Assertion, None> assertionComputationCells;
 
-    //only used for pretty printing
-    public ProgramAnalyzer analyzer;
+
+    final boolean debugMode;
+
+    final AtomicInteger[] assertionPassCount;
+    final AtomicInteger branchTakenCount = new AtomicInteger(0);
+
 
     private Stream<ComputationCellGroup<? extends Dependency, ? extends Event, ?>> streamCellGroups() {
         return Stream.of(
@@ -70,7 +77,25 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 .orElse(ev -> defaultVal);
     }
 
-    public ComputationNetwork(TotalFormulaProvider formulaProvider, Optional<SerialResults> precedentResults) {
+    public ComputationNetwork(TotalFormulaProvider formulaProvider, Optional<SerialResults> precedentResults, Optional<ProgramAnalyzer> programAnalyzer) {
+
+        if (programAnalyzer.isPresent()) {
+            //this is a network created for debugging/testing - linked directly to an analyzer
+            assertionPassCount = new AtomicInteger[] {};
+            debugMode = true;
+        } else  {
+            if (formulaProvider instanceof SerialFormulas sf) {
+                assertionPassCount = IntStream.range(0, sf.getAllAssertions().size())
+                        .mapToObj(i -> new AtomicInteger(0))
+                        .toArray(ignored -> new AtomicInteger[sf.getAllAssertions().size()]);
+                debugMode = false;
+            } else {
+                throw new IllegalArgumentException(
+                        "ComputationNetwork created in runtime mode (i.e. without ProgramAnalyzer) must have SerialFormuals");
+            }
+        }
+
+
         piComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, PI_COLD_VALUE),
@@ -138,10 +163,10 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     }
 
     public static ComputationNetwork generateFromSourcePath(String sourcePath) {
+        //creates a network in debug mode
         ProgramAnalyzer analyzer = new ProgramAnalyzer(sourcePath, Optional.empty());
         TotalProvider provider = new TotalProvider(analyzer);
-        ComputationNetwork network = new ComputationNetwork(provider, Optional.empty());
-        network.analyzer = analyzer;
+        ComputationNetwork network = new ComputationNetwork(provider, Optional.empty(), Optional.of(analyzer));
         network.initializeAssertions(analyzer.getAllAssertions().size());
         return network;
     }
@@ -178,17 +203,28 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
     @Override
     public void notifyAssertionPass(Assertion assertion) {
         lineComputationCells.passMessageToAll(new AssertionPass(assertion));
+        if (assertionPassCount.length != 0) {
+            assertionPassCount[assertion.num()].incrementAndGet();
+        }
     }
 
     @Override
     public void notifyBranchTaken(Pi branch, boolean direction) {
         piComputationCells.passMessage(branch, new BranchTaken(direction));
+        branchTakenCount.incrementAndGet();
     }
 
     @Override
     public void run() {
         streamCellGroups().forEach(Thread::start);
-        while (!isInterrupted()) {}
+        while (!isInterrupted()) {
+            try {
+                Thread.sleep(1000);
+                System.out.println(this);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
         streamCellGroups().forEach(Thread::interrupt);
     }
 
@@ -245,17 +281,19 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     @Override
     public String toString() {
-        if (analyzer != null) {
-            List<Float> assertionCorrectness = IntStream.range(0, analyzer.getAllAssertions().size())
-                    .mapToObj(i -> get(new Assertion(i))).toList();
-            String repr = "Supervisor[" + numActive() + " active, " + assertionCorrectness.size() + " assertions: {";
-            for (Float f : assertionCorrectness) {
-                repr = repr + f + ", ";
-            }
-            return repr + "}, line coverages: " +
-                    Util.binStatisticString(BINS_FOR_DISPLAY, this::getCoverageForLine, analyzer.getAllLines()) + ", line correctnesses: " +
-                    Util.binStatisticString(BINS_FOR_DISPLAY, this::get, analyzer.getAllLines());
+        List<String> assertionCorrectness = IntStream.range(0, (int) assertionComputationCells.streamKeys().count())
+                .mapToObj(i -> "<" +
+                        (assertionPassCount.length == 0? "?": assertionPassCount[i].get())
+                        + ", " + get(new Assertion(i)) + ">").toList();
+        String repr = "Supervisor["
+                + numActive() + " active, "
+                + branchTakenCount.get() + " branches taken, "
+                + assertionCorrectness.size() + " assertions: {";
+        for (String s : assertionCorrectness) {
+            repr = repr + s + ", ";
         }
-        return "Supervisor";
+        return repr + "}, line coverages: " +
+                Util.binStatisticString(BINS_FOR_DISPLAY, this::getCoverageForLine, lineComputationCells.streamKeys().toList()) + ", line correctnesses: " +
+                Util.binStatisticString(BINS_FOR_DISPLAY, this::get, lineComputationCells.streamKeys().toList()) + "]";
     }
 }

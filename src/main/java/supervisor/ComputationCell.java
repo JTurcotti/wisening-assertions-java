@@ -143,6 +143,10 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         return store.entrySet().stream();
     }
 
+    Stream<Result> streamKeys() {
+        return store.keySet().stream();
+    }
+
     @Override
     public void run() {
         while (!isInterrupted()) {

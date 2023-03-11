@@ -49,7 +49,7 @@ public class Main {
     }
 
     public static void testProcessor() {
-        AnalysisDriver.run("src/test/java/simpleassertions",
+        AnalysisDriver.run("src/test/java/andrew",
                 Optional.empty(),
                 Optional.empty(),
                 "src/main/java",

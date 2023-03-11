@@ -3,6 +3,7 @@ package supervisor;
 import core.codemodel.events.Event;
 import core.dependencies.Dependency;
 import core.formula.FormulaProvider;
+import util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static supervisor.Config.BINS_FOR_DISPLAY;
 import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
@@ -124,12 +126,18 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
         return readCells().stream().flatMap(ComputationCell::streamRows);
     }
 
+    Stream<Result> streamKeys() {
+        return readCells().stream().flatMap(ComputationCell::streamKeys);
+    }
+
     public long numActive() {
         return readCells().stream().mapToLong(ComputationCell::numActive).sum();
     }
 
     @Override
     public String toString() {
-        return "ComputationCellGroup[" + streamValues().count() + " values; " + numActive() + " active]";
+        return "ComputationCellGroup[" + streamValues().count() + " values; " + numActive() + " active; "
+                + Util.binStatisticString(BINS_FOR_DISPLAY, this::get, streamKeys().toList()) +
+        "]";
     }
 }

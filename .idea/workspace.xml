@@ -4,23 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="work on driver infrastructure - ready to test">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="remove debugging print">
+      <change afterPath="$PROJECT_DIR$/src/test/java/simpleassertions/SimpleAssertions.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Arg.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Call.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Call.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/CallOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Field.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Procedure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Procedure.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Ret.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Ret.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Self.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/codemodel/elements/Variable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/core/formula/Formula.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/core/formula/Formula.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/ClassProcessor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/PackageProcessor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/SupervisorLiason.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,31 +52,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="core.codemodel.types" />
       <recent name="analyzer" />
     </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="driver" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="Application.andrew.a5.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Main" />
       <module name="wisening-assertions" />
@@ -97,38 +93,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Simple (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="simple.Simple" />
+    <configuration name="SimpleAssertions" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="simpleassertions.SimpleAssertions" />
       <module name="wisening-assertions" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="simple.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Simple" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="simple.Simple" />
-      <module name="wisening-assertions" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="simple.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="a5.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="a5.Main" />
-      <module name="wisening-assertions" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="a5.*" />
+          <option name="PATTERN" value="simpleassertions.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -139,6 +109,7 @@
     <configuration name="andrew.a5.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="andrew.a5.Main" />
       <module name="wisening-assertions" />
+      <option name="PROGRAM_PARAMETERS" value="Pente ai ai" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="andrew.a5.*" />
@@ -149,13 +120,39 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="main.simpleassertions.SimpleAssertions" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.simpleassertions.SimpleAssertions" />
+      <module name="wisening-assertions" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.simpleassertions.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="simpleassertions.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="simpleassertions.Main" />
+      <module name="wisening-assertions" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="simpleassertions.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
         <item itemvalue="Application.andrew.a5.Main" />
-        <item itemvalue="Application.Simple (1)" />
-        <item itemvalue="Application.Simple" />
-        <item itemvalue="Application.a5.Main" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.simpleassertions.Main" />
+        <item itemvalue="Application.SimpleAssertions" />
+        <item itemvalue="Application.main.simpleassertions.SimpleAssertions" />
       </list>
     </recent_temporary>
   </component>
@@ -168,14 +165,8 @@
       <option name="presentableId" value="Default" />
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
-      <workItem from="1676765368190" duration="238392000" />
-    </task>
-    <task id="LOCAL-00001" summary="initial commit - maven project and some ComputationNetwork skeletons">
-      <created>1676302757956</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1676302757956</updated>
+      <workItem from="1676765368190" duration="248534000" />
+      <workItem from="1678563216345" duration="2907000" />
     </task>
     <task id="LOCAL-00002" summary="add message passing to branches and lines to handle more events, and other improvements like configging">
       <created>1676314088774</created>
@@ -471,7 +462,56 @@
       <option name="project" value="LOCAL" />
       <updated>1678481246485</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="get assertion instruementation working pretty well">
+      <created>1678482142224</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1678482142224</updated>
+    </task>
+    <task id="LOCAL-00045" summary="tweaks">
+      <created>1678482988341</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1678482988341</updated>
+    </task>
+    <task id="LOCAL-00046" summary="tweaks">
+      <created>1678485563682</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1678485563682</updated>
+    </task>
+    <task id="LOCAL-00047" summary="actually start supervisor">
+      <created>1678486438709</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1678486438709</updated>
+    </task>
+    <task id="LOCAL-00048" summary="initialize assertions">
+      <created>1678489628749</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1678489628749</updated>
+    </task>
+    <task id="LOCAL-00049" summary="add warmup">
+      <created>1678490077320</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1678490077321</updated>
+    </task>
+    <task id="LOCAL-00050" summary="remove debugging print">
+      <created>1678491896108</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1678491896117</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,12 +529,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="more typechecking, focussing on branches" />
-    <MESSAGE value="more typechecking, focussing on branches like switch" />
-    <MESSAGE value="make invocation more abstract" />
-    <MESSAGE value="fix bugs" />
-    <MESSAGE value="add loop desugaring code - it's probably buggy" />
-    <MESSAGE value="add tracking for assertion and call input blames" />
     <MESSAGE value="minor tweaks" />
     <MESSAGE value="start working on formula providers - phi done" />
     <MESSAGE value="fill in all providers except alpha provider" />
@@ -514,7 +548,13 @@
     <MESSAGE value="add serialization of version-intermediate results, deserialization next" />
     <MESSAGE value="add input of serialized values - next, actually perform serialization and deserialization" />
     <MESSAGE value="work on driver infrastructure - ready to test" />
-    <option name="LAST_COMMIT_MESSAGE" value="work on driver infrastructure - ready to test" />
+    <MESSAGE value="get assertion instruementation working pretty well" />
+    <MESSAGE value="tweaks" />
+    <MESSAGE value="actually start supervisor" />
+    <MESSAGE value="initialize assertions" />
+    <MESSAGE value="add warmup" />
+    <MESSAGE value="remove debugging print" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove debugging print" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -617,7 +657,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>34</line>
+          <line>31</line>
           <option name="timeStamp" value="157" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -631,30 +671,57 @@
           <line>212</line>
           <option name="timeStamp" value="163" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="164" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/main/driver/RefinedRuntimeDriver.java</url>
+          <line>20</line>
+          <option name="timeStamp" value="166" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/main/simpleassertions/SimpleAssertions.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="167" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
+          <line>61</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/simpleassertions/Main.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java</url>
+          <line>32</line>
+          <option name="timeStamp" value="175" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/andrew/a5/Main.java</url>
+          <line>48</line>
+          <option name="timeStamp" value="178" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/andrew/a5/Main.java</url>
+          <line>111</line>
+          <option name="timeStamp" value="179" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java</url>
+          <line>228</line>
+          <option name="timeStamp" value="185" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="this" language="JAVA" />
-        <watch expression="procedureIndexer.lookupAux(p).get()" language="JAVA" />
-        <watch expression="typechecker.typecheckedProcedures.get(p)" language="JAVA" />
-        <watch expression="analyzer.procedureIndexer.lookupAux(phi.procedure).get()" language="JAVA" />
-        <watch expression="supervisor.piComputationCells" />
-        <watch expression="supervisor.lineComputationCells.streamRows().map(entry -&gt; supervisor.get(new Omega(new Assertion(0), entry.getKey()))).reduce(Float::max)" language="JAVA" custom="java.util.Map,core.codemodel.events.Omega" />
-        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; analyzer.assertionIndexer.lookupAux(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
-        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.getBlamedLines(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
-        <watch expression="IntStream.range(0, analyzer.assertionIndexer.outputs().size()).mapToObj(i -&gt; supervisor.countBlamedLines(new Assertion(i))).toList()" language="JAVA" custom="java.util.stream.IntStream" />
-        <watch expression="analyzer.assertionIndexer.auxMap" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(new Procedure(14))" language="JAVA" />
-        <watch expression="analyzer.procedureIndexer.auxMap" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(15)" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(14)" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(p).declaringType" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(35)" language="JAVA" />
-        <watch expression="analyzer.lookupVar(81)" language="JAVA" />
-        <watch expression="analyzer.lookupVar(91)" language="JAVA" />
-        <watch expression="analyzer.lookupProcedure(2)" language="JAVA" />
-        <watch expression="analyzer.lookupParamVars(procedureCalled(analyzer)).get(0)" language="JAVA" />
+        <watch expression="RuntimeDriver.supervisor.assertionComputationCells.streamValues().toList()" language="JAVA" custom="driver.RuntimeDriver" />
+        <watch expression="RuntimeDriver.supervisor" language="JAVA" custom="driver.RuntimeDriver" />
       </configuration>
     </watches-manager>
   </component>

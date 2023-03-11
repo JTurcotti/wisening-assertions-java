@@ -47,7 +47,7 @@ public class RuntimeDriver {
                         Optional.of(Util.deserializeObject(precedentResultsPath)):
                         Optional.empty();
                 SerialFormulas formulas = Util.deserializeObject(serialFormulasPath);
-                supervisor = new ComputationNetwork(formulas, precedentResults);
+                supervisor = new ComputationNetwork(formulas, precedentResults, Optional.empty());
 
                 Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
                 supervisor.initializeAllAssertions(formulas.getAllAssertions());
@@ -65,9 +65,12 @@ public class RuntimeDriver {
     }
 
     static void serializeResults() {
+        if (supervisor == null) {
+            java.lang.System.out.println("WARNING: serializeResults called before supervisor initialized");
+        }
         initializeSupervisor();
         SerialResults results = supervisor.serializeResults();
-        System.out.println(results);
+        //System.out.println(results);
         Util.serializeObject(outputPath, results);
     }
 
@@ -78,11 +81,17 @@ public class RuntimeDriver {
     }
 
     public static boolean executeAssertion(int i) {
-        return getSupervisor().executeAssertion(new Assertion(i));
+        if (active) {
+            return getSupervisor().executeAssertion(new Assertion(i));
+        } else {
+            return true;
+        }
     }
 
     public static void notifyAssertionPass(int i) {
-        getSupervisor().notifyAssertionPass(new Assertion(i));
+        if (active) {
+            getSupervisor().notifyAssertionPass(new Assertion(i));
+        }
     }
 
     public static void notifyBranchTaken(int i, boolean dir) {
