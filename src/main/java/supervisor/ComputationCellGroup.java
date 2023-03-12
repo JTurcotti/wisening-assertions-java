@@ -16,22 +16,26 @@ import static supervisor.Config.BINS_FOR_DISPLAY;
 import static supervisor.Config.COMPUTATION_CELL_GROUP_MAX_CELL_SIZE;
 
 
-class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {
+public class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT>, Runnable {
     private final ComputationNetwork parentNetwork;
     private final Function<Result, Float> defaultValProducer;
     private final boolean rowsBeginInitialized;
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
+    private final String cellName;
+
     ComputationCellGroup(ComputationNetwork parentNetwork,
                          Function<Result, Float> defaultValProducer,
                          boolean rowsBeginInitialized, FormulaProvider<Dep, Result> formulaProvider,
-                         MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
+                         MessageProcessorProducer<Result, MsgT> messageProcessorProducer,
+                         String cellName) {
         this.parentNetwork = parentNetwork;
         this.defaultValProducer = defaultValProducer;
         this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
+        this.cellName = cellName;
     }
 
     private final List<ComputationCell<Dep, Result, MsgT>> cells = new LinkedList<>();
@@ -72,7 +76,7 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
                 ComputationCell<Dep, Result, MsgT> newCell =
                         new ComputationCell<>(
                                 parentNetwork, defaultValProducer, rowsBeginInitialized,
-                                formulaProvider, messageProcessorProducer);
+                                formulaProvider, messageProcessorProducer, cellName);
                 cells.add(newCell);
                 if (isAlive()) {
                     newCell.start();
@@ -108,6 +112,8 @@ class ComputationCellGroup<Dep extends Dependency, Result extends Event, MsgT> e
 
     @Override
     public void run() {
+        setPriority(Config.NETWORK_THREAD_PRIORITY);
+        setName("ComputationCellGroup: " + cellName);
         readCells().forEach(Thread::start);
         while (!isInterrupted()) {/*noop - intentional infinite loop */}
         readCells().forEach(Thread::interrupt);

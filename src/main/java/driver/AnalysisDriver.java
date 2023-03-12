@@ -18,8 +18,12 @@ public class AnalysisDriver {
 
         ProgramAnalyzer analyzer = new ProgramAnalyzer(srcPath, precedentLabelsPath.map(Util::deserializeObject));
 
+        System.out.println("AnalysisDriver: done analyzing, beginning serialization");
+
         Util.serializeObject(formulasPath, analyzer.serializeFormulas());
         Util.serializeObject(labelsPath, analyzer.serializeLabels());
+
+        System.out.println("AnalysisDriver: done serializing formulas and labels, beginning instrumentation");
 
         Launcher launcher = new Launcher();
         launcher.addInputResource(srcPath);
@@ -30,5 +34,7 @@ public class AnalysisDriver {
 
         launcher.setSourceOutputDirectory(tgtPath);
         launcher.run();
+
+        System.out.println("AnalysisDriver: done instrumenting");
     }
 }

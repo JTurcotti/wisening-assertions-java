@@ -11,12 +11,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static supervisor.Config.COMPUTATION_CELL_FRESH_VAL_TRESHOLD;
 
-class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT> {
+public class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extends Thread implements RowProvider<Dep, Result, MsgT> {
 
     private final ComputationNetwork parentNetwork;
     private final Function<Result, Float> defaultValProducer;
@@ -24,16 +25,20 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
     private final FormulaProvider<Dep, Result> formulaProvider;
     private final MessageProcessorProducer<Result, MsgT> messageProcessorProducer;
 
+    private final String cellName;
+
     ComputationCell(ComputationNetwork parentNetwork,
                     Function<Result, Float> defaultValProducer,
                     boolean rowsBeginInitialized,
                     FormulaProvider<Dep, Result> formulaProvider,
-                    MessageProcessorProducer<Result, MsgT> messageProcessorProducer) {
+                    MessageProcessorProducer<Result, MsgT> messageProcessorProducer,
+                    String cellName) {
         this.parentNetwork = parentNetwork;
         this.defaultValProducer = defaultValProducer;
         this.rowsBeginInitialized = rowsBeginInitialized;
         this.formulaProvider = formulaProvider;
         this.messageProcessorProducer = messageProcessorProducer;
+        this.cellName = cellName;
     }
 
     class Row implements ComputationRow<Dep, Result, MsgT> {
@@ -147,8 +152,12 @@ class ComputationCell<Dep extends Dependency, Result extends Event, MsgT> extend
         return store.keySet().stream();
     }
 
+    static AtomicInteger num_cells = new AtomicInteger(0);
+
     @Override
     public void run() {
+        setPriority(Config.NETWORK_THREAD_PRIORITY);
+        setName("ComputationCell: " + cellName + " - " + num_cells.incrementAndGet());
         while (!isInterrupted()) {
             performCycle();
         }

@@ -100,43 +100,43 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, PI_COLD_VALUE),
                         true, new ErrorFormulaProvider<>("there is no pi formula"),
-                        BranchMessageProcessor::new);
+                        BranchMessageProcessor::new, "pi computation");
         phiComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, PHI_COLD_VALUE),
                         false, formulaProvider.phiFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "phi computation");
         betaComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, BETA_COLD_VALUE),
                         false, formulaProvider.betaFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "beta computation");
         etaComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, ETA_COLD_VALUE),
                         false, formulaProvider.etaFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "eta computation");
         alphaComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, ALPHA_COLD_VALUE),
                         false, formulaProvider.alphaFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "alpha computation");
         omegaComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, OMEGA_COLD_VALUE),
                         false, formulaProvider.omegaFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "omega computation");
         lineComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, LINE_CORRECTNESS_COLD_VALUE),
                         true, new ErrorFormulaProvider<>("there is no line formula"),
                         line -> new AssertionPassMessageProcessor(
-                                formulaProvider.lineUpdateFormulaProvider(), this, line));
+                                formulaProvider.lineUpdateFormulaProvider(), this, line), "line correctness computation");
         assertionComputationCells =
                 new ComputationCellGroup<>(this,
                         precedentOrDefault(precedentResults, ASSERTION_CORRECTNESS_COLD_VALUE),
                         false, formulaProvider.assertionFormulaProvider(),
-                        NoopMessageProcessor::new);
+                        NoopMessageProcessor::new, "assertion correctness computation");
         assertionCorrectnessToFrequencyProvider = formulaProvider.assertionCorrectnessToFrequencyProvider();
     }
 
@@ -216,6 +216,8 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
 
     @Override
     public void run() {
+        setPriority(Config.NETWORK_THREAD_PRIORITY);
+        setName("ComputationNetwork");
         streamCellGroups().forEach(Thread::start);
         while (!isInterrupted()) {
             try {

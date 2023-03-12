@@ -28,4 +28,6 @@ public class Config {
 
     //to get the computation network primed, perform a fixed number of warmup rounds. This is that number.
     static final int WARMUP_ROUNDS = 5;
+
+    static final int NETWORK_THREAD_PRIORITY = Thread.MIN_PRIORITY;
 }
