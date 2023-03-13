@@ -8,7 +8,7 @@ public class Config {
     static final float COMPUTATION_CELL_FRESH_VAL_TRESHOLD = 0.001f;
 
     //max size for a given computation cell
-    static final int COMPUTATION_CELL_GROUP_MAX_CELL_SIZE = 1000;
+    static final int COMPUTATION_CELL_GROUP_MAX_CELL_SIZE = 100;
 
     //cold values for various computation cells
     static final float PI_COLD_VALUE = 0.5f;
