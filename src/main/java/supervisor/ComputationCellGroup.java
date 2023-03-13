@@ -115,8 +115,6 @@ public class ComputationCellGroup<Dep extends Dependency, Result extends Event, 
         setPriority(Config.NETWORK_THREAD_PRIORITY);
         setName("ComputationCellGroup: " + cellName);
         readCells().forEach(Thread::start);
-        while (!isInterrupted()) {/*noop - intentional infinite loop */}
-        readCells().forEach(Thread::interrupt);
     }
 
     //mostly for debugging purposes
