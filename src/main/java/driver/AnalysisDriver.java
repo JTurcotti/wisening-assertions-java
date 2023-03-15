@@ -31,8 +31,8 @@ public class AnalysisDriver {
         launcher.addInputResource("src/main/java/driver/RuntimeDriver.java");
 
         launcher.addProcessor(new RuntimeDriverFieldProcessor(precedentResultsPath, resultsPath, formulasPath));
-        launcher.addProcessor(new AssertionProcessor(analyzer));
         launcher.addProcessor(new IfProcessor(analyzer));
+        launcher.addProcessor(new AssertionProcessor(analyzer));
         //TODO: process loops, switches, and other control flow branchTaken notification
 
         launcher.setSourceOutputDirectory(tgtPath);

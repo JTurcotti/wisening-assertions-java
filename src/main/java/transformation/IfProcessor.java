@@ -7,6 +7,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtStatement;
+import util.Util;
 
 public class IfProcessor extends AbstractProcessor<CtIf> {
     private final ProgramAnalyzer parentAnalyzer;
@@ -16,7 +17,13 @@ public class IfProcessor extends AbstractProcessor<CtIf> {
     }
 
     private void addInvToBlock(CtBlock<?> block, int i, boolean dir) {
-        block.addStatement(0, RuntimeDriver.getNotifyBranchTakenInvocation(this, i, true));
+        block.addStatement(0, RuntimeDriver.getNotifyBranchTakenInvocation(this, i, dir));
+    }
+
+    @Override
+    public boolean isToBeProcessed(CtIf candidate) {
+        //TODO: get rid of this when Catch is handled
+        return Util.inSupportedContext(candidate);
     }
 
     @Override

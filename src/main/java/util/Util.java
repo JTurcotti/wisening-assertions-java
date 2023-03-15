@@ -1,7 +1,11 @@
 package util;
 
 import spoon.processing.AbstractProcessor;
+import spoon.reflect.code.CtCatch;
+import spoon.reflect.code.CtLambda;
+import spoon.reflect.code.CtTry;
 import spoon.reflect.code.CtTypeAccess;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
 import java.io.*;
@@ -161,5 +165,14 @@ public class Util {
 
     public static CtTypeAccess<?> getTypeAccess(AbstractProcessor<?> processor, Class<?> c) {
         return processor.getFactory().createTypeAccess(getTypeReference(processor, c));
+    }
+
+    public static boolean inSupportedContext(CtElement elem) {
+        //TODO: support all contexts so this isn't needed
+        return (elem.getParent(parent ->
+                parent instanceof CtTry ||
+                        parent instanceof CtCatch ||
+                        parent instanceof CtLambda<?>
+        ) == null);
     }
 }

@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="make cellgroups smaller">
-      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="refactor runtime driver and add if processing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +69,9 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="driver.RuntimeDriverBacking" />
+    </key>
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="core.codemodel.types" />
       <recent name="analyzer" />
@@ -164,14 +169,7 @@
       <workItem from="1676765368190" duration="248534000" />
       <workItem from="1678563216345" duration="5380000" />
       <workItem from="1678592708273" duration="13557000" />
-      <workItem from="1678808961225" duration="5348000" />
-    </task>
-    <task id="LOCAL-00006" summary="comment">
-      <created>1676472763894</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1676472763894</updated>
+      <workItem from="1678808961225" duration="7722000" />
     </task>
     <task id="LOCAL-00007" summary="refactoring into package structure">
       <created>1676473450882</created>
@@ -509,7 +507,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678735733666</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="refactor runtime driver and add if processing">
+      <created>1678885558138</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1678885558138</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -529,7 +534,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="fix bugs and get system (buggily) running" />
     <MESSAGE value="system seems to be working for simple code!" />
     <MESSAGE value="fix failing lookup bugs" />
     <MESSAGE value="get to a pretty good state, I can watch it working!" />
@@ -554,7 +558,8 @@
     <MESSAGE value="make debugging easier" />
     <MESSAGE value="kill cellgroup busywaiting" />
     <MESSAGE value="make cellgroups smaller" />
-    <option name="LAST_COMMIT_MESSAGE" value="make cellgroups smaller" />
+    <MESSAGE value="refactor runtime driver and add if processing" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor runtime driver and add if processing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -672,11 +677,6 @@
           <option name="timeStamp" value="163" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>107</line>
-          <option name="timeStamp" value="164" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/driver/RefinedRuntimeDriver.java</url>
           <line>20</line>
           <option name="timeStamp" value="166" />
@@ -685,11 +685,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/main/simpleassertions/SimpleAssertions.java</url>
           <line>13</line>
           <option name="timeStamp" value="167" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>117</line>
-          <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/simpleassertions/Main.java</url>

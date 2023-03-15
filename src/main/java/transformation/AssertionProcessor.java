@@ -7,6 +7,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtAssert;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtIf;
+import util.Util;
 
 public class AssertionProcessor extends AbstractProcessor<CtAssert<?>> {
     private final ProgramAnalyzer parentAnalyzer;
@@ -14,6 +15,13 @@ public class AssertionProcessor extends AbstractProcessor<CtAssert<?>> {
     public AssertionProcessor(ProgramAnalyzer parentAnalyzer) {
         this.parentAnalyzer = parentAnalyzer;
     }
+
+    @Override
+    public boolean isToBeProcessed(CtAssert<?> candidate) {
+        //TODO: get rid of this when Catch is handled
+        return Util.inSupportedContext(candidate);
+    }
+
     @Override
     public void process(CtAssert<?> ctAssert) {
         Assertion assertion = parentAnalyzer.indexOfAssertion(ctAssert);

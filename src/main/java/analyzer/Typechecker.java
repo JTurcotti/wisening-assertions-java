@@ -365,7 +365,6 @@ public class Typechecker {
                 }
                 case CtThrow t -> {
                     //TODO: handle this
-                    System.out.println("Unhandled: " + stmt);
                 }
                 case CtBlock<?> b -> {
                     return typecheckStmtList(ctxt, b);

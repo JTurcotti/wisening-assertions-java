@@ -53,7 +53,7 @@ public class RuntimeDriver {
         }
         initializeSupervisor();
         SerialResults results = supervisor.serializeResults();
-        //System.out.println(results);
+        System.out.println("RuntimeDriver: serializing results");
         Util.serializeObject(RuntimeDriverParams.outputPath, results);
     }
 
@@ -82,7 +82,7 @@ public class RuntimeDriver {
     }
 
     public static CtClass<?> getCtClass(AbstractProcessor<?> processor) {
-        return processor.getFactory().Class().get(RuntimeDriverParams.class);
+        return processor.getFactory().Class().get(RuntimeDriver.class);
     }
 
     public static CtTypeReference<?> getCtTypeRef(AbstractProcessor<?> processor) {
