@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="refactor runtime driver and add if processing">
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="debugging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriverParams.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriverParams.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/AssertionProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/Util.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,21 +166,7 @@
       <workItem from="1676765368190" duration="248534000" />
       <workItem from="1678563216345" duration="5380000" />
       <workItem from="1678592708273" duration="13557000" />
-      <workItem from="1678808961225" duration="7722000" />
-    </task>
-    <task id="LOCAL-00007" summary="refactoring into package structure">
-      <created>1676473450882</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1676473450882</updated>
-    </task>
-    <task id="LOCAL-00008" summary="lots of work">
-      <created>1676661107292</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1676661107292</updated>
+      <workItem from="1678808961225" duration="8528000" />
     </task>
     <task id="LOCAL-00009" summary="start working on closure analysis">
       <created>1676762627901</created>
@@ -514,7 +497,21 @@
       <option name="project" value="LOCAL" />
       <updated>1678885558138</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="debugging">
+      <created>1678887398826</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1678887398826</updated>
+    </task>
+    <task id="LOCAL-00057" summary="debugging">
+      <created>1678887498625</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1678887498625</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -534,7 +531,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="system seems to be working for simple code!" />
     <MESSAGE value="fix failing lookup bugs" />
     <MESSAGE value="get to a pretty good state, I can watch it working!" />
     <MESSAGE value="improve assertions blame zeroing" />
@@ -559,7 +555,8 @@
     <MESSAGE value="kill cellgroup busywaiting" />
     <MESSAGE value="make cellgroups smaller" />
     <MESSAGE value="refactor runtime driver and add if processing" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor runtime driver and add if processing" />
+    <MESSAGE value="debugging" />
+    <option name="LAST_COMMIT_MESSAGE" value="debugging" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -602,7 +599,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>577</line>
+          <line>576</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -612,7 +609,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>628</line>
+          <line>627</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -627,7 +624,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>608</line>
+          <line>607</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -637,7 +634,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/analyzer/Typechecker.java</url>
-          <line>375</line>
+          <line>374</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -718,5 +715,10 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/wisening_assertions$Main.ic" NAME="Main Coverage Results" MODIFIED="1678887569494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>main.*</FILTER>
+    </SUITE>
   </component>
 </project>
