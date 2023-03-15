@@ -108,7 +108,7 @@ public class RuntimeDriver {
 
     public static CtInvocation<?> getNotifyAssertionPassInvocation(AbstractProcessor<?> processor, int i) {
         return processor.getFactory().createInvocation(
-                Util.getTypeAccess(processor, RuntimeDriverParams.class),
+                getCtTypeAccess(processor),
 
                 processor.getFactory().Executable().createReference(
                         getCtTypeRef(processor),
@@ -121,7 +121,7 @@ public class RuntimeDriver {
 
     public static CtInvocation<?> getNotifyBranchTakenInvocation(AbstractProcessor<?> processor, int i, boolean dir) {
         return processor.getFactory().createInvocation(
-                Util.getTypeAccess(processor, RuntimeDriverParams.class),
+                getCtTypeAccess(processor),
 
                 processor.getFactory().Executable().createReference(
                         getCtTypeRef(processor),
