@@ -3,6 +3,7 @@ package driver;
 import analyzer.ProgramAnalyzer;
 import spoon.Launcher;
 import transformation.AssertionProcessor;
+import transformation.IfProcessor;
 import transformation.RuntimeDriverFieldProcessor;
 import util.Util;
 
@@ -31,6 +32,8 @@ public class AnalysisDriver {
 
         launcher.addProcessor(new RuntimeDriverFieldProcessor(precedentResultsPath, resultsPath, formulasPath));
         launcher.addProcessor(new AssertionProcessor(analyzer));
+        launcher.addProcessor(new IfProcessor(analyzer));
+        //TODO: process loops, switches, and other control flow branchTaken notification
 
         launcher.setSourceOutputDirectory(tgtPath);
         launcher.run();

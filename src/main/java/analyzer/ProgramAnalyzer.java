@@ -132,6 +132,12 @@ public class ProgramAnalyzer {
         );
     }
 
+    public Pi indexOfIfBranch(CtIf ctIf) {
+        return branchIndexer.lookup(SourcePos.fromSpoon(ctIf.getPosition())).orElseThrow(
+                () -> new IllegalStateException("Expected If to be indexed")
+        );
+    }
+
     public CtVirtualCall lookupCall(Call c) {
         return callIndexer.lookupAux(c).orElseThrow(() -> new IllegalArgumentException("Expected call to be indexed: " + c));
     }

@@ -1,12 +1,12 @@
 package transformation;
 
-import driver.RuntimeDriver;
+import driver.RuntimeDriverParams;
 import spoon.processing.AbstractAnnotationProcessor;
 import spoon.reflect.declaration.CtField;
 
 import java.util.Optional;
 
-public class RuntimeDriverFieldProcessor extends AbstractAnnotationProcessor<RuntimeDriver.ReplaceFieldDuringProcessing, CtField<?>> {
+public class RuntimeDriverFieldProcessor extends AbstractAnnotationProcessor<RuntimeDriverParams.IsRuntimeDriverParam, CtField<?>> {
     private final String serialFormulasPath;
     private final String precedentResultsPath;
     private final boolean precedentResultsPresent;
@@ -25,7 +25,7 @@ public class RuntimeDriverFieldProcessor extends AbstractAnnotationProcessor<Run
         this.outputPath = outputPath;
     }
     @Override
-    public void process(RuntimeDriver.ReplaceFieldDuringProcessing annotation, CtField field) {
+    public void process(RuntimeDriverParams.IsRuntimeDriverParam annotation, CtField field) {
         switch (field.getSimpleName()) {
             case "serialFormulasPath" ->
                 field.setAssignment(getFactory().createLiteral(this.serialFormulasPath));

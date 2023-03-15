@@ -14,39 +14,22 @@ import util.Util;
 
 import java.util.Optional;
 
-
-@RuntimeDriver.IsRuntimeDriver
 public class RuntimeDriver {
-    public @interface IsRuntimeDriver {}
-
+    static boolean initialized = false;
     private static ComputationNetwork supervisor;
 
-    public @interface ReplaceFieldDuringProcessing {}
-    @ReplaceFieldDuringProcessing
-    static final String serialFormulasPath = "to be replaced by spoon Transformer";
-
-    @ReplaceFieldDuringProcessing
-    static final String precedentResultsPath = "to be replaced by spoon Transformer";
-    @ReplaceFieldDuringProcessing
-    static final boolean precedentResultsPresent = false;
-    @ReplaceFieldDuringProcessing
-    static final String outputPath = "to be replaced by spoon Transformer";
-    @ReplaceFieldDuringProcessing
-    static final boolean active = false;
-
-    static boolean initialized = false;
 
     static {
-        initializeSupervisor();
+        RuntimeDriver.initializeSupervisor();
     }
 
-    private static void initializeSupervisor() {
+    static void initializeSupervisor() {
         if (!initialized) {
-            if (active) {
-                Optional<SerialResults> precedentResults = precedentResultsPresent?
-                        Optional.of(Util.deserializeObject(precedentResultsPath)):
+            if (RuntimeDriverParams.active) {
+                Optional<SerialResults> precedentResults = RuntimeDriverParams.precedentResultsPresent?
+                        Optional.of(Util.deserializeObject(RuntimeDriverParams.precedentResultsPath)):
                         Optional.empty();
-                SerialFormulas formulas = Util.deserializeObject(serialFormulasPath);
+                SerialFormulas formulas = Util.deserializeObject(RuntimeDriverParams.serialFormulasPath);
                 supervisor = new ComputationNetwork(formulas, precedentResults, Optional.empty());
 
                 Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
@@ -66,12 +49,12 @@ public class RuntimeDriver {
 
     static void serializeResults() {
         if (supervisor == null) {
-            java.lang.System.out.println("WARNING: serializeResults called before supervisor initialized");
+            System.out.println("WARNING: serializeResults called before supervisor initialized");
         }
         initializeSupervisor();
         SerialResults results = supervisor.serializeResults();
         //System.out.println(results);
-        Util.serializeObject(outputPath, results);
+        Util.serializeObject(RuntimeDriverParams.outputPath, results);
     }
 
     public static void notifyAssertionFailure(Assertion assertion) {
@@ -81,7 +64,7 @@ public class RuntimeDriver {
     }
 
     public static boolean executeAssertion(int i) {
-        if (active) {
+        if (RuntimeDriverParams.active) {
             return getSupervisor().executeAssertion(new Assertion(i));
         } else {
             return true;
@@ -89,7 +72,7 @@ public class RuntimeDriver {
     }
 
     public static void notifyAssertionPass(int i) {
-        if (active) {
+        if (RuntimeDriverParams.active) {
             getSupervisor().notifyAssertionPass(new Assertion(i));
         }
     }
@@ -99,7 +82,7 @@ public class RuntimeDriver {
     }
 
     public static CtClass<?> getCtClass(AbstractProcessor<?> processor) {
-        return processor.getFactory().Class().get(RuntimeDriver.class);
+        return processor.getFactory().Class().get(RuntimeDriverParams.class);
     }
 
     public static CtTypeReference<?> getCtTypeRef(AbstractProcessor<?> processor) {
@@ -109,7 +92,6 @@ public class RuntimeDriver {
     public static CtTypeAccess<?> getCtTypeAccess(AbstractProcessor<?> processor) {
         return processor.getFactory().createTypeAccess(getCtTypeRef(processor));
     }
-
 
     public static CtInvocation<Boolean> getExecuteAssertionInvocation(AbstractProcessor<?> processor, int i) {
         return processor.getFactory().createInvocation(
@@ -126,7 +108,7 @@ public class RuntimeDriver {
 
     public static CtInvocation<?> getNotifyAssertionPassInvocation(AbstractProcessor<?> processor, int i) {
         return processor.getFactory().createInvocation(
-                Util.getTypeAccess(processor, RuntimeDriver.class),
+                Util.getTypeAccess(processor, RuntimeDriverParams.class),
 
                 processor.getFactory().Executable().createReference(
                         getCtTypeRef(processor),
@@ -135,5 +117,20 @@ public class RuntimeDriver {
                         processor.getFactory().Type().INTEGER_PRIMITIVE),
 
                 processor.getFactory().createLiteral(i));
+    }
+
+    public static CtInvocation<?> getNotifyBranchTakenInvocation(AbstractProcessor<?> processor, int i, boolean dir) {
+        return processor.getFactory().createInvocation(
+                Util.getTypeAccess(processor, RuntimeDriverParams.class),
+
+                processor.getFactory().Executable().createReference(
+                        getCtTypeRef(processor),
+                        true,
+                        processor.getFactory().Type().VOID_PRIMITIVE, "notifyBranchTaken",
+                        processor.getFactory().Type().INTEGER_PRIMITIVE,
+                        processor.getFactory().Type().BOOLEAN_PRIMITIVE),
+
+                processor.getFactory().createLiteral(i),
+                processor.getFactory().createLiteral(dir));
     }
 }

@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="remove debugging print">
-      <change afterPath="$PROJECT_DIR$/src/test/java/simpleassertions/SimpleAssertions.java" afterDir="false" />
+    <list default="true" id="885a0d50-121e-42b1-8045-5f1b6761ddda" name="Changes" comment="make cellgroups smaller">
+      <change afterPath="$PROJECT_DIR$/src/main/java/transformation/IfProcessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/AnalysisDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/analyzer/ProgramAnalyzer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/serializable/SerialFormulas.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationCellGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +53,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;false&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -66,7 +62,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.CommitDialog&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -79,7 +75,7 @@
       <recent name="driver" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.andrew.a5.Main">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Main" />
       <module name="wisening-assertions" />
@@ -148,8 +144,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.andrew.a5.Main" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.andrew.a5.Main" />
         <item itemvalue="Application.simpleassertions.Main" />
         <item itemvalue="Application.SimpleAssertions" />
         <item itemvalue="Application.main.simpleassertions.SimpleAssertions" />
@@ -166,35 +162,9 @@
       <updated>1676223265352</updated>
       <workItem from="1676223267589" duration="111690000" />
       <workItem from="1676765368190" duration="248534000" />
-      <workItem from="1678563216345" duration="2907000" />
-    </task>
-    <task id="LOCAL-00002" summary="add message passing to branches and lines to handle more events, and other improvements like configging">
-      <created>1676314088774</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1676314088774</updated>
-    </task>
-    <task id="LOCAL-00003" summary="add top-level ExecutionSupervisor contract">
-      <created>1676315149774</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1676315149774</updated>
-    </task>
-    <task id="LOCAL-00004" summary="add thread running structure">
-      <created>1676317703478</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1676317703478</updated>
-    </task>
-    <task id="LOCAL-00005" summary="make computationcell row data volatile">
-      <created>1676472718653</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1676472718653</updated>
+      <workItem from="1678563216345" duration="5380000" />
+      <workItem from="1678592708273" duration="13557000" />
+      <workItem from="1678808961225" duration="5348000" />
     </task>
     <task id="LOCAL-00006" summary="comment">
       <created>1676472763894</created>
@@ -511,7 +481,35 @@
       <option name="project" value="LOCAL" />
       <updated>1678491896117</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="make debugging easier">
+      <created>1678566617810</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1678566617811</updated>
+    </task>
+    <task id="LOCAL-00052" summary="make debugging easier">
+      <created>1678645685191</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1678645685192</updated>
+    </task>
+    <task id="LOCAL-00053" summary="kill cellgroup busywaiting">
+      <created>1678735710675</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1678735710675</updated>
+    </task>
+    <task id="LOCAL-00054" summary="make cellgroups smaller">
+      <created>1678735733666</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1678735733666</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -529,9 +527,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="minor tweaks" />
-    <MESSAGE value="start working on formula providers - phi done" />
-    <MESSAGE value="fill in all providers except alpha provider" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="fix bugs and get system (buggily) running" />
     <MESSAGE value="system seems to be working for simple code!" />
     <MESSAGE value="fix failing lookup bugs" />
@@ -554,7 +551,10 @@
     <MESSAGE value="initialize assertions" />
     <MESSAGE value="add warmup" />
     <MESSAGE value="remove debugging print" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove debugging print" />
+    <MESSAGE value="make debugging easier" />
+    <MESSAGE value="kill cellgroup busywaiting" />
+    <MESSAGE value="make cellgroups smaller" />
+    <option name="LAST_COMMIT_MESSAGE" value="make cellgroups smaller" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -657,7 +657,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>31</line>
+          <line>33</line>
           <option name="timeStamp" value="157" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -673,7 +673,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>51</line>
+          <line>107</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -688,18 +688,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/main/Main.java</url>
-          <line>61</line>
+          <line>117</line>
           <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/simpleassertions/Main.java</url>
           <line>13</line>
           <option name="timeStamp" value="174" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/driver/RuntimeDriver.java</url>
-          <line>32</line>
-          <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/test/java/andrew/a5/Main.java</url>
@@ -713,7 +708,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/supervisor/ComputationNetwork.java</url>
-          <line>228</line>
+          <line>224</line>
           <option name="timeStamp" value="185" />
         </line-breakpoint>
       </breakpoints>
