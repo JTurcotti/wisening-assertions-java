@@ -28,7 +28,7 @@ public class AnalysisDriver {
 
         Launcher launcher = new Launcher();
         launcher.addInputResource(srcPath);
-        launcher.addInputResource("src/main/java/driver/RuntimeDriver.java");
+        launcher.addInputResource(RuntimeDriverParams.pathToThisFile);
 
         launcher.addProcessor(new RuntimeDriverFieldProcessor(precedentResultsPath, resultsPath, formulasPath));
         launcher.addProcessor(new IfProcessor(analyzer));

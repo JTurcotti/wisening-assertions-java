@@ -5,8 +5,10 @@ import core.codemodel.events.Assertion;
 import driver.AnalysisDriver;
 import supervisor.ComputationNetwork;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class Main {
     static String simplePath = "src/test/java/simple";
@@ -47,6 +49,60 @@ public class Main {
             System.out.println(net.executeAssertion(new Assertion(0)));
         }*/
     }
+    static class Box<T> {
+        volatile T val;
+    }
+
+    public static void countIterations(long time, int others, int otherPriority, int mainPriority) throws InterruptedException {
+        Box<Boolean> run = new Box<>();
+        run.val = true;
+        List<Thread> otherThreads = IntStream.range(0, others).mapToObj(ignored -> new Thread(() -> {
+            while (run.val) {}
+        })).toList();
+        otherThreads.forEach(t -> t.setPriority(otherPriority));
+        final Box<Integer> count = new Box();
+        count.val = 0;
+        Thread main = new Thread(() -> {
+            while (run.val) {count.val++;}
+        });
+        main.setPriority(mainPriority);
+
+        otherThreads.forEach(Thread::start);
+        main.start();
+
+        Thread.sleep(time);
+
+        run.val = false;
+
+        System.out.println(others + " other threads at priority " + otherPriority + " allowed main thread at priority " + mainPriority + " to execute " + count.val + " times");
+    }
+
+    public static void testThreadPriority() throws InterruptedException {
+        long time = 1;
+        int others = 0;
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.MAX_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+
+        others = 10;
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.MAX_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+
+        others = 100;
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.MAX_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+
+        others = 1000;
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.NORM_PRIORITY);
+        countIterations(time, others, Thread.NORM_PRIORITY, Thread.MAX_PRIORITY);
+        countIterations(time, others, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+    }
 
     public static void testProcessor() {
         AnalysisDriver.run("src/test/java/andrew",
@@ -60,6 +116,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         //testSupervisorCycling();
         testProcessor();
+        //testThreadPriority();
     }
 }
 

@@ -1,21 +1,19 @@
 package driver;
-
-
-@RuntimeDriverParams.IsRuntimeDriverParamClass
+@driver.RuntimeDriverParams.IsRuntimeDriverParamClass
 public class RuntimeDriverParams {
+    static final java.lang.String pathToThisFile = "src/main/java/driver/RuntimeDriverParams.java";
+
     public @interface IsRuntimeDriverParamClass {}
 
     public @interface IsRuntimeDriverParam {}
-    @IsRuntimeDriverParam
-    static final String serialFormulasPath = "to be replaced by spoon Transformer";
 
-    @IsRuntimeDriverParam
-    static final String precedentResultsPath = "to be replaced by spoon Transformer";
-    @IsRuntimeDriverParam
+    static final java.lang.String serialFormulasPath = "target/aux/formulas";
+
+    static final java.lang.String precedentResultsPath = "";
+
     static final boolean precedentResultsPresent = false;
-    @IsRuntimeDriverParam
-    static final String outputPath = "to be replaced by spoon Transformer";
-    @IsRuntimeDriverParam
-    static final boolean active = false;
 
+    static final java.lang.String outputPath = "target/aux/results";
+
+    static final boolean active = true;
 }
