@@ -8,7 +8,7 @@ public class RuntimeDriverParams {
     public @interface IsRuntimeDriverParam {}
 
     @IsRuntimeDriverParam
-    static final java.lang.String serialFormulasPath = "target/aux/formulas";
+    static final java.lang.String serialFormulasPath = "";
 
     @IsRuntimeDriverParam
     static final java.lang.String precedentResultsPath = "";
@@ -17,8 +17,8 @@ public class RuntimeDriverParams {
     static final boolean precedentResultsPresent = false;
 
     @IsRuntimeDriverParam
-    static final java.lang.String outputPath = "target/aux/results";
+    static final java.lang.String outputPath = "";
 
     @IsRuntimeDriverParam
-    static final boolean active = true;
+    static final boolean active = false;
 }
