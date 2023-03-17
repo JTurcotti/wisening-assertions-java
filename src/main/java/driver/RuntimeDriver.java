@@ -14,6 +14,8 @@ import util.Util;
 
 import java.util.Optional;
 
+import static util.Util.internalLog;
+
 public class RuntimeDriver {
     static boolean initialized = false;
     private static ComputationNetwork supervisor;
@@ -23,7 +25,7 @@ public class RuntimeDriver {
         RuntimeDriver.initializeSupervisor();
     }
 
-    static void initializeSupervisor() {
+    public static void initializeSupervisor() {
         if (!initialized) {
             if (RuntimeDriverParams.active) {
                 Optional<SerialResults> precedentResults = RuntimeDriverParams.precedentResultsPresent?
@@ -34,6 +36,7 @@ public class RuntimeDriver {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(RuntimeDriver::serializeResults));
                 supervisor.initializeAllAssertions(formulas.getAllAssertions());
+                internalLog("Supervisor initialized: " + supervisor);
                 supervisor.start();
             } else {
                 supervisor = null;

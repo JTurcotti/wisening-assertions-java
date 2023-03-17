@@ -180,4 +180,11 @@ public class Util {
         long start_time = System.currentTimeMillis();
         while (System.currentTimeMillis() - start_time < millis) {}
     }
+
+    public static void internalLog(String s) {
+        long millis = System.currentTimeMillis();
+        long secs = millis / 1000;
+        millis = millis % 1000;
+        System.out.printf("%d.%d: %s\n", secs, millis, s);
+    }
 }

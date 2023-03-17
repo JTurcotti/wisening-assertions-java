@@ -23,6 +23,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static supervisor.Config.*;
+import static util.Util.internalLog;
 
 interface ComputationRow<Dep extends Dependency, Result extends Event, MsgT> {
     float getVal();
@@ -221,8 +222,8 @@ public class ComputationNetwork extends Thread implements ExecutionSupervisor {
         streamCellGroups().forEach(Thread::start);
         while (!isInterrupted()) {
             try {
-                Thread.sleep(1000);
-                System.out.println(this);
+                Thread.sleep(2000);
+                internalLog(toString());
             } catch (InterruptedException e) {
                 break;
             }
