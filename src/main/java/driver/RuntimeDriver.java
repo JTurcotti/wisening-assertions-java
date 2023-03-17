@@ -78,7 +78,9 @@ public class RuntimeDriver {
     }
 
     public static void notifyBranchTaken(int i, boolean dir) {
-        getSupervisor().notifyBranchTaken(new Pi(i), dir);
+        if (RuntimeDriverParams.active) {
+            getSupervisor().notifyBranchTaken(new Pi(i), dir);
+        }
     }
 
     public static CtClass<?> getCtClass(AbstractProcessor<?> processor) {
