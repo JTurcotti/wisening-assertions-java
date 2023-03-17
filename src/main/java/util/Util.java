@@ -175,4 +175,9 @@ public class Util {
                         parent instanceof CtLambda<?>
         ) == null);
     }
+
+    public static void spinSleep(long millis) {
+        long start_time = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start_time < millis) {}
+    }
 }

@@ -623,6 +623,19 @@ public class Typechecker {
                     //for example a.foo().bar() is treated as a write to `a`
                     typecheckAssignmentToExpression(ctxt, inv.getTarget(), assignment);
                 }
+                case CtConditional<?> c -> {
+                    Pair<FullContext, Blame> guard = typecheckExpression(ctxt, c.getCondition());
+                    ctxt = guard.left();
+                    Blame guardBlame = guard.right();
+                    Pi pi = parentAnalyzer.branchIndexer.lookupOrCreate(new CtVirtualBranch(c));
+                    FullContext thenCtxt =
+                            typecheckAssignmentToExpression(ctxt.takeBranch(pi, true, guardBlame),
+                                    c.getThenExpression(), assignment);
+                    FullContext elseCtxt =
+                            typecheckAssignmentToExpression(ctxt.takeBranch(pi, false, guardBlame),
+                                    c.getElseExpression(), assignment);
+                    return thenCtxt.mergeAcrossBranch(pi, elseCtxt);
+                }
                 case null -> {
                 }
                 default -> throw new IllegalArgumentException("Unexpected assignment to expression: " + assigned);
